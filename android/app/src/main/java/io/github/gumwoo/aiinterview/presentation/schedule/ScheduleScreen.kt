@@ -54,6 +54,7 @@ import io.github.gumwoo.aiinterview.data.InterviewSchedule
 import io.github.gumwoo.aiinterview.data.LocalScheduleRepository
 import io.github.gumwoo.aiinterview.presentation.theme.CallColors
 import io.github.gumwoo.aiinterview.presentation.theme.PillButton
+import io.github.gumwoo.aiinterview.presentation.theme.SmallButton
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -278,16 +279,13 @@ private fun Notice(title: Int, text: Int, onOpen: () -> Unit) {
         Text(stringResource(title), style = MaterialTheme.typography.labelMedium, color = CallColors.Partial)
         Spacer(Modifier.height(2.dp))
         Text(stringResource(text), style = MaterialTheme.typography.bodySmall, color = CallColors.Muted)
+        Spacer(Modifier.height(10.dp))
         TextAction(stringResource(R.string.notice_open), onClick = onOpen)
+        Spacer(Modifier.height(8.dp))
     }
 }
 
 @Composable
 private fun TextAction(text: String, onClick: () -> Unit) {
-    Text(
-        text,
-        style = MaterialTheme.typography.labelLarge,
-        color = CallColors.Text,
-        modifier = Modifier.clickable(onClick = onClick).padding(vertical = 10.dp, horizontal = 4.dp),
-    )
+    SmallButton(text, onClick)
 }

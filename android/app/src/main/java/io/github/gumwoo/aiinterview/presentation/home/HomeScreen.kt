@@ -1,6 +1,5 @@
 package io.github.gumwoo.aiinterview.presentation.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +24,7 @@ import io.github.gumwoo.aiinterview.presentation.schedule.daysLabel
 import io.github.gumwoo.aiinterview.presentation.settings.difficultyLabel
 import io.github.gumwoo.aiinterview.presentation.theme.CallColors
 import io.github.gumwoo.aiinterview.presentation.theme.PillButton
+import io.github.gumwoo.aiinterview.presentation.theme.SmallButton
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -52,14 +52,7 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(stringResource(R.string.home_label), style = MaterialTheme.typography.labelMedium, color = CallColors.Muted)
-                Text(
-                    stringResource(R.string.home_settings),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = CallColors.Muted,
-                    modifier = Modifier
-                        .clickable(onClick = onOpenSettings)
-                        .padding(vertical = 10.dp, horizontal = 4.dp),
-                )
+                SmallButton(stringResource(R.string.home_settings), onOpenSettings)
             }
             Spacer(Modifier.height(56.dp))
             Text(stringResource(R.string.home_next_call), style = MaterialTheme.typography.labelMedium, color = CallColors.Muted)
@@ -110,12 +103,16 @@ private fun nextCallLabel(next: ZonedDateTime, now: ZonedDateTime): String {
 
 @Composable
 private fun DetailRow(label: String, value: String, onClick: (() -> Unit)? = null) {
-    val clickable = if (onClick == null) Modifier else Modifier.clickable(onClick = onClick)
     Row(
-        modifier = Modifier.fillMaxWidth().then(clickable).padding(vertical = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, style = MaterialTheme.typography.bodyLarge, color = CallColors.Muted)
-        Text(value, style = MaterialTheme.typography.bodyLarge)
+        if (onClick == null) {
+            Text(value, style = MaterialTheme.typography.bodyLarge)
+        } else {
+            SmallButton(value, onClick)
+        }
     }
 }

@@ -46,6 +46,7 @@ import io.github.gumwoo.aiinterview.data.InterviewSettings
 import io.github.gumwoo.aiinterview.data.InterviewSettingsStore
 import io.github.gumwoo.aiinterview.presentation.theme.CallColors
 import io.github.gumwoo.aiinterview.presentation.theme.PillButton
+import io.github.gumwoo.aiinterview.presentation.theme.SmallButton
 import io.github.gumwoo.aiinterview.security.ApiTokenStore
 import kotlinx.coroutines.launch
 
@@ -194,12 +195,7 @@ private fun SectionTitle(text: String) {
 
 @Composable
 private fun TextAction(text: String, onClick: () -> Unit) {
-    Text(
-        text,
-        style = MaterialTheme.typography.labelLarge,
-        color = CallColors.Text,
-        modifier = Modifier.clickable(onClick = onClick).padding(vertical = 10.dp, horizontal = 4.dp),
-    )
+    SmallButton(text, onClick)
 }
 
 @Composable

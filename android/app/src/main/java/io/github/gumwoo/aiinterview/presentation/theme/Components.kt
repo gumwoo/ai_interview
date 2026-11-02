@@ -73,6 +73,21 @@ fun PillButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier,
     }
 }
 
+/** 화면 안의 보조 동작. 글자만 두면 눌리는지 알 수 없어 배경을 준다. */
+@Composable
+fun SmallButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(CallColors.Control)
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+    ) {
+        Text(text, style = MaterialTheme.typography.labelMedium, color = CallColors.Text)
+    }
+}
+
 /** 아이콘과 이름이 있는 통화 버튼. */
 @Composable
 fun CallControl(
