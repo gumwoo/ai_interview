@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -35,16 +36,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.gumwoo.aiinterview.R
+import io.github.gumwoo.aiinterview.alarm.AlarmScheduler
 import io.github.gumwoo.aiinterview.data.InterviewSettings
 import io.github.gumwoo.aiinterview.presentation.settings.topicLabel
 import io.github.gumwoo.aiinterview.presentation.theme.CallColors
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun IncomingCallScreen(settings: InterviewSettings, onAnswer: () -> Unit, onDecline: () -> Unit) {
+fun IncomingCallScreen(
+    settings: InterviewSettings,
+    ringing: Boolean,
+    onAnswer: () -> Unit,
+    onDecline: () -> Unit,
+    onSnooze: () -> Unit,
+    onTimeout: () -> Unit,
+) {
     BackHandler(onBack = onDecline)
+    if (ringing) {
+        LaunchedEffect(Unit) {
+            delay(AlarmScheduler.RING_TIMEOUT_MILLIS)
+            onTimeout()
+        }
+    }
     Box(Modifier.fillMaxSize().padding(horizontal = 24.dp), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 480.dp).fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(Modifier.height(96.dp))
@@ -58,6 +74,19 @@ fun IncomingCallScreen(settings: InterviewSettings, onAnswer: () -> Unit, onDecl
             Spacer(Modifier.height(10.dp))
             Text(topicsLine(settings), style = MaterialTheme.typography.bodyMedium, color = CallColors.Muted)
             Spacer(Modifier.weight(1f))
+            if (ringing) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(CallColors.Control)
+                        .clickable(onClick = onSnooze)
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                ) {
+                    Text(stringResource(R.string.incoming_snooze), style = MaterialTheme.typography.labelMedium, color = CallColors.Text)
+                }
+                Spacer(Modifier.height(20.dp))
+            }
             AnswerSlider(onAnswer, onDecline)
             Spacer(Modifier.height(40.dp))
         }

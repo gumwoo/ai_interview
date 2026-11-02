@@ -429,6 +429,62 @@ class InterviewViewModelTest {
     }
 
     @Test
+    fun `does not call server until answered`() = runTest {
+        val vm = viewModel()
+
+        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03"), ringing = true))
+        advanceUntilIdle()
+        assertTrue(api.startAttempts.isEmpty())
+
+        vm.dismissIncoming()
+        advanceUntilIdle()
+
+        assertNull(vm.state.value.incoming)
+        assertTrue(api.startAttempts.isEmpty())
+    }
+
+    @Test
+    fun `answered alarm starts scheduled session for its date`() = runTest {
+        input.results += ListenResult.Recognized("답변")
+        val vm = viewModel()
+        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03"), ringing = true))
+
+        vm.answer()
+        advanceUntilIdle()
+
+        assertEquals("SCHEDULED", api.started.single().source)
+        assertEquals("2026-11-03", api.started.single().scheduledDate)
+        assertNull(vm.state.value.incoming)
+    }
+
+    @Test
+    fun `test call and manual start use manual session`() = runTest {
+        input.results += ListenResult.Recognized("답변")
+        val vm = viewModel()
+        vm.showIncoming(IncomingCall(scheduledDate = null, ringing = true))
+
+        vm.answer()
+        advanceUntilIdle()
+
+        assertEquals("MANUAL", api.started.single().source)
+    }
+
+    @Test
+    fun `falls back to manual when scheduled session already exists`() = runTest {
+        input.results += ListenResult.Recognized("답변")
+        api.scheduledExists = true
+        val vm = viewModel()
+        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03"), ringing = true))
+
+        vm.answer()
+        advanceUntilIdle()
+
+        assertEquals("MANUAL", api.started.single().source)
+        assertEquals(2, api.startAttempts.size)
+        assertEquals(InterviewPhase.REVIEW, vm.state.value.phase)
+    }
+
+    @Test
     fun `reset returns to idle`() = runTest {
         input.results += ListenResult.Recognized("답변")
         val vm = viewModel()
@@ -493,6 +549,7 @@ class InterviewViewModelTest {
         var answerFailure: ApiException? = null
         var nextTurn: Long? = 11L
         var endFailure: ApiException? = null
+        var scheduledExists = false
         var ended = false
 
         override suspend fun checkConnection() = Unit
@@ -500,6 +557,9 @@ class InterviewViewModelTest {
         override suspend fun startSession(request: StartSessionRequest): SessionResponse {
             startAttempts += request
             startFailure?.let { throw it }
+            if (scheduledExists && request.source == "SCHEDULED") {
+                throw ApiException.Server(409, "SCHEDULED_SESSION_EXISTS", "이미 있습니다")
+            }
             started += request
             return SessionResponse(1L, "ASKING", 10L, "질문1", 900)
         }

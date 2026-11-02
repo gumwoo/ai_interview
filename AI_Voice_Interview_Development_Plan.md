@@ -56,7 +56,7 @@
 
 | 영역 | 선택 | 선택 이유 |
 |---|---|---|
-| Android 앱 | **Kotlin, Jetpack Compose, ViewModel, Room(설정/임시 캐시)** | 갤럭시 네이티브 알람·마이크·알림 제어 |
+| Android 앱 | **Kotlin, Jetpack Compose, ViewModel, SharedPreferences(설정과 일정)** | 갤럭시 네이티브 알람·마이크·알림 제어 |
 | 알람/일정 | **AlarmManager**, BootReceiver | 휴대폰 단독으로 예약 알림 실행. 권한 거부 시 비정확 알람 대안 |
 | 음성 인식(STT) | **Android SpeechRecognizer**, 가능하면 기기 내 인식 | 별도 유료 STT 제공업체 없이 우선 검증 |
 | 음성 합성(TTS) | **Android TextToSpeech** | 별도 유료 TTS 제공업체 없이 시작 |
@@ -122,7 +122,7 @@
 - **최소 보장 UI:** 고우선순위 알림 + 알림 탭으로 앱 열기 + 앱 안에서 받기/거절/미루기.
 - **확장 UI:** OS가 허용하면 잠금화면/전체 화면 인텐트 기반 수신 인터페이스 지원.
 - Android 14 이상은 `USE_FULL_SCREEN_INTENT`가 **통화·알람 중심 앱**에 제한된다. 이 앱은 Play 배포 없이 APK로 직접 설치하지만, 설치 경로와 사용자 설정에 따라 허용되지 않을 수 있으므로 실기기에서 확인한다. 권한을 우회하지 않는다.
-- **정확 알람**도 최신 Android에서는 특별 권한이 기본 거부될 수 있다. `canScheduleExactAlarms()`로 확인하고, 허용하지 않으면 일반 알림/비정확 알람으로 기능을 낮춰 제공한다.
+- **정확 알람**은 `USE_EXACT_ALARM`과 `setAlarmClock`을 쓴다. Play 배포가 없어 Play 정책 제한은 해당하지 않는다. `canScheduleExactAlarms()`로 확인하고, 허용하지 않으면 비정확 알람으로 낮춘다.
 - 마이크는 사용자가 ‘받기’를 선택한 **후**에 활성화한다. Android 14 이상에서 마이크 포그라운드 서비스는 시작 위치·권한에 제한이 있다.
 - Android 17의 변경 문서에는 전체 화면 알림과 `AlarmManager` 자체의 변경이 따로 나오지 않는다. 다만 동작이 그대로라고 단정하지 않고 폴드 실기기에서 확인한다. 오디오·화면 관련 변경은 6.2에 정리했다.
 - 갤럭시 제조사의 절전 설정·방해금지·알림 권한 때문에 실제 울림 방식은 기기에서 검증해야 한다.
@@ -325,8 +325,8 @@ SCHEDULED
 ### 6.1 화면
 
 - **Home:** 다음 학습 시각, 오늘 학습 여부, ‘지금 연습하기’ 버튼.
-- **Schedule:** 요일/시간/분량/주제/알림음 설정.
-- **Incoming Session:** AI 면접관 이름, 받기/거절/미루기, 알림음 재생.
+- **Schedule:** 요일과 시간, 1분 뒤 시험 전화, 막혀 있는 권한 안내. 벨소리는 폰의 기본 벨소리이고, 분량과 주제는 Settings에서 고른다.
+- **Incoming Session:** AI 면접관 이름, 밀어서 받기와 거절, 5분 뒤에 받기, 알림음 재생. 잠금 화면에는 전화 전용 `CallActivity`만 뜨고 홈과 설정은 보이지 않는다. 폰을 쓰는 중이면 위쪽 알림으로 온다. 1분 동안 안 받으면 부재중으로 남긴다.
 - **Interview:** 전화 통화 화면. 통화 시간, 말하기 상태, 읽은 문장을 밝히는 자막, 음성 인식 텍스트, 다시 듣기, 힌트, 자막 켜고 끄기, 스피커, 끊기. 말을 끝내면 아래에서 답변 확인이 올라온다. 펼친 화면은 왼쪽 통화, 오른쪽 대화 자막으로 나눈다.
 - **Summary:** 통화 기록 형태로 통화 시간, 정답/부분정답/오답 수, 누락 개념, 다음 복습.
 - **History:** 지난 세션과 질문별 해설, 세션 삭제.
@@ -349,18 +349,20 @@ SCHEDULED
 - **`ACCESS_LOCAL_NETWORK`:** API 37 타깃 앱의 LAN 통신에 필요한 런타임 권한이다. 없으면 TCP 연결이 시간 초과로 실패한다(API 37 에뮬레이터에서 PC 주소 `10.0.2.2`로 확인). Tailscale 주소가 해당하는지는 문서에 없고, 폴드에서는 권한을 허용한 상태로만 써 봤다. 그래서 앱은 면접 시작과 연결 확인 때 이 권한을 요청한다.
 - **`usesCleartextTraffic` 폐지 예정:** 쓰지 않는다. 9.1의 HTTPS 방식을 기본으로 한다.
 
-### 6.3 주요 모듈(예정)
+### 6.3 주요 모듈
 
 ```text
 android/app/src/main/java/.../
   presentation/home/
   presentation/schedule/
-  presentation/incoming/
   presentation/interview/
-  presentation/history/
+  presentation/settings/
+  presentation/history/        (M6 이후)
+  CallActivity.kt
   alarm/AlarmScheduler.kt
   alarm/AlarmReceiver.kt
   alarm/BootReceiver.kt
+  alarm/IncomingCallNotifier.kt
   audio/SpeechRecognitionController.kt
   audio/TextToSpeechController.kt
   data/InterviewApi.kt
@@ -546,11 +548,12 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 
 ### Phase 3. 자동 기상 알림/통화형 UX (M5)
 
-- [ ] 반복 스케줄 저장, AlarmManager 예약
-- [ ] 알림 수신 화면, 받기·거절·5분 미루기
-- [ ] 재부팅/배터리 절전/화면 잠금/방해금지 상황 테스트
-- [ ] 정확 알람/전체 화면 권한 및 제한 안내
-- [ ] 알람 중복 실행 방지와 미응답 상태 처리
+- [x] 반복 스케줄 저장, AlarmManager 예약
+- [x] 알림 수신 화면, 받기·거절·5분 미루기
+- [x] 재부팅(에뮬레이터), 화면 잠금과 방해금지(폴드) 상황 테스트
+- [ ] 배터리 절전 상황과 실제 아침 일정 시각의 오차 측정
+- [x] 정확 알람/전체 화면 권한 및 제한 안내
+- [x] 알람 중복 실행 방지와 미응답 상태 처리
 
 **완료 조건:** 휴대폰 화면이 꺼져 있고 앱을 열어두지 않은 상태에서도 지정한 시각에 사용자가 인지 가능한 알림이 발생하며, 받기를 누르면 세션이 시작된다. OS가 전체 화면을 제한하면 알림 방식으로 정상 작동한다.
 
@@ -667,7 +670,7 @@ ai-voice-interview/
 **미결정·검증:**
 
 - [ ] API 키가 Ultra 구독과 연결된 조직에서 발급된 것인지 확인
-- [ ] Z 폴드 8의 정확 알람·전체 화면 알림 동작 실기기 확인
+- [x] Z 폴드 8의 정확 알람·전체 화면 알림 동작 실기기 확인(시험 전화 기준)
 - [ ] `ACCESS_LOCAL_NETWORK`가 Tailscale 연결에 필요한지 확인(폴드에서는 허용한 상태로만 써 봤다. 거부 상태는 미확인)
 - [ ] Galaxy 한국어 on-device STT 지원 여부 및 정확도 테스트
 - [ ] 아침 알림 기본 시각·요일·세션 길이 최종 확정
