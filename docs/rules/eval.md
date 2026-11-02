@@ -11,6 +11,8 @@ M3의 품질 게이트와 M6의 Sonnet 전환에 쓴다. 평가셋은 `eval/grad
 
 ## 실행
 
+- `backend/`에서 환경 변수 `ANTHROPIC_API_KEY`를 주고 `./gradlew evalGrading`으로 실행한다. 결과는 `eval/results/`에 남는다.
+- `eval/grading-cases.json`의 `reviewedByUser`가 `true`이고 `eval/pass-criteria.json`이 있어야 실행된다. 없으면 API를 호출하기 전에 멈춘다.
 - 통과 기준은 실행 전에 정해 적어 둔다. 결과를 보고 기준을 바꾸지 않는다.
 - 같은 사례를 3번 돌려 판정이 일정한지 본다. 흔들리는 사례는 따로 기록한다.
 - 확인 가능한 항목은 코드로 채점한다. 스키마 유효성, `verdict` 값, 수동 판정과의 일치 여부가 그렇다.
