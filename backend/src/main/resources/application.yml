@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: ai-interview
+  datasource:
+    # 접속 정보는 SPRING_DATASOURCE_URL, _USERNAME, _PASSWORD 환경 변수로 받는다.
+    hikari:
+      connection-timeout: 5000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+# API 토큰은 APP_API_TOKEN 환경 변수로 받는다. 없으면 기동에 실패한다.

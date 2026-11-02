@@ -41,8 +41,8 @@ Java 17, Spring Boot, Gradle, Spring Data JPA, Flyway 기준이다.
 ## 테스트
 
 - 범위에 맞는 테스트를 쓴다. 서비스는 Mockito 단위 테스트, 컨트롤러는 `@WebMvcTest`, 리포지토리는 `@DataJpaTest`다. 단위 테스트에 `@SpringBootTest`를 쓰지 않는다.
-- DB 테스트는 Testcontainers의 실제 PostgreSQL로 하고, `@DynamicPropertySource`로 연결한다. H2를 쓰지 않는다.
-- `@MockBean`은 Spring Boot 3.4부터 폐기 예정이고 4.0에서 제거되므로, 해당 버전 이상에서는 `@MockitoBean`을 쓴다.
+- DB 테스트는 Testcontainers의 실제 PostgreSQL로 하고, `@ServiceConnection`으로 연결한다. H2를 쓰지 않는다.
+- 이 프로젝트는 Spring Boot 4.1이므로 `@MockBean` 대신 `@MockitoBean`을 쓴다.
 - Claude는 인터페이스 뒤로 분리해 가짜 구현으로 테스트한다.
 - `Thread.sleep()` 대신 Awaitility를 쓴다.
 - 테스트 이름은 동작을 설명한다. 예: `should_return_401_when_token_missing`
