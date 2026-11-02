@@ -1,0 +1,26 @@
+# 비밀값
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+local.properties
+
+# DB 백업과 로그
+infra/backup/
+logs/
+*.log
+
+# 빌드 산출물
+build/
+out/
+.gradle/
+.kotlin/
+captures/
+
+# IDE와 OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
