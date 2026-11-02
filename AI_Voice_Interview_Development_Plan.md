@@ -327,8 +327,8 @@ SCHEDULED
 - **Home:** 다음 학습 시각, 오늘 학습 여부, ‘지금 연습하기’ 버튼.
 - **Schedule:** 요일/시간/분량/주제/알림음 설정.
 - **Incoming Session:** AI 면접관 이름, 받기/거절/미루기, 알림음 재생.
-- **Interview:** 현재 주제/질문, 말하기 상태, 음성 인식 텍스트, 다시 듣기, 힌트, 종료.
-- **Summary:** 정답/부분정답/오답 수, 누락 개념, 다음 복습.
+- **Interview:** 전화 통화 화면. 통화 시간, 말하기 상태, 읽은 문장을 밝히는 자막, 음성 인식 텍스트, 다시 듣기, 힌트, 자막 켜고 끄기, 스피커, 끊기. 말을 끝내면 아래에서 답변 확인이 올라온다. 펼친 화면은 왼쪽 통화, 오른쪽 대화 자막으로 나눈다.
+- **Summary:** 통화 기록 형태로 통화 시간, 정답/부분정답/오답 수, 누락 개념, 다음 복습.
 - **History:** 지난 세션과 질문별 해설, 세션 삭제.
 - **Settings:** 서버 주소·API 토큰 입력, 알림 권한 안내, Tailscale 연결 확인.
 
@@ -338,7 +338,7 @@ SCHEDULED
 - Android 12+의 정확 알람 특별 접근과 Android 14+ 전체 화면 알림 제한을 기능 단위로 확인.
 - 재부팅 후 `BOOT_COMPLETED`에서 다음 알람 재등록(사용자가 설치 후 앱을 한 번 실행했고 OS 제한을 충족한다는 전제).
 - Android `SpeechRecognizer`는 **항상 켜 놓는 연속 음성 스트리밍용이 아니다**. 질문 TTS 종료 후 단발 인식 세션을 시작하는 턴 기반 구조를 사용한다.
-- `SpeechRecognizer.isOnDeviceRecognitionAvailable()` 등으로 로컬 인식 가능 여부를 확인하며, 미지원 기기에서는 이용 가능한 시스템 음성 서비스로 폴백하되 네트워크 전송 가능성을 명시한다.
+- `SpeechRecognizer.isOnDeviceRecognitionAvailable()` 등으로 로컬 인식 가능 여부를 확인하며, 기기 내 한국어 음성 팩이 없으면 앱을 켤 때 `triggerModelDownload()`로 내려받기를 요청한다(시스템이 확인 창을 띄우므로 통화 중에는 부르지 않는다). 팩이 없는 동안에는 이용 가능한 시스템 음성 서비스로 폴백하되 네트워크 전송 가능성을 명시한다.
 - TTS 중 마이크 중지/에코 억제. 블루투스 이어폰·스피커 전환과 통화 볼륨 별도 테스트.
 - 면접 도중 화면이 잠겨도 오디오를 계속 유지하려면 적절한 Foreground Service 유형/권한 및 OS 제한을 준수한다. 시작은 **사용자가 수락한 다음**으로 제한한다.
 
@@ -346,7 +346,7 @@ SCHEDULED
 
 - **백그라운드 오디오 제한:** 앱이 백그라운드면 재생·오디오 포커스·볼륨 변경이 막히고, 재생과 볼륨 호출은 오류 없이 실패한다. 받기 후 화면이 보일 때 Foreground Service를 시작한다. 수신 알림음은 알림 채널 소리로 내거나, 정확 알람 권한과 `USAGE_ALARM`을 함께 쓴다.
 - **큰 화면 방향 고정 해제:** API 37을 타깃으로 하면 폴드 안쪽 화면에서 방향·크기 고정을 끌 수 없다. 접은 화면과 펼친 화면 모두에 맞게 레이아웃을 만든다.
-- **`ACCESS_LOCAL_NETWORK`:** API 37 타깃 앱의 LAN 통신에 필요한 새 권한이다. Tailscale 주소가 해당하는지는 문서에 없으므로 M4에서 실기기로 확인한다.
+- **`ACCESS_LOCAL_NETWORK`:** API 37 타깃 앱의 LAN 통신에 필요한 런타임 권한이다. 없으면 TCP 연결이 시간 초과로 실패한다(API 37 에뮬레이터에서 PC 주소 `10.0.2.2`로 확인). Tailscale 주소가 해당하는지는 문서에 없어 폴드에서 확인한다. 그때까지 앱은 면접 시작과 연결 확인 때 이 권한을 요청한다.
 - **`usesCleartextTraffic` 폐지 예정:** 쓰지 않는다. 9.1의 HTTPS 방식을 기본으로 한다.
 
 ### 6.3 주요 모듈(예정)
@@ -455,7 +455,7 @@ backend/src/main/java/.../
 
 **주요 제약:**
 
-- `source = 'SCHEDULED'`인 행에 한해 `interview_session(scheduled_date)` 유니크를 적용한다. 사용자가 직접 시작한 **수동 세션**(`MANUAL`)은 `MAX_DAILY_SESSIONS` 안에서 같은 날 여러 번 허용.
+- `source = 'SCHEDULED'`인 행에 한해 `interview_session(scheduled_date)` 유니크를 적용한다. 사용자가 직접 시작한 **수동 세션**(`MANUAL`)은 같은 날 횟수 제한 없이 허용.
 - `session_turn(session_id, turn_no)`와 `session_turn(session_id, client_request_id)` 유니크로 답변 중복 방지. 세션 생성 재전송은 `interview_session(client_request_id)` 유니크로 막는다.
 - 꼬리질문은 `question_bank`에 없으므로 채점 기준을 `session_turn.expected_points_json`에 저장한다.
 - 복습 대상은 `concept_key`로 찾는다. 같은 개념의 변형 질문을 고르기 위해 `question_bank`와 `session_turn`에 모두 둔다.
@@ -483,7 +483,7 @@ backend/src/main/java/.../
 - **Android STT/TTS:** 기본 내장 서비스 사용 시 별도 외부 음성 API 계약 없이 시작 가능. 일부 인식 기능은 기기·네트워크·서비스 제공자 정책에 의존하며 데이터 사용량/오프라인 지원은 확인 필요.
 - **PC 서버:** 보유 PC 활용, 별도 임대료 없음. 전기 및 인터넷 비용은 기존 운영에 포함되거나 추가될 수 있음.
 - **Claude:** Ultra의 월간 API 크레딧 내에서 사용한다. 기본 모델은 Sonnet이다. 자동 충전은 쓰지 않으므로 크레딧이 없으면 오류만 안내한다. **크레딧이 곧 무제한 무료 호출을 의미하지는 않는다.**
-- **안전장치:** `MAX_DAILY_SESSIONS=2`, `MAX_SESSION_TURNS=30`, `MAX_DAILY_INPUT_TOKENS`, `MAX_DAILY_OUTPUT_TOKENS` 등 설정 기반 상한. 사용량은 모델별 실제 가격과 토큰 소비를 기준으로 추산.
+- **안전장치:** `MAX_SESSION_TURNS=30`, `MAX_DAILY_INPUT_TOKENS`, `MAX_DAILY_OUTPUT_TOKENS` 등 설정 기반 상한. 사용량은 모델별 실제 가격과 토큰 소비를 기준으로 추산.
 
 ---
 
@@ -532,14 +532,14 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 
 ### Phase 2. 갤럭시 음성 면접 (M4)
 
-- [ ] Tailscale 설치(PC·폴드, 같은 계정), MagicDNS와 HTTPS Certificates 활성화
+- [x] Tailscale 설치(PC·폴드, 같은 계정), MagicDNS와 HTTPS Certificates 활성화
 - [ ] 폴드 USB 디버깅 활성화, `adb` PATH 설정
-- [ ] Kotlin/Compose 앱 생성 및 서버 연결(주소·토큰 입력)
+- [x] Kotlin/Compose 앱 생성 및 서버 연결(주소·토큰 입력)
 - [ ] 접은 화면·펼친 화면 레이아웃
 - [ ] 질문 TTS 재생, STT 응답 입력/수정
 - [ ] 오디오 포커스, 무음 처리, 반복 재생 및 오류 처리
 - [ ] Android 17 백그라운드 오디오 제한 대응, `ACCESS_LOCAL_NETWORK` 필요 여부 확인
-- [ ] 세션 종료/요약 화면 구현
+- [x] 세션 종료/요약 화면 구현
 - [ ] Tailscale로 집 밖 모바일 데이터 연결 검증
 
 **완료 조건:** 동일 Wi-Fi/모바일 데이터 환경에서 각각 10분간 음성 면접을 끝까지 진행할 수 있다.

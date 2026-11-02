@@ -2,7 +2,7 @@
 
 매일 아침 전화처럼 울리는 알림을 받으면, AI가 음성으로 기술 면접을 진행하는 개인용 Android 앱입니다. 질문은 제가 만든 프로젝트 [FlowTicket](https://github.com/gumwoo/first_come-first_served)의 설계 기록과 장애 기록에서 나옵니다.
 
-지금은 텍스트 면접과 채점 평가까지 만든 단계입니다. 음성 앱과 알람은 아직 없고, 이 문서에 적힌 동작 대부분은 앞으로 만들 계획입니다. 만들어 가면서 실제 결과로 고쳐 쓰겠습니다.
+지금은 서버와 채점 평가를 마치고 음성 앱을 만드는 단계입니다. 앱은 에뮬레이터에서 서버와 연결해 면접을 끝까지 진행해 봤지만, 폴드에서 실제로 말하는 검증은 아직 하지 않았습니다. 알람도 아직 없고, 이 문서에 적힌 동작 일부는 앞으로 만들 계획입니다. 만들어 가면서 실제 결과로 고쳐 쓰겠습니다.
 
 ## 왜 만드나요
 
@@ -83,7 +83,7 @@ FlowTicket 문서에는 지금은 대체된 결정도 섞여 있습니다. Kafka
 - 폴드에서 화면이 꺼지고 앱이 종료된 상태로도 알람이 제시간에 울리는지
 - Android 17의 백그라운드 오디오 제한 아래에서 화면이 잠겨도 면접이 이어지는지
 - 기기 내 한국어 음성 인식이 기술 용어를 얼마나 알아듣는지
-- Tailscale 연결에 Android 17의 `ACCESS_LOCAL_NETWORK` 권한이 필요한지
+- Tailscale 주소에도 Android 17의 `ACCESS_LOCAL_NETWORK` 권한이 필요한지. 에뮬레이터에서 PC로 가는 사설 주소는 이 권한이 없으면 연결되지 않았습니다.
 - 실제 말로 한 답변에서도 채점이 평가셋만큼 잘 맞는지
 
 ## 개발 순서
@@ -100,7 +100,7 @@ FlowTicket 문서에는 지금은 대체된 결정도 섞여 있습니다. Kafka
 
 ## 실행 방법
 
-지금은 음성 없이 텍스트로 면접을 진행할 수 있습니다. Docker가 필요합니다.
+서버를 띄우려면 Docker가 필요합니다.
 
 `infra/.env.example`을 `infra/.env`로 복사해 비밀번호, 32자 이상의 API 토큰, Claude API 키를 채운 뒤 서버를 띄웁니다.
 
@@ -118,6 +118,12 @@ curl http://localhost:18080/api/v1/health
 
 ```bash
 cd backend && ./gradlew test
+```
+
+앱은 `android/`에 있고, Android SDK 37이 필요합니다. 설치한 뒤 설정 화면에서 서버 주소와 API 토큰을 입력합니다. 토큰은 APK에 넣지 않고 기기의 Android Keystore로 암호화해 보관합니다.
+
+```bash
+cd android && ./gradlew testDebugUnitTest installDebug
 ```
 
 ## 문서

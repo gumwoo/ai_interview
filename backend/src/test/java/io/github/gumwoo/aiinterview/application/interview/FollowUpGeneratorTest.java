@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class FollowUpGeneratorTest {
 
-	private final FollowUpGenerator generator = new FollowUpGenerator(new InterviewProperties(2, 30, 2));
+	private final FollowUpGenerator generator = new FollowUpGenerator(new InterviewProperties(30, 2));
 
 	@Test
 	void should_use_follow_up_question_from_grading() {

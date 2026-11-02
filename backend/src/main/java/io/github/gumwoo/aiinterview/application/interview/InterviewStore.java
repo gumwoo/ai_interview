@@ -2,7 +2,6 @@ package io.github.gumwoo.aiinterview.application.interview;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,14 +59,6 @@ public class InterviewStore {
 	public SessionTurn getTurn(Long sessionId, Long turnId) {
 		return turns.findByIdAndSessionId(turnId, sessionId)
 			.orElseThrow(() -> new InterviewException(ErrorCode.TURN_NOT_FOUND, "질문을 찾을 수 없습니다"));
-	}
-
-	public void ensureCanStart() {
-		LocalDate today = LocalDate.now(clock);
-		long startedToday = sessions.countByStartedAtGreaterThanEqual(today.atStartOfDay(clock.getZone()).toInstant());
-		if (startedToday >= properties.maxDailySessions()) {
-			throw new InterviewException(ErrorCode.DAILY_SESSION_LIMIT, "오늘의 면접 횟수 상한에 도달했습니다");
-		}
 	}
 
 	@Transactional

@@ -54,7 +54,6 @@ public class InterviewOrchestrator {
 		if (existing.isPresent()) {
 			return view(existing.get());
 		}
-		store.ensureCanStart();
 		QuestionBankItem question = planner.next(command.topics(), command.difficulty(), QuestionPlanner.NO_SESSION,
 				List.of());
 		try {

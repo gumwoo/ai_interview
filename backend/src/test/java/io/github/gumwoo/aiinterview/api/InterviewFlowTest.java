@@ -58,7 +58,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @SpringBootTest(properties = { "app.api-token=" + TestcontainersConfiguration.TEST_API_TOKEN,
-		"app.claude.api-key=test-key", "app.interview.max-daily-sessions=3", "app.interview.max-session-turns=6",
+		"app.claude.api-key=test-key", "app.interview.max-session-turns=6",
 		"app.interview.max-follow-up-depth=1" })
 @AutoConfigureMockMvc
 @Import({ TestcontainersConfiguration.class, InterviewFlowTest.ClockConfiguration.class })
@@ -135,14 +135,13 @@ class InterviewFlowTest {
 	}
 
 	@Test
-	void should_reject_session_over_daily_limit() throws Exception {
+	void should_allow_any_number_of_manual_sessions_in_a_day() throws Exception {
 		seed("c1", "질문1");
 		start("MANUAL", UUID.randomUUID());
 		start("MANUAL", UUID.randomUUID());
 		start("MANUAL", UUID.randomUUID());
 
-		postStart("MANUAL", UUID.randomUUID()).andExpect(status().isTooManyRequests())
-			.andExpect(jsonPath("$.code").value("DAILY_SESSION_LIMIT"));
+		postStart("MANUAL", UUID.randomUUID()).andExpect(status().isOk());
 	}
 
 	@Test

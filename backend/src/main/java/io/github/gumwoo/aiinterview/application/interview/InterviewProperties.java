@@ -7,6 +7,6 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties("app.interview")
-public record InterviewProperties(@Min(1) int maxDailySessions, @Min(1) int maxSessionTurns,
+public record InterviewProperties(@Min(1) int maxSessionTurns,
 		@Min(0) int maxFollowUpDepth) {
 }
