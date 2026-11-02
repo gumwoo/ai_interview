@@ -503,7 +503,7 @@ backend/src/main/java/.../
 | **M3 품질 게이트** | 정답·부분정답·오답 예시 30건 이상의 평가셋, 프롬프트 조정 | 채점을 저장소 대조 판정과 비교해 통과. Sonnet 기준 확인용 92%, 일관성 100%, 치명 오류 0건. 통과 전에는 앱 개발 안 함 | 저장소로 답할 수 없는 항목 확인 |
 | **M4 음성 앱** | Compose 앱, TTS와 STT, 수정과 재시도, 요약 화면, Tailscale 연결 | Wi-Fi와 모바일 데이터에서 각각 10분 완주, 접은 화면·펼친 화면 모두 동작 | Tailscale 설치, USB 디버깅 켜기 |
 | **M5 알람** | `AlarmManager`, `BootReceiver`, 받기·거절·미루기, 권한 안내 | 화면이 꺼지고 앱이 종료된 상태에서 울림, 거절 시 Claude 호출 없음 | 폴드 실기기 테스트 |
-| **M6 복습·운영** | `ReviewScheduler`, 복습 출제, 사용량 상한 점검, DB 백업 | 3회 이상 진행 시 이전 오답이 재출제됨. 여기까지가 MVP | Docker Desktop 자동 시작, 활성 시간 변경 |
+| **M6 복습** | `ReviewScheduler`, 복습 출제 | 3회 이상 진행 시 이전 오답이 재출제됨. 여기까지가 MVP | Docker Desktop 자동 시작, 활성 시간 변경 |
 
 Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 
@@ -563,8 +563,7 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 - [ ] 오답 복습 스케줄 및 출제 중복 회피
 - [ ] 면접 이력 화면, 세션 삭제
 - [ ] (선택) 월별 정답률·취약 주제 화면
-- [ ] Claude API 사용량/일별 상한/실패 로그
-- [ ] Docker Desktop 자동 시작, Windows Update 활성 시간 변경(재시작 시 로그인 후 복구), DB 백업 및 복원
+- [ ] Docker Desktop 자동 시작, Windows Update 활성 시간 변경(재시작 시 로그인 후 복구)
 - [ ] (선택) Notion 오답 노트 자동 동기화
 
 **완료 조건:** 3회 이상의 세션을 진행했을 때 이전 세션의 오답·부분정답이 후속 세션에 복습 출제되고, 점수 및 이력이 유지된다.
@@ -696,7 +695,7 @@ ai-voice-interview/
 
 ## 15. 최종 MVP 완료 정의(Definition of Done)
 
-**범위:** 4절의 P0 기능 전체와 Phase 4의 복습·사용량 상한 항목. 이력 화면(FR-11)과 Phase 4의 나머지 항목은 MVP 이후로 둔다.
+**범위:** 4절의 P0 기능 전체와 Phase 4의 복습 항목. 이력 화면(FR-11)과 Phase 4의 나머지 항목은 MVP 이후로 둔다.
 
 - [ ] 갤럭시에서 시간·요일을 설정할 수 있다.
 - [ ] 알림에 ‘받기’를 누르면 앱에서 AI 면접을 시작할 수 있다.
