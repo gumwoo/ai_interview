@@ -1,0 +1,5 @@
+{
+  "minHoldoutAgreement": 0.80,
+  "minConsistency": 0.90,
+  "maxCriticalErrors": 0
+}
