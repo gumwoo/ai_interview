@@ -1,6 +1,5 @@
 package io.github.gumwoo.aiinterview.presentation.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,42 +18,68 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.gumwoo.aiinterview.R
+import io.github.gumwoo.aiinterview.data.InterviewSchedule
 import io.github.gumwoo.aiinterview.data.InterviewSettings
+import io.github.gumwoo.aiinterview.presentation.schedule.daysLabel
 import io.github.gumwoo.aiinterview.presentation.settings.difficultyLabel
 import io.github.gumwoo.aiinterview.presentation.theme.CallColors
 import io.github.gumwoo.aiinterview.presentation.theme.PillButton
+import io.github.gumwoo.aiinterview.presentation.theme.SmallButton
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
+import java.util.Locale
+
+private val KOREAN_CLOCK = DateTimeFormatter.ofPattern("a h:mm", Locale.KOREAN)
 
 @Composable
-fun HomeScreen(settings: InterviewSettings, canStart: Boolean, onStart: () -> Unit, onOpenSettings: () -> Unit) {
+fun HomeScreen(
+    settings: InterviewSettings,
+    schedule: InterviewSchedule,
+    canStart: Boolean,
+    onStart: () -> Unit,
+    onOpenSchedule: () -> Unit,
+    onOpenSettings: () -> Unit,
+) {
+    val now = ZonedDateTime.now()
+    val next = schedule.nextOccurrence(now)
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 480.dp).fillMaxSize().padding(horizontal = 24.dp)) {
-            Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.CenterEnd) {
-                Text(
-                    stringResource(R.string.home_settings),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = CallColors.Muted,
-                    modifier = Modifier
-                        .clickable(onClick = onOpenSettings)
-                        .padding(vertical = 10.dp, horizontal = 4.dp),
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(stringResource(R.string.home_label), style = MaterialTheme.typography.labelMedium, color = CallColors.Muted)
+                SmallButton(stringResource(R.string.home_settings), onOpenSettings)
             }
-            Spacer(Modifier.height(64.dp))
+            Spacer(Modifier.height(56.dp))
+            Text(stringResource(R.string.home_next_call), style = MaterialTheme.typography.labelMedium, color = CallColors.Muted)
+            Spacer(Modifier.height(8.dp))
             Text(
-                stringResource(R.string.home_label),
-                style = MaterialTheme.typography.labelMedium,
-                color = CallColors.Muted,
-                modifier = Modifier.fillMaxWidth(),
+                if (next == null) stringResource(R.string.home_no_call) else nextCallLabel(next, now),
+                style = MaterialTheme.typography.displaySmall,
             )
-            Spacer(Modifier.height(10.dp))
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.displaySmall)
-            Spacer(Modifier.height(40.dp))
-            DetailRow(stringResource(R.string.home_row_topics), stringResource(R.string.home_topics_count, settings.topics.size))
-            DetailRow(stringResource(R.string.settings_difficulty), stringResource(difficultyLabel(settings.difficulty)))
-            DetailRow(stringResource(R.string.settings_duration), stringResource(R.string.home_duration_value, settings.durationMinutes))
+            if (next != null) {
+                Spacer(Modifier.height(6.dp))
+                Text(schedule.daysLabel(), style = MaterialTheme.typography.bodyMedium, color = CallColors.Muted)
+            }
+            Spacer(Modifier.height(36.dp))
             DetailRow(
-                stringResource(R.string.home_row_server),
-                stringResource(if (canStart) R.string.home_server_ready else R.string.home_server_missing),
+                label = stringResource(R.string.schedule_title),
+                value = stringResource(if (next == null) R.string.home_schedule_set else R.string.home_schedule_change),
+                onClick = onOpenSchedule,
             )
+            DetailRow(stringResource(R.string.home_row_topics), stringResource(R.string.home_topics_count, settings.topics.size))
+            DetailRow(
+                stringResource(R.string.settings_difficulty),
+                stringResource(difficultyLabel(settings.difficulty)),
+            )
+            DetailRow(stringResource(R.string.settings_duration), stringResource(R.string.home_duration_value, settings.durationMinutes))
+            if (!canStart) {
+                DetailRow(stringResource(R.string.home_row_server), stringResource(R.string.home_server_missing))
+            }
             Spacer(Modifier.weight(1f))
             if (canStart) {
                 PillButton(stringResource(R.string.home_start), onStart)
@@ -67,12 +92,27 @@ fun HomeScreen(settings: InterviewSettings, canStart: Boolean, onStart: () -> Un
 }
 
 @Composable
-private fun DetailRow(label: String, value: String) {
+private fun nextCallLabel(next: ZonedDateTime, now: ZonedDateTime): String {
+    val day = when (ChronoUnit.DAYS.between(now.toLocalDate(), next.toLocalDate())) {
+        0L -> stringResource(R.string.home_today)
+        1L -> stringResource(R.string.home_tomorrow)
+        else -> next.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN)
+    }
+    return "$day ${next.format(KOREAN_CLOCK)}"
+}
+
+@Composable
+private fun DetailRow(label: String, value: String, onClick: (() -> Unit)? = null) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, style = MaterialTheme.typography.bodyLarge, color = CallColors.Muted)
-        Text(value, style = MaterialTheme.typography.bodyLarge)
+        if (onClick == null) {
+            Text(value, style = MaterialTheme.typography.bodyLarge)
+        } else {
+            SmallButton(value, onClick)
+        }
     }
 }

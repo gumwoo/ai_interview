@@ -10,7 +10,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.IBinder
 import androidx.core.app.ServiceCompat
-import io.github.gumwoo.aiinterview.MainActivity
+import io.github.gumwoo.aiinterview.InterviewApplication
 import io.github.gumwoo.aiinterview.R
 
 /**
@@ -39,7 +39,7 @@ class InterviewAudioService : Service() {
         val openApp = PendingIntent.getActivity(
             this,
             0,
-            Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            Intent(this, (application as InterviewApplication).callActivity).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE,
         )
         return Notification.Builder(this, CHANNEL_ID)

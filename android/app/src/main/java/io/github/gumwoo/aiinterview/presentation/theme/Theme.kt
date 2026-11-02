@@ -31,6 +31,13 @@ private val ColorScheme = darkColorScheme(
     onSurface = CallColors.Text,
     onSurfaceVariant = CallColors.Muted,
     surfaceContainerHigh = CallColors.Sheet,
+    surfaceContainerHighest = CallColors.Control,
+    primaryContainer = CallColors.Control,
+    onPrimaryContainer = CallColors.Text,
+    secondaryContainer = CallColors.Control,
+    onSecondaryContainer = CallColors.Text,
+    tertiaryContainer = CallColors.Text,
+    onTertiaryContainer = CallColors.Background,
     primary = CallColors.Text,
     onPrimary = CallColors.Background,
     error = CallColors.End,
@@ -44,6 +51,7 @@ private val KoreanLineBreak = LineBreak(
 )
 
 private val CallTypography = Typography(
+    displayLarge = TextStyle(fontSize = 64.sp, lineHeight = 76.sp, fontWeight = FontWeight.Medium, letterSpacing = (-1.5).sp),
     displaySmall = TextStyle(fontSize = 34.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium, letterSpacing = (-0.7).sp),
     headlineSmall = TextStyle(
         fontSize = 26.sp,

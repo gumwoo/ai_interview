@@ -12,6 +12,7 @@ import io.github.gumwoo.aiinterview.data.AnswerResponse
 import io.github.gumwoo.aiinterview.data.ApiException
 import io.github.gumwoo.aiinterview.data.InterviewApi
 import io.github.gumwoo.aiinterview.data.InterviewSettings
+import io.github.gumwoo.aiinterview.data.SessionResponse
 import io.github.gumwoo.aiinterview.data.StartSessionRequest
 import io.github.gumwoo.aiinterview.data.SummaryResponse
 import java.time.LocalDate
@@ -43,11 +44,19 @@ sealed interface InterviewError {
     data object TtsFailed : InterviewError
 }
 
+/** 울리는 전화. [scheduledDate]가 있으면 그날 일정의 전화이고, [ringing]이면 알람으로 온 전화다. */
+data class IncomingCall(val scheduledDate: LocalDate?, val ringing: Boolean) {
+    companion object {
+        val MANUAL = IncomingCall(scheduledDate = null, ringing = false)
+    }
+}
+
 /** 통화에서 오간 말 한 줄. */
 data class CallLine(val fromInterviewer: Boolean, val text: String)
 
 data class InterviewUiState(
     val phase: InterviewPhase = InterviewPhase.IDLE,
+    val incoming: IncomingCall? = null,
     val sessionId: Long? = null,
     val turnId: Long? = null,
     val questionText: String = "",
@@ -88,6 +97,21 @@ class InterviewViewModel(
     private var pendingAnswer: AnswerRequest? = null
     private var lastAnswer: AnswerResponse? = null
     private var currentJob: Job? = null
+    private var call: IncomingCall = IncomingCall.MANUAL
+
+    fun showIncoming(call: IncomingCall) {
+        _state.update { it.copy(incoming = call) }
+    }
+
+    fun dismissIncoming() {
+        _state.update { it.copy(incoming = null) }
+    }
+
+    /** 울리던 전화를 받는다. 이때 처음으로 서버에 면접을 만든다. */
+    fun answer() {
+        call = _state.value.incoming ?: IncomingCall.MANUAL
+        start()
+    }
 
     fun start() {
         startRequestId = startRequestId ?: newRequestId()
@@ -95,21 +119,31 @@ class InterviewViewModel(
             _state.value = InterviewUiState(phase = InterviewPhase.CONNECTING)
             val config = settings()
             val session = call(RetryAction.START) {
-                api.startSession(
-                    StartSessionRequest(
-                        source = "MANUAL",
-                        scheduledDate = today().toString(),
-                        topics = config.topics,
-                        difficulty = config.difficulty,
-                        durationMinutes = config.durationMinutes,
-                        reviewRatio = InterviewSettings.REVIEW_RATIO,
-                        clientRequestId = requireNotNull(startRequestId),
-                    ),
-                )
+                startSession(config, requireNotNull(startRequestId))
             } ?: return@run
             startRequestId = null
             _state.update { it.copy(sessionId = session.sessionId, callStartedAtMillis = elapsedMillis()) }
             askQuestion(session.turnId, session.questionText.orEmpty())
+        }
+    }
+
+    /** 그날 일정 면접이 이미 있으면(일정을 바꿔 또 울린 경우) 수동 면접으로 시작한다. */
+    private suspend fun startSession(config: InterviewSettings, requestId: String): SessionResponse {
+        val request = StartSessionRequest(
+            source = SOURCE_MANUAL,
+            scheduledDate = today().toString(),
+            topics = config.topics,
+            difficulty = config.difficulty,
+            durationMinutes = config.durationMinutes,
+            reviewRatio = InterviewSettings.REVIEW_RATIO,
+            clientRequestId = requestId,
+        )
+        val date = call.scheduledDate ?: return api.startSession(request)
+        return try {
+            api.startSession(request.copy(source = SOURCE_SCHEDULED, scheduledDate = date.toString()))
+        } catch (ex: ApiException.Server) {
+            if (ex.code != SCHEDULED_SESSION_EXISTS) throw ex
+            api.startSession(request.copy(clientRequestId = newRequestId()))
         }
     }
 
@@ -198,6 +232,7 @@ class InterviewViewModel(
         pendingAnswer = null
         lastAnswer = null
         startRequestId = null
+        call = IncomingCall.MANUAL
         _state.value = InterviewUiState()
     }
 
@@ -334,5 +369,11 @@ class InterviewViewModel(
         if (!_state.value.speakerOn) {
             output.setSpeakerOn(true)
         }
+    }
+
+    private companion object {
+        const val SOURCE_MANUAL = "MANUAL"
+        const val SOURCE_SCHEDULED = "SCHEDULED"
+        const val SCHEDULED_SESSION_EXISTS = "SCHEDULED_SESSION_EXISTS"
     }
 }

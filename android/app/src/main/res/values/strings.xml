@@ -6,8 +6,13 @@
     <string name="home_row_topics">주제</string>
     <string name="home_topics_count">%1$d개</string>
     <string name="home_duration_value">%1$d분</string>
+    <string name="home_next_call">다음 전화</string>
+    <string name="home_no_call">일정 없음</string>
+    <string name="home_today">오늘</string>
+    <string name="home_tomorrow">내일</string>
+    <string name="home_schedule_change">바꾸기</string>
+    <string name="home_schedule_set">정하기</string>
     <string name="home_row_server">서버</string>
-    <string name="home_server_ready">연결 정보 저장됨</string>
     <string name="home_server_missing">설정 필요</string>
     <string name="home_start">지금 연습하기</string>
     <string name="home_setup">서버 연결 설정</string>
@@ -18,6 +23,31 @@
     <string name="incoming_topics">%1$s · %2$d분</string>
     <string name="incoming_decline">거절</string>
     <string name="incoming_answer">받기</string>
+    <string name="incoming_snooze">5분 뒤에 받기</string>
+
+    <string name="ring_channel">면접 전화</string>
+    <string name="ring_title">면접 전화가 왔어요</string>
+    <string name="ring_text">AI 면접관</string>
+    <string name="ring_snooze_short">5분 뒤</string>
+    <string name="missed_channel">부재중 면접 전화</string>
+    <string name="missed_title">부재중 면접 전화</string>
+    <string name="missed_text">눌러서 지금 연습할 수 있어요</string>
+
+    <string name="schedule_title">일정</string>
+    <string name="schedule_enable">면접 전화 받기</string>
+    <string name="schedule_time_hint">누르면 시간을 바꿉니다</string>
+    <string name="schedule_time_confirm">확인</string>
+    <string name="schedule_days">요일</string>
+    <string name="schedule_test">1분 뒤 시험 전화</string>
+    <string name="schedule_test_action">걸기</string>
+    <string name="schedule_test_set">1분 뒤에 전화합니다. 화면을 꺼 두고 기다려 보세요.</string>
+    <string name="notice_notifications_title">알림이 꺼져 있어요</string>
+    <string name="notice_notifications_text">이대로는 전화가 울리지 않습니다.</string>
+    <string name="notice_full_screen_title">전체 화면 전화가 꺼져 있어요</string>
+    <string name="notice_full_screen_text">지금은 잠금 화면에 알림으로만 울립니다.</string>
+    <string name="notice_battery_title">배터리 사용이 제한돼 있어요</string>
+    <string name="notice_battery_text">전화가 늦게 올 수 있습니다.</string>
+    <string name="notice_open">설정 열기</string>
 
     <string name="settings_title">설정</string>
     <string name="settings_close">닫기</string>
