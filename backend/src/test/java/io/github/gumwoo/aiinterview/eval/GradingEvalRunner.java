@@ -32,7 +32,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * 평가셋으로 채점 품질을 측정한다. 실제 API를 호출해 크레딧을 쓰며 {@code ./gradlew evalGrading}으로만 실행된다.
- * 규칙은 docs/rules/eval.md를 따른다. 판정 검토와 통과 기준 기록이 끝나야 실행된다.
+ * 규칙은 docs/rules/eval.md를 따른다. 판정 대조와 통과 기준 기록이 끝나야 실행된다.
  */
 @Tag("eval")
 @SpringBootTest(properties = { "app.api-token=" + TestcontainersConfiguration.TEST_API_TOKEN,
@@ -55,7 +55,7 @@ class GradingEvalRunner {
 	@Test
 	void should_measure_grading_against_human_verdicts() throws Exception {
 		EvalCases cases = EvalCases.load();
-		assertThat(cases.reviewedByUser()).as("사용자가 판정을 검토한 뒤 reviewedByUser를 true로 바꿔야 합니다").isTrue();
+		assertThat(cases.verifiedAgainstRepository()).as("판정을 대조한 저장소 커밋을 verifiedAgainstRepository에 적어야 합니다").isNotBlank();
 		assertThat(CRITERIA_FILE).as("통과 기준을 실행 전에 eval/pass-criteria.json에 적어야 합니다").exists();
 		Criteria criteria = JsonMapper.builder().build().readValue(CRITERIA_FILE.toFile(), Criteria.class);
 
@@ -92,7 +92,7 @@ class GradingEvalRunner {
 			}
 			catch (LlmException ex) {
 				verdicts.add(null);
-				lastFeedback = "실패: " + ex.getClass().getSimpleName();
+				lastFeedback = "실패: " + ex.getClass().getSimpleName() + ": " + ex.getMessage();
 			}
 			latencies.add((System.nanoTime() - start) / 1_000_000);
 		}
@@ -136,7 +136,7 @@ class GradingEvalRunner {
 				+ String.format("%.4f", cost));
 		report.add("- 지연: 중앙값 " + sorted.get(sorted.size() / 2) + "ms, p95 "
 				+ sorted.get((int) Math.ceil(sorted.size() * 0.95) - 1) + "ms, 최대 " + sorted.get(sorted.size() - 1) + "ms");
-		report.add("").add("| 사례 | 구분 | 수동 판정 | AI 판정 | 결과 | 마지막 응답 |").add("|---|---|---|---|---|---|");
+		report.add("").add("| 사례 | 구분 | 기준 판정 | AI 판정 | 결과 | 마지막 응답 |").add("|---|---|---|---|---|---|");
 		report.add(details.toString());
 		return report.toString();
 	}

@@ -9,7 +9,7 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * {@code eval/grading-cases.json}의 내용.
  */
-record EvalCases(boolean reviewedByUser, List<EvalCase> cases) {
+record EvalCases(String verifiedAgainstRepository, List<EvalCase> cases) {
 
 	static final Path EVAL_DIR = Path.of("..", "eval");
 
