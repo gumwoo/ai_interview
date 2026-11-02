@@ -18,7 +18,13 @@
 
 - 구현 단계(M0~M6)는 사용자가 시작을 지시한 뒤에 진행한다. 계획서의 완료 기준을 확인해야 다음 단계로 넘어간다.
 - 1인 사용 앱이다. 다중 사용자, 역할 권한, 기기 페어링처럼 계획서에 없는 범용 기능을 추가하지 않는다.
-- 빌드·테스트 명령은 프로젝트를 생성한 뒤 이 문서에 추가한다.
+
+## 명령
+
+- 백엔드 테스트(`backend/`에서 실행, Docker 필요): `./gradlew test`
+- 서버 실행(저장소 루트에서): `docker compose -f infra/compose.yaml up -d --build`
+- 상태 확인: `curl http://localhost:18080/api/v1/health`
+- 로컬 설정: `infra/.env.example`을 `infra/.env`로 복사해 값을 채운다.
 
 ## 항상 지킬 것
 
