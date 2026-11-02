@@ -23,6 +23,7 @@
 
 - 백엔드 테스트(`backend/`에서 실행, Docker 필요): `./gradlew test`
 - 실제 Claude 호출 테스트(`backend/`에서, 환경 변수 `ANTHROPIC_API_KEY` 필요, 크레딧 사용): `./gradlew liveTest`
+- 채점 평가(`backend/`에서, 환경 변수 `ANTHROPIC_API_KEY` 필요, 크레딧 사용): `./gradlew evalGrading`
 - 서버 실행(저장소 루트에서): `docker compose -f infra/compose.yaml up -d --build`
 - 개발용 콘솔: `SPRING_PROFILES_ACTIVE=dev`로 서버를 띄운 뒤 `http://localhost:18080/dev/console`
 - 상태 확인: `curl http://localhost:18080/api/v1/health`

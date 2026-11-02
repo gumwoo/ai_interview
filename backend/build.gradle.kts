@@ -50,7 +50,7 @@ tasks.withType<Test> {
 
 tasks.test {
 	useJUnitPlatform {
-		excludeTags("live")
+		excludeTags("live", "eval")
 	}
 }
 
@@ -62,6 +62,18 @@ tasks.register<Test>("liveTest") {
 	classpath = sourceSets.test.get().runtimeClasspath
 	useJUnitPlatform {
 		includeTags("live")
+	}
+	outputs.upToDateWhen { false }
+}
+
+// 평가셋으로 채점 품질을 측정한다. 실제 Claude API를 호출해 크레딧을 쓴다. 수동으로만 실행한다.
+tasks.register<Test>("evalGrading") {
+	description = "평가셋으로 채점 품질을 측정한다."
+	group = "verification"
+	testClassesDirs = sourceSets.test.get().output.classesDirs
+	classpath = sourceSets.test.get().runtimeClasspath
+	useJUnitPlatform {
+		includeTags("eval")
 	}
 	outputs.upToDateWhen { false }
 }
