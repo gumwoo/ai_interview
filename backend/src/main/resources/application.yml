@@ -20,7 +20,7 @@ app:
   claude:
     # 없으면 기동에 실패한다.
     api-key: ${ANTHROPIC_API_KEY:}
-    model: ${CLAUDE_MODEL:claude-haiku-5-5}
+    model: ${CLAUDE_MODEL:claude-sonnet-5-5}
     # 모델마다 기본값이 다르므로 직접 지정한다.
     # 환경 변수 CLAUDE_EFFORT는 Claude Code가 자체로 쓰므로 다른 이름을 쓴다.
     effort: ${INTERVIEW_LLM_EFFORT:medium}
