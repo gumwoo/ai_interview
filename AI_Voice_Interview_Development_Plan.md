@@ -60,7 +60,7 @@
 | 알람/일정 | **AlarmManager**, BootReceiver | 휴대폰 단독으로 예약 알림 실행. 권한 거부 시 비정확 알람 대안 |
 | 음성 인식(STT) | **Android SpeechRecognizer**, 가능하면 기기 내 인식 | 별도 유료 STT 제공업체 없이 우선 검증 |
 | 음성 합성(TTS) | **Android TextToSpeech** | 별도 유료 TTS 제공업체 없이 시작 |
-| 개인 PC 백엔드 | **Java 17 + Spring Boot + Gradle** | 기존 Java/Spring 경험 활용, 상태관리와 REST 개발 용이 |
+| 개인 PC 백엔드 | **Java 17 + Spring Boot 4.1 + Gradle** | 기존 Java/Spring 경험 활용, 상태관리와 REST 개발 용이 |
 | LLM | **Anthropic Claude Messages API + 공식 Java SDK**. 테스트는 `claude-haiku-5-5`, 최종은 `claude-sonnet-5-5` | 구조화된 질문/판정/해설 생성, 테스트 비용 절감 |
 | 데이터 저장 | **PostgreSQL + Flyway** | 세션·답변·평가·복습 계획 관리 |
 | 연결 | **Tailscale**(갤럭시와 PC에 모두 설치) | 집 밖에서도 개인 PC에 사설 네트워크로 연결 |
@@ -438,7 +438,7 @@ backend/src/main/java/.../
 
 | 테이블 | 핵심 컬럼 | 설명 |
 |---|---|---|
-| `interview_session` | `id`, `scheduled_date`, `source`, `status`, `started_at`, `ended_at`, `topic` | 세션 진행/결과 |
+| `interview_session` | `id`, `client_request_id`, `scheduled_date`, `source`, `status`, `started_at`, `ended_at`, `topic` | 세션 진행/결과 |
 | `question_bank` | `id`, `topic`, `concept_key`, `difficulty`, `question_text`, `reference_points_json`, `rubric_version`, `origin`, `source_ref`, `source_commit` | 질문 및 채점 기준. `origin`은 `SEED`/`GENERATED` |
 | `session_turn` | `id`, `session_id`, `turn_no`, `question_id`(꼬리질문은 null), `concept_key`, `question_text`, `expected_points_json`, `answer_text`, `client_request_id`, `processing_status`, `verdict`, `feedback_json`, `response_ms` | 질문·답변·판정 |
 | `review_item` | `id`, `concept_key`, `source_turn_id`, `next_review_at`, `streak`, `priority` | 복습 상태 |
@@ -448,10 +448,12 @@ backend/src/main/java/.../
 
 **ID 타입:** 모든 테이블의 PK는 `bigint`(`GENERATED ALWAYS AS IDENTITY`)다. 앱이 재전송 식별을 위해 직접 만드는 `client_request_id`만 `uuid`다. DB가 하나이고 API가 Tailscale과 토큰 뒤에 있어, 분산 ID 생성이나 공개용 ID가 필요 없기 때문이다.
 
+**값 목록:** `interview_session.status`는 `ASKING`, `LISTENING`, `GRADING`, `EXPLAINING`, `FOLLOW_UP`, `COMPLETED`이고, `session_turn.processing_status`는 `AWAITING_ANSWER`, `GRADING`, `GRADED`, `FAILED`이며, `session_turn.verdict`는 `CORRECT`, `PARTIAL`, `WRONG`, `UNDETERMINED`(판단보류)다.
+
 **주요 제약:**
 
 - `source = 'SCHEDULED'`인 행에 한해 `interview_session(scheduled_date)` 유니크를 적용한다. 사용자가 직접 시작한 **수동 세션**(`MANUAL`)은 `MAX_DAILY_SESSIONS` 안에서 같은 날 여러 번 허용.
-- `session_turn(session_id, turn_no)`와 `session_turn(session_id, client_request_id)` 유니크로 답변 중복 방지.
+- `session_turn(session_id, turn_no)`와 `session_turn(session_id, client_request_id)` 유니크로 답변 중복 방지. 세션 생성 재전송은 `interview_session(client_request_id)` 유니크로 막는다.
 - 꼬리질문은 `question_bank`에 없으므로 채점 기준을 `session_turn.expected_points_json`에 저장한다.
 - 복습 대상은 `concept_key`로 찾는다. 같은 개념의 변형 질문을 고르기 위해 `question_bank`와 `session_turn`에 모두 둔다.
 - `question_bank`는 동일 질문을 재사용 가능. `session_turn`에는 질문 원문과 평가 결과를 스냅샷으로 남겨 사후 재현 가능하게 한다.
@@ -490,8 +492,8 @@ backend/src/main/java/.../
 
 | 단계 | 만드는 것 | 완료 확인 | 사용자 준비물 |
 |---|---|---|---|
-| **M0 기반** | 저장소, 단계별 이슈, CI, 브랜치 보호, Spring Boot, Compose DB, Flyway 스키마, 토큰 필터, `/health` | 토큰 없는 호출이 401, 재기동 후 데이터 유지, CI 통과 후 PR 머지 | `infra/.env`에 API 키 입력 |
-| **M1 Claude 연결** | `ClaudeClientAdapter`, 구조화 출력, 타임아웃과 재시도, `api_usage_log`, 일일 상한 | 질문 생성과 채점 JSON이 스키마대로 오고 토큰이 기록됨 | 자동 충전 OFF 확인 |
+| **M0 기반** | 저장소, 단계별 이슈, CI, 브랜치 보호, Spring Boot, Compose DB, Flyway 스키마, 토큰 필터, `/health` | 토큰 없는 호출이 401, 재기동 후 데이터 유지, CI 통과 후 PR 머지 | 없음 |
+| **M1 Claude 연결** | `ClaudeClientAdapter`, 구조화 출력, 타임아웃과 재시도, `api_usage_log`, 일일 상한 | 질문 생성과 채점 JSON이 스키마대로 오고 토큰이 기록됨 | `infra/.env`에 API 키 입력, 자동 충전 OFF 확인 |
 | **M2 텍스트 면접** | `InterviewOrchestrator`, 세션과 턴 API, FlowTicket 시드 질문, dev 전용 콘솔 | 5문제 이상 진행 후 재조회 가능, 같은 답을 다시 보내도 채점 1회 | 시드 질문 검토 |
 | **M3 품질 게이트** | 정답·부분정답·오답 예시 30건 이상의 평가셋, 프롬프트 조정 | Haiku 채점을 수동 판정과 비교, 통과 전에는 앱 개발 안 함 | 평가셋 수동 판정 |
 | **M4 음성 앱** | Compose 앱, TTS와 STT, 수정과 재시도, 요약 화면, Tailscale 연결 | Wi-Fi와 모바일 데이터에서 각각 10분 완주, 접은 화면·펼친 화면 모두 동작 | Tailscale 설치, USB 디버깅 켜기 |
