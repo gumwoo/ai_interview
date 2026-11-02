@@ -15,7 +15,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(properties = "app.api-token=" + TestcontainersConfiguration.TEST_API_TOKEN)
+@SpringBootTest(properties = { "app.api-token=" + TestcontainersConfiguration.TEST_API_TOKEN,
+		"app.claude.api-key=test-key" })
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 class ApiTokenSecurityTest {

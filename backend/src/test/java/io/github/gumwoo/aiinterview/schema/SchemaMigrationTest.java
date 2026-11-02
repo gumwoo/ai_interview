@@ -14,7 +14,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-@SpringBootTest(properties = "app.api-token=" + TestcontainersConfiguration.TEST_API_TOKEN)
+@SpringBootTest(properties = { "app.api-token=" + TestcontainersConfiguration.TEST_API_TOKEN,
+		"app.claude.api-key=test-key" })
 @Import(TestcontainersConfiguration.class)
 class SchemaMigrationTest {
 

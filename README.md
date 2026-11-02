@@ -2,7 +2,7 @@
 
 매일 아침 전화처럼 울리는 알림을 받으면, AI가 음성으로 기술 면접을 진행하는 개인용 Android 앱입니다. 질문은 제가 만든 프로젝트 [FlowTicket](https://github.com/gumwoo/first_come-first_served)의 설계 기록과 장애 기록에서 나옵니다.
 
-지금은 서버 기반을 만드는 단계입니다. 면접 기능과 측정 결과는 아직 없고, 이 문서에 적힌 동작 대부분은 앞으로 만들 계획입니다. 만들어 가면서 실제 결과로 고쳐 쓰겠습니다.
+지금은 서버 기반과 Claude 연결까지 만든 단계입니다. 면접 기능과 품질 측정 결과는 아직 없고, 이 문서에 적힌 동작 대부분은 앞으로 만들 계획입니다. 만들어 가면서 실제 결과로 고쳐 쓰겠습니다.
 
 ## 왜 만드나요
 
@@ -102,7 +102,7 @@ FlowTicket 문서에는 지금은 대체된 결정도 섞여 있습니다. Kafka
 
 지금은 서버의 상태 확인까지만 동작합니다. Docker가 필요합니다.
 
-`infra/.env.example`을 `infra/.env`로 복사해 비밀번호와 32자 이상의 API 토큰을 채운 뒤 서버를 띄웁니다.
+`infra/.env.example`을 `infra/.env`로 복사해 비밀번호, 32자 이상의 API 토큰, Claude API 키를 채운 뒤 서버를 띄웁니다.
 
 ```bash
 docker compose -f infra/compose.yaml up -d --build
