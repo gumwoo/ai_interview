@@ -21,7 +21,6 @@ public class ApiExceptionHandler {
 	ResponseEntity<ErrorResponse> handle(InterviewException ex) {
 		HttpStatus status = switch (ex.getCode()) {
 			case SESSION_NOT_FOUND, TURN_NOT_FOUND -> HttpStatus.NOT_FOUND;
-			case DAILY_SESSION_LIMIT -> HttpStatus.TOO_MANY_REQUESTS;
 			case SESSION_COMPLETED, SCHEDULED_SESSION_EXISTS, GRADING_IN_PROGRESS, TURN_ALREADY_ANSWERED,
 					REQUEST_ID_ALREADY_USED ->
 				HttpStatus.CONFLICT;
