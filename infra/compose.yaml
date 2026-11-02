@@ -37,6 +37,7 @@ services:
       APP_API_TOKEN: ${APP_API_TOKEN:?infra/.env에 APP_API_TOKEN을 설정하세요}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?infra/.env에 ANTHROPIC_API_KEY를 설정하세요}
       CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-haiku-5-5}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
     ports:
       # 외부 접근은 tailscale serve를 거친다. 8080은 이 PC의 다른 프로그램이 쓰고 있어 18080이 기본값이다.
       - "127.0.0.1:${BACKEND_PORT:-18080}:8080"

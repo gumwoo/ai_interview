@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>면접 콘솔</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; line-height: 1.6; }
+  label { display: block; margin: 12px 0 4px; font-weight: 600; }
+  input, select, textarea { width: 100%; padding: 8px; box-sizing: border-box; font: inherit; }
+  button { padding: 8px 14px; margin: 8px 8px 0 0; font: inherit; cursor: pointer; }
+  button:disabled { cursor: wait; opacity: .6; }
+  #question { padding: 12px; border-left: 4px solid #2563eb; background: #f1f5f9; white-space: pre-wrap; }
+  #log { white-space: pre-wrap; font-size: 14px; }
+  .turn { border-top: 1px solid #cbd5e1; padding: 8px 0; }
+  .error { color: #b91c1c; }
+</style>
+</head>
+<body>
+<h1>면접 콘솔</h1>
+<p>음성 없이 면접 흐름을 시험하는 개발용 화면입니다. 토큰은 저장하지 않습니다.</p>
+
+<label for="token">API 토큰</label>
+<input id="token" type="password" autocomplete="off">
+
+<label for="topics">주제(쉼표로 구분)</label>
+<input id="topics" value="Kubernetes,Concurrency">
+
+<label for="difficulty">난이도</label>
+<select id="difficulty"><option>intermediate</option><option>advanced</option></select>
+
+<button id="start">면접 시작</button>
+<button id="hint">힌트</button>
+<button id="end">면접 종료</button>
+
+<h2>질문</h2>
+<div id="question">면접을 시작하세요.</div>
+
+<label for="answer">답변</label>
+<textarea id="answer" rows="5"></textarea>
+<button id="send">답변 보내기</button>
+<button id="resend" title="직전 요청을 같은 ID로 다시 보냅니다">같은 요청 다시 보내기</button>
+
+<h2>기록</h2>
+<div id="log"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let sessionId = null;
+  let turnId = null;
+  let lastAnswer = null;
+
+  function log(text, isError) {
+    const div = document.createElement('div');
+    div.className = isError ? 'turn error' : 'turn';
+    div.textContent = text;
+    $('log').prepend(div);
+  }
+
+  async function api(method, path, body) {
+    document.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    try {
+      const response = await fetch('/api/v1/sessions' + path, {
+        method,
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + $('token').value },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : null;
+      if (!response.ok) {
+        throw new Error(response.status + ' ' + (data ? data.code + ': ' + data.message : ''));
+      }
+      return data;
+    } finally {
+      document.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+    }
+  }
+
+  function showQuestion(id, text) {
+    turnId = id;
+    $('question').textContent = text || '면접이 끝났습니다.';
+  }
+
+  async function run(action) {
+    try {
+      await action();
+    } catch (error) {
+      log(error.message, true);
+    }
+  }
+
+  async function sendAnswer(request) {
+    const started = performance.now();
+    const data = await api('POST', '/' + sessionId + '/answers', request);
+    const seconds = ((performance.now() - started) / 1000).toFixed(1);
+    log('판정 ' + data.verdict + ' (' + seconds + '초)\n' + data.feedbackToSpeak
+      + '\n빠진 내용: ' + (data.missingPoints.join(', ') || '없음'));
+    showQuestion(data.nextTurnId, data.nextQuestionText);
+    $('answer').value = '';
+  }
+
+  $('start').onclick = () => run(async () => {
+    const data = await api('POST', '', {
+      source: 'MANUAL',
+      scheduledDate: new Date().toLocaleDateString('sv-SE'),
+      topics: $('topics').value.split(',').map((t) => t.trim()).filter(Boolean),
+      difficulty: $('difficulty').value,
+      durationMinutes: 15,
+      reviewRatio: 0.4,
+      clientRequestId: crypto.randomUUID(),
+    });
+    sessionId = data.sessionId;
+    showQuestion(data.turnId, data.questionText);
+    log('세션 ' + sessionId + ' 시작');
+  });
+
+  $('send').onclick = () => run(async () => {
+    lastAnswer = { turnId, recognizedText: $('answer').value, clientRequestId: crypto.randomUUID() };
+    await sendAnswer(lastAnswer);
+  });
+
+  $('resend').onclick = () => run(async () => {
+    if (lastAnswer) {
+      await sendAnswer(lastAnswer);
+    }
+  });
+
+  $('hint').onclick = () => run(async () => {
+    const data = await api('POST', '/' + sessionId + '/hint', { turnId });
+    log('힌트: ' + data.hintText);
+  });
+
+  $('end').onclick = () => run(async () => {
+    const data = await api('POST', '/' + sessionId + '/end');
+    showQuestion(null, null);
+    log('요약 ' + JSON.stringify(data, null, 2));
+  });
+</script>
+</body>
+</html>

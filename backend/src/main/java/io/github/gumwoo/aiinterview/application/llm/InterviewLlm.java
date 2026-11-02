@@ -18,7 +18,8 @@ public interface InterviewLlm {
 	record QuestionRequest(String topic, String difficulty, List<String> recentConcepts) {
 	}
 
-	record GradingRequest(String question, List<String> expectedPoints, List<String> commonMistakes, String answer) {
+	record GradingRequest(String question, List<String> expectedPoints, List<String> commonMistakes, String answer,
+			boolean followUpAllowed) {
 	}
 
 	record GeneratedQuestion(
