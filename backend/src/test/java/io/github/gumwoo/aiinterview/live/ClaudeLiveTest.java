@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import io.github.gumwoo.aiinterview.TestcontainersConfiguration;
 import io.github.gumwoo.aiinterview.application.llm.InterviewLlm;
 import io.github.gumwoo.aiinterview.domain.usage.ApiUsageLog;
+import io.github.gumwoo.aiinterview.infrastructure.claude.ClaudeProperties;
 import io.github.gumwoo.aiinterview.infrastructure.persistence.ApiUsageLogRepository;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class ClaudeLiveTest {
 
 	@Autowired
 	private ApiUsageLogRepository usageRepository;
+
+	@Autowired
+	private ClaudeProperties properties;
 
 	@Test
 	void should_generate_and_grade_with_schema_and_record_usage() {
@@ -73,7 +77,7 @@ class ClaudeLiveTest {
 		usage.forEach((log) -> System.out.printf("[live] usage: model=%s input=%d output=%d cost=%s%n", log.getModelId(),
 				log.getInputTokens(), log.getOutputTokens(), log.getEstimatedCostUsd()));
 		assertThat(usage).hasSize(5).allSatisfy((log) -> {
-			assertThat(log.getModelId()).isEqualTo("claude-haiku-5-5");
+			assertThat(log.getModelId()).isEqualTo(properties.model());
 			assertThat(log.getInputTokens()).isPositive();
 			assertThat(log.getOutputTokens()).isPositive();
 		});

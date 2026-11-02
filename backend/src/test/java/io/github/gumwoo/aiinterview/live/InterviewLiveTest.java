@@ -49,7 +49,7 @@ class InterviewLiveTest {
 	void should_finish_text_interview_with_at_least_five_questions() {
 		usageRepository.deleteAll();
 		SessionView session = timed("start", () -> orchestrator.start(new StartSession(SessionSource.MANUAL,
-				LocalDate.now(), List.of("Kubernetes", "Database"), "intermediate", 60, new BigDecimal("0.40"),
+				LocalDate.now(), List.of("Kubernetes", "Concurrency"), "intermediate", 60, new BigDecimal("0.40"),
 				UUID.randomUUID())));
 		Long sessionId = session.sessionId();
 		Long turnId = session.turnId();

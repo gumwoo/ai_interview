@@ -61,7 +61,7 @@
 | 음성 인식(STT) | **Android SpeechRecognizer**, 가능하면 기기 내 인식 | 별도 유료 STT 제공업체 없이 우선 검증 |
 | 음성 합성(TTS) | **Android TextToSpeech** | 별도 유료 TTS 제공업체 없이 시작 |
 | 개인 PC 백엔드 | **Java 17 + Spring Boot 4.1 + Gradle** | 기존 Java/Spring 경험 활용, 상태관리와 REST 개발 용이 |
-| LLM | **Anthropic Claude Messages API + 공식 Java SDK**. 테스트는 `claude-haiku-5-5`, 최종은 `claude-sonnet-5-5` | 구조화된 질문/판정/해설 생성, 테스트 비용 절감 |
+| LLM | **Anthropic Claude Messages API + 공식 Java SDK**. 기본은 `claude-sonnet-5-5` | 구조화된 질문/판정/해설 생성 |
 | 데이터 저장 | **PostgreSQL + Flyway** | 세션·답변·평가·복습 계획 관리 |
 | 연결 | **Tailscale**(갤럭시와 PC에 모두 설치) | 집 밖에서도 개인 PC에 사설 네트워크로 연결 |
 | 실행 | **Docker Desktop + Compose**(DB, 백엔드), `restart: always` | 프로세스가 죽거나 Docker가 다시 뜨면 자동 재기동 |
@@ -76,7 +76,7 @@
 - **Ultra의 월간 API 크레딧**을 사용하려면 Claude Console 조직을 Ultra 구독과 연결하고 해당 조직의 API 키를 발급받아야 한다(14절 1번 문서 기준, 직접 검증하지 않음). 잔액은 별도 관리 대상으로 두지 않는다.
 - API 키는 발급 완료 상태이며, M0에서 만드는 `infra/.env`의 `ANTHROPIC_API_KEY`에 직접 넣는다.
 - 별도 구매 크레딧 또는 자동 충전이 설정되어 있으면 월간 제공 크레딧 소진 후에도 사용이 계속될 수 있으므로 **자동 충전은 절대 켜지 않고, 애플리케이션 자체 사용 상한**도 유지한다. 상한은 버그로 호출이 반복될 때를 막는 장치다.
-- **모델 전략:** 테스트 단계는 Haiku, 어느 정도 완성되면 Sonnet으로 전환하며 최종 모델은 Sonnet이다. 2026-10-06 기준 문서의 1M 토큰당 단가는 Haiku 5.5가 입력 $0.10·출력 $0.50, Sonnet 5.5가 입력 $2·출력 $10이다. 실제 단가는 전환 시점에 다시 확인한다.
+- **모델 전략:** 기본 모델은 Sonnet이다. M3 평가에서 같은 평가셋으로 Haiku는 기준을 넘지 못했고 Sonnet은 넘었다(`eval/results/`). 수동 테스트에서 비용을 줄일 때만 `CLAUDE_MODEL`로 Haiku를 지정하고, 품질 판단은 Sonnet으로 한다. 2026-10-06 기준 문서의 1M 토큰당 단가는 Haiku 5.5가 입력 $0.10·출력 $0.50, Sonnet 5.5가 입력 $2·출력 $10이다.
 
 ---
 
@@ -223,8 +223,8 @@ SCHEDULED
 - 호출은 도구 없는 단발 요청으로 하고 대화 전체를 보내지 않는다. 턴당 입력은 질문, 채점 기준, 답변과 짧은 세션 메모로 제한한다.
 - 응답 형식은 구조화 출력(`output_config.format`)으로 고정한다. Sonnet 5.5는 강제 `tool_choice`를 400으로 거부하므로 쓰지 않는다.
 - 모델은 `CLAUDE_MODEL` 설정값으로 두고, effort는 모델마다 기본값이 달라 직접 지정한다.
-- `stop_reason`이 `refusal`이면 판단보류로 처리한다. Sonnet 전환 때 refusal 대체 모델 설정도 함께 검토한다.
-- 모델을 바꾸면 M3의 평가셋을 다시 돌려 확인한다. Haiku로 맞춘 프롬프트가 Sonnet에서도 같은 품질이라는 보장은 없다.
+- `stop_reason`이 `refusal`이면 판단보류로 처리한다. 면접이 끊기지 않으므로 refusal 대체 모델 설정은 쓰지 않는다. 거부가 실제로 잦으면 다시 검토한다.
+- 모델이나 effort를 바꾸면 평가셋을 다시 돌려 확인한다. M3에서 같은 프롬프트의 결과가 모델마다 크게 달랐다.
 
 ### 5.2 질문 데이터 구조(예시)
 
@@ -482,7 +482,7 @@ backend/src/main/java/.../
 - **알람/기본 UI:** 별도 유료 서비스 비용 없음.
 - **Android STT/TTS:** 기본 내장 서비스 사용 시 별도 외부 음성 API 계약 없이 시작 가능. 일부 인식 기능은 기기·네트워크·서비스 제공자 정책에 의존하며 데이터 사용량/오프라인 지원은 확인 필요.
 - **PC 서버:** 보유 PC 활용, 별도 임대료 없음. 전기 및 인터넷 비용은 기존 운영에 포함되거나 추가될 수 있음.
-- **Claude:** Ultra의 월간 API 크레딧 내에서 사용한다. 테스트는 Haiku로 비용을 줄이고 최종은 Sonnet으로 전환한다. 자동 충전은 쓰지 않으므로 크레딧이 없으면 오류만 안내한다. **크레딧이 곧 무제한 무료 호출을 의미하지는 않는다.**
+- **Claude:** Ultra의 월간 API 크레딧 내에서 사용한다. 기본 모델은 Sonnet이다. 자동 충전은 쓰지 않으므로 크레딧이 없으면 오류만 안내한다. **크레딧이 곧 무제한 무료 호출을 의미하지는 않는다.**
 - **안전장치:** `MAX_DAILY_SESSIONS=2`, `MAX_SESSION_TURNS=30`, `MAX_DAILY_INPUT_TOKENS`, `MAX_DAILY_OUTPUT_TOKENS` 등 설정 기반 상한. 사용량은 모델별 실제 가격과 토큰 소비를 기준으로 추산.
 
 ---
@@ -498,10 +498,10 @@ backend/src/main/java/.../
 | **M0 기반** | 저장소, 단계별 이슈, CI, 브랜치 보호, Spring Boot, Compose DB, Flyway 스키마, 토큰 필터, `/health` | 토큰 없는 호출이 401, 재기동 후 데이터 유지, CI 통과 후 PR 머지 | 없음 |
 | **M1 Claude 연결** | `ClaudeClientAdapter`, 구조화 출력, 타임아웃과 재시도, `api_usage_log`, 일일 상한 | 질문 생성과 채점 JSON이 스키마대로 오고 토큰이 기록됨 | `infra/.env`에 API 키 입력, 자동 충전 OFF 확인 |
 | **M2 텍스트 면접** | `InterviewOrchestrator`, 세션과 턴 API, FlowTicket 시드 질문, dev 전용 콘솔 | 5문제 이상 진행 후 재조회 가능, 같은 답을 다시 보내도 채점 1회 | 시드 질문 검토 |
-| **M3 품질 게이트** | 정답·부분정답·오답 예시 30건 이상의 평가셋, 프롬프트 조정 | Haiku 채점을 저장소 대조 판정과 비교, 통과 전에는 앱 개발 안 함 | 저장소로 답할 수 없는 항목 확인 |
+| **M3 품질 게이트** | 정답·부분정답·오답 예시 30건 이상의 평가셋, 프롬프트 조정 | 채점을 저장소 대조 판정과 비교해 통과. Sonnet 기준 확인용 92%, 일관성 100%, 치명 오류 0건. 통과 전에는 앱 개발 안 함 | 저장소로 답할 수 없는 항목 확인 |
 | **M4 음성 앱** | Compose 앱, TTS와 STT, 수정과 재시도, 요약 화면, Tailscale 연결 | Wi-Fi와 모바일 데이터에서 각각 10분 완주, 접은 화면·펼친 화면 모두 동작 | Tailscale 설치, USB 디버깅 켜기 |
 | **M5 알람** | `AlarmManager`, `BootReceiver`, 받기·거절·미루기, 권한 안내 | 화면이 꺼지고 앱이 종료된 상태에서 울림, 거절 시 Claude 호출 없음 | 폴드 실기기 테스트 |
-| **M6 복습·운영** | `ReviewScheduler`, 복습 출제, 사용량 상한 점검, Sonnet 전환, DB 백업 | 3회 이상 진행 시 이전 오답이 재출제됨, Sonnet으로 평가셋 재확인. 여기까지가 MVP | Docker Desktop 자동 시작, 활성 시간 변경 |
+| **M6 복습·운영** | `ReviewScheduler`, 복습 출제, 사용량 상한 점검, DB 백업 | 3회 이상 진행 시 이전 오답이 재출제됨. 여기까지가 MVP | Docker Desktop 자동 시작, 활성 시간 변경 |
 
 Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 
@@ -519,7 +519,7 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 - [ ] Git 저장소 구조 생성(`backend`, `android` 독립 빌드)
 - [ ] M0~M6 이슈 생성, GitHub Actions(빌드·테스트·gitleaks), `main` 브랜치 보호 설정
 - [ ] Spring Boot + PostgreSQL + Flyway + Docker Compose 구성
-- [ ] Claude API 키 관리 및 메시지 호출 검증(`claude-haiku-5-5`)
+- [ ] Claude API 키 관리 및 메시지 호출 검증
 - [ ] `/health` 외 API에 고정 토큰 인증 적용
 - [ ] `QuestionPlanner` / `QuestionGenerator` / `AnswerGrader` / `FollowUpGenerator` 구현
 - [ ] JSON 형식 응답 검증, 재시도, 타임아웃 처리
@@ -561,7 +561,6 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 - [ ] 면접 이력 화면, 세션 삭제
 - [ ] (선택) 월별 정답률·취약 주제 화면
 - [ ] Claude API 사용량/일별 상한/실패 로그
-- [ ] `claude-sonnet-5-5`로 전환하고 평가셋 재확인
 - [ ] Docker Desktop 자동 시작, Windows Update 활성 시간 변경(재시작 시 로그인 후 복구), DB 백업 및 복원
 - [ ] (선택) Notion 오답 노트 자동 동기화
 
@@ -588,7 +587,7 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 | 장시간 음성 | 10~15분 연속 면접 | 마이크/TTS 리소스 누수·앱 종료 없음 |
 | 데이터 삭제 | 세션 1건 삭제 | 관련 답변/복습 데이터 삭제 확인 |
 | API 인증 | 토큰 없이 또는 틀린 토큰으로 호출 | `/health` 외 경로는 401, Claude 호출 없음 |
-| 모델 전환 | `CLAUDE_MODEL`을 Sonnet으로 변경 후 평가셋 재실행 | 스키마 오류 없음, 기준 판정과 비교해 품질 확인 |
+| 모델 전환 | `CLAUDE_MODEL` 변경 후 평가셋 재실행 | 스키마 오류 없음, 기준 판정과 비교해 품질 확인 |
 | 폴드 전환 | 면접 중 화면 접기/펼치기 | 진행 상태와 음성 세션 유지, 화면 깨짐 없음 |
 
 ### 11.2 측정해야 할 품질 지표(초기 목표값)
@@ -596,7 +595,7 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 - 질문 생성 완료부터 음성 재생 시작까지 **p95 7초 이내**를 목표로 측정. 이는 목표일 뿐, 네트워크/모델/STT에 따라 조정 가능.
 - 알림은 정확 알람이 허용된 실제 기기에서 **설정 시각 대비 오차 측정**; 배터리 정책에 따른 예외 기록.
 - 세션당 STT 실패율, 서버 API 오류율, 턴별 응답 지연, 토큰 사용량 수집.
-- 채점 품질은 검증된 정답/오답/부분정답 예시 **최소 30건**을 저장소 대조로 정한 기준과 비교. Haiku 단계(M3)와 Sonnet 전환 시점(M6)에 각각 측정한다.
+- 채점 품질은 검증된 정답/오답/부분정답 예시 **최소 30건**을 저장소 대조로 정한 기준과 비교. 모델이나 프롬프트를 바꿀 때마다 측정한다.
 - ‘무리한 단정’, ‘모범답변 부정확’, ‘무관한 꼬리질문’은 우선순위 높은 품질 결함으로 분류.
 
 ### 11.3 실제 갤럭시 테스트 조건 (Z 폴드 8, Android 17)
@@ -644,7 +643,7 @@ ai-voice-interview/
 ### 12.1 추천 개발 첫 순서
 
 1. 발급된 API 키를 `infra/.env`에 넣고 Console에서 자동 충전이 꺼져 있는지 확인.
-2. PC에 백엔드 최소 프로젝트 생성 → Haiku에게 질문 1개를 받아 JSON으로 출력.
+2. PC에 백엔드 최소 프로젝트 생성 → Claude에게 질문 1개를 받아 JSON으로 출력.
 3. 출제 결과와 사용자 답변을 입력해 평가 및 후속 질문까지 받기.
 4. DB에 세션 1개를 끝까지 저장하기.
 5. 이후 갤럭시 앱에서 텍스트→TTS→STT를 연결.
@@ -660,7 +659,7 @@ ai-voice-interview/
 
 - [x] 기기: 갤럭시 Z 폴드 8, Android 17
 - [x] 상시 PC: 이 Windows 11 데스크톱, Docker Desktop. 자동 로그인은 쓰지 않음
-- [x] 모델: 테스트 `claude-haiku-5-5`, 최종 `claude-sonnet-5-5`
+- [x] 모델: 기본 `claude-sonnet-5-5`. M3 평가로 결정
 - [x] 요금: Ultra, API 키 발급 완료, 자동 충전 금지
 - [x] 시드 질문: FlowTicket 문서 기반, 개발·인프라 모두 포함
 - [x] ID 타입: PK는 `bigint`, `client_request_id`만 `uuid`
@@ -694,7 +693,7 @@ ai-voice-interview/
 
 ## 15. 최종 MVP 완료 정의(Definition of Done)
 
-**범위:** 4절의 P0 기능 전체와 Phase 4의 복습·사용량 상한·Sonnet 전환 항목. 이력 화면(FR-11)과 Phase 4의 나머지 항목은 MVP 이후로 둔다.
+**범위:** 4절의 P0 기능 전체와 Phase 4의 복습·사용량 상한 항목. 이력 화면(FR-11)과 Phase 4의 나머지 항목은 MVP 이후로 둔다.
 
 - [ ] 갤럭시에서 시간·요일을 설정할 수 있다.
 - [ ] 알림에 ‘받기’를 누르면 앱에서 AI 면접을 시작할 수 있다.
@@ -704,7 +703,7 @@ ai-voice-interview/
 - [ ] 결과가 DB에 저장되고 다음 면접에서 오답을 다시 출제한다.
 - [ ] API 키가 휴대폰 APK와 저장소에 포함되지 않는다.
 - [ ] Claude API 사용량 상한과 연결 실패 대책이 있고, 자동 충전은 꺼져 있다.
-- [ ] 최종 모델 `claude-sonnet-5-5`로 평가셋 비교를 통과한다.
+- [x] 기본 모델 `claude-sonnet-5-5`로 평가셋 비교를 통과한다.
 - [ ] Android 권한 거부·서버 오프라인·앱 재시작 상황에서 사용자에게 복구 경로를 안내한다.
 
 **최종 방향:** ‘실제 전화망 없이, 보이스톡 같은 수신 경험을 제공하는 개인용 AI 기술 면접관’. 처음부터 통신 시스템을 만들지 않고 **스마트폰 알람 + 턴 기반 음성 대화 + Claude 지능 + 개인 PC 서버**로 시작해 완성도를 확보한다.
