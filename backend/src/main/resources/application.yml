@@ -22,7 +22,8 @@ app:
     api-key: ${ANTHROPIC_API_KEY:}
     model: ${CLAUDE_MODEL:claude-haiku-5-5}
     # 모델마다 기본값이 다르므로 직접 지정한다.
-    effort: ${CLAUDE_EFFORT:medium}
+    # 환경 변수 CLAUDE_EFFORT는 Claude Code가 자체로 쓰므로 다른 이름을 쓴다.
+    effort: ${INTERVIEW_LLM_EFFORT:medium}
     # SDK는 타임아웃도 재시도하므로 최대 대기는 timeout x (max-retries + 1)이다. 앱 타임아웃은 이보다 길게 잡는다.
     # 실제 호출에서 질문 생성이 14초 걸린 적이 있어 여유를 둔다.
     timeout: 30s

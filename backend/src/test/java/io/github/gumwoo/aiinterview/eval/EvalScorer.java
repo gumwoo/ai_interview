@@ -6,7 +6,7 @@ import java.util.Objects;
 import io.github.gumwoo.aiinterview.application.llm.InterviewLlm.Verdict;
 
 /**
- * 수동 판정과 AI 판정을 비교한다. 실행 실패는 null 판정으로 기록하고 불일치로 센다.
+ * 기준 판정과 AI 판정을 비교한다. 실행 실패는 null 판정으로 기록하고 불일치로 센다.
  */
 final class EvalScorer {
 
@@ -27,7 +27,7 @@ final class EvalScorer {
 
 	record CaseRun(String id, String set, Verdict human, List<Verdict> verdicts) {
 
-		/** 과반 판정이 수동 판정과 같은지 본다. */
+		/** 과반 판정이 기준 판정과 같은지 본다. */
 		boolean majorityAgrees() {
 			long same = verdicts.stream().filter((verdict) -> verdict == human).count();
 			return same * 2 > verdicts.size();
