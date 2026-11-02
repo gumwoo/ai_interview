@@ -263,6 +263,8 @@ SCHEDULED
 }
 ```
 
+실제 응답의 필드 이름은 camelCase(`feedbackToSpeak` 등)이고, 스키마는 Java 타입에서 만든다. `next_action`은 `FOLLOW_UP`, `EXPLAIN_AND_RECHECK`, `CLARIFY`, `NEXT_QUESTION` 중 하나다.
+
 `confidence`는 **모델의 자기평가값**이므로 검증된 확률로 간주하지 않는다. 중요한 사실 판단에는 참고 답안, 문서 근거 또는 별도 검증을 결합한다.
 
 ### 5.4 면접 규칙(시스템 프롬프트 요구사항)
@@ -625,17 +627,13 @@ ai-voice-interview/
 ├─ android/
 │  └─ app/...
 ├─ backend/
-│  ├─ src/main/...
+│  ├─ src/main/...      # 프롬프트는 resources/prompts
 │  └─ src/test/...
 ├─ infra/
 │  ├─ compose.yaml
 │  ├─ .env.example
 │  ├─ .env              # API 키 보관, Git 제외
 │  └─ backup/
-├─ prompts/
-│  ├─ interviewer.md
-│  ├─ grading.md
-│  └─ schemas/
 ├─ eval/
 │  └─ grading-cases.json
 └─ seed/

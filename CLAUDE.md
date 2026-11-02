@@ -22,6 +22,7 @@
 ## 명령
 
 - 백엔드 테스트(`backend/`에서 실행, Docker 필요): `./gradlew test`
+- 실제 Claude 호출 테스트(`backend/`에서, 환경 변수 `ANTHROPIC_API_KEY` 필요, 크레딧 사용): `./gradlew liveTest`
 - 서버 실행(저장소 루트에서): `docker compose -f infra/compose.yaml up -d --build`
 - 상태 확인: `curl http://localhost:18080/api/v1/health`
 - 로컬 설정: `infra/.env.example`을 `infra/.env`로 복사해 값을 채운다.

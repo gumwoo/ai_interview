@@ -11,3 +11,25 @@ spring:
       ddl-auto: validate
 
 # API 토큰은 APP_API_TOKEN 환경 변수로 받는다. 없으면 기동에 실패한다.
+app:
+  claude:
+    # 없으면 기동에 실패한다.
+    api-key: ${ANTHROPIC_API_KEY:}
+    model: ${CLAUDE_MODEL:claude-haiku-5-5}
+    # 모델마다 기본값이 다르므로 직접 지정한다.
+    effort: ${CLAUDE_EFFORT:medium}
+    # SDK는 타임아웃도 재시도하므로 최대 대기는 timeout x (max-retries + 1)이다. 앱 타임아웃은 이보다 길게 잡는다.
+    # 실제 호출에서 질문 생성이 14초 걸린 적이 있어 여유를 둔다.
+    timeout: 30s
+    max-retries: 2
+    max-output-tokens: 4000
+    daily-input-token-limit: ${MAX_DAILY_INPUT_TOKENS:300000}
+    daily-output-token-limit: ${MAX_DAILY_OUTPUT_TOKENS:100000}
+    # 1M 토큰당 USD. 2026-10-06 기준 문서 값이며, 사용량 추산에만 쓴다.
+    pricing:
+      claude-haiku-5-5:
+        input-per-million: 0.10
+        output-per-million: 0.50
+      claude-sonnet-5-5:
+        input-per-million: 2.00
+        output-per-million: 10.00
