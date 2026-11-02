@@ -12,6 +12,11 @@ spring:
 
 # API 토큰은 APP_API_TOKEN 환경 변수로 받는다. 없으면 기동에 실패한다.
 app:
+  interview:
+    max-daily-sessions: ${MAX_DAILY_SESSIONS:2}
+    max-session-turns: ${MAX_SESSION_TURNS:30}
+    # 한 개념을 이어서 묻는 횟수. 넘으면 다음 질문으로 간다.
+    max-follow-up-depth: 2
   claude:
     # 없으면 기동에 실패한다.
     api-key: ${ANTHROPIC_API_KEY:}

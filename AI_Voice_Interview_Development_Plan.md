@@ -213,7 +213,7 @@ SCHEDULED
 1. **QuestionPlanner:** 당일 주제, 오답 복습 대상, 난이도, 기존 출제 이력을 바탕으로 `question_bank`에서 질문 선택.
 2. **QuestionGenerator:** 선택할 후보가 없을 때만 질문 하나와 참고 답안·채점 루브릭을 생성해 `question_bank`에 저장.
 3. **AnswerGrader:** 답변에서 기술적 사실·핵심 개념을 확인하여 판정하고, 꼬리질문과 그 채점 기준까지 **한 번의 호출로** 받는다.
-4. **FollowUpGenerator:** 별도 API 호출 없이 채점 결과의 `next_action`과 꼬리질문을 해석해 다음 턴을 만들고, 꼬리질문 깊이를 제한한다.
+4. **FollowUpGenerator:** 별도 API 호출 없이 채점 결과의 `next_action`과 꼬리질문을 해석해 다음 턴을 만들고, 꼬리질문 깊이를 제한한다. 상한에 닿으면 채점 요청에 `follow_up_allowed=false`를 넘겨, 예고한 꼬리질문이 사라지지 않게 한다.
 5. **ReviewScheduler:** 오답 우선순위, 다음 복습일 갱신.
 
 초기에는 같은 Claude 모델을 쓰되 **출제와 채점은 프롬프트·데이터 구조를 분리**한다. 향후 비용 최적화가 필요하면 출제와 채점 모델을 다르게 설정할 수 있게 한다.
@@ -384,7 +384,7 @@ android/app/src/main/java/.../
 | `GET /sessions/{id}` | 현재 세션 및 질문 조회 |
 | `DELETE /sessions/{id}` | 세션 삭제. 연결된 턴과 복습 항목도 함께 삭제 |
 | `POST /sessions/{id}/answers` | `turnId`, `recognizedText`, `clientRequestId` 전송 |
-| `POST /sessions/{id}/hint` | 힌트 요청 |
+| `POST /sessions/{id}/hint` | 힌트 요청. Claude를 부르지 않고 채점 기준의 첫 항목을 알려 준다 |
 | `POST /sessions/{id}/end` | 면접 종료 및 요약 저장. 요약은 Claude 호출 없이 DB 집계로 만든다 |
 | `GET /sessions/{id}/summary` | 세션 요약 조회 |
 | `GET /reviews/due` | 복습 대상 조회 |
@@ -428,6 +428,7 @@ backend/src/main/java/.../
   application/ReviewScheduler.java
   infrastructure/claude/ClaudeClientAdapter.java
   infrastructure/persistence/
+  infrastructure/seed/SeedQuestionLoader.java
   domain/session/
   domain/question/
   domain/review/
@@ -440,9 +441,9 @@ backend/src/main/java/.../
 
 | 테이블 | 핵심 컬럼 | 설명 |
 |---|---|---|
-| `interview_session` | `id`, `client_request_id`, `scheduled_date`, `source`, `status`, `started_at`, `ended_at`, `topic` | 세션 진행/결과 |
+| `interview_session` | `id`, `client_request_id`, `scheduled_date`, `source`, `status`, `topics`, `difficulty`, `duration_minutes`, `review_ratio`, `started_at`, `ended_at`, `topic` | 세션 진행/결과와 시작 시점의 학습 설정 |
 | `question_bank` | `id`, `topic`, `concept_key`, `difficulty`, `question_text`, `reference_points_json`, `rubric_version`, `origin`, `source_ref`, `source_commit` | 질문 및 채점 기준. `origin`은 `SEED`/`GENERATED` |
-| `session_turn` | `id`, `session_id`, `turn_no`, `question_id`(꼬리질문은 null), `concept_key`, `question_text`, `expected_points_json`, `answer_text`, `client_request_id`, `processing_status`, `verdict`, `feedback_json`, `response_ms` | 질문·답변·판정 |
+| `session_turn` | `id`, `session_id`, `turn_no`, `question_id`(꼬리질문은 null), `concept_key`, `question_text`, `expected_points_json`, `common_mistakes_json`, `follow_up_depth`, `answer_text`, `client_request_id`, `processing_status`, `verdict`, `feedback_json`, `response_ms` | 질문·답변·판정 |
 | `review_item` | `id`, `concept_key`, `source_turn_id`, `next_review_at`, `streak`, `priority` | 복습 상태 |
 | `api_usage_log` | `id`, `session_id`, `model_id`, `input_tokens`, `output_tokens`, `estimated_cost_usd`, `created_at` | 크레딧 사용량 추적 |
 
@@ -450,7 +451,7 @@ backend/src/main/java/.../
 
 **ID 타입:** 모든 테이블의 PK는 `bigint`(`GENERATED ALWAYS AS IDENTITY`)다. 앱이 재전송 식별을 위해 직접 만드는 `client_request_id`만 `uuid`다. DB가 하나이고 API가 Tailscale과 토큰 뒤에 있어, 분산 ID 생성이나 공개용 ID가 필요 없기 때문이다.
 
-**값 목록:** `interview_session.status`는 `ASKING`, `LISTENING`, `GRADING`, `EXPLAINING`, `FOLLOW_UP`, `COMPLETED`이고, `session_turn.processing_status`는 `AWAITING_ANSWER`, `GRADING`, `GRADED`, `FAILED`이며, `session_turn.verdict`는 `CORRECT`, `PARTIAL`, `WRONG`, `UNDETERMINED`(판단보류)다.
+**값 목록:** `interview_session.status`는 `ASKING`, `LISTENING`, `GRADING`, `EXPLAINING`, `FOLLOW_UP`, `COMPLETED`이고, `session_turn.processing_status`는 `AWAITING_ANSWER`, `GRADING`, `GRADED`, `FAILED`이며, `session_turn.verdict`는 `CORRECT`, `PARTIAL`, `WRONG`, `UNDETERMINED`(판단보류)다. 서버의 세션 상태는 현재 `ASKING`, `GRADING`, `COMPLETED`만 쓰고, 말하기·듣기 단계는 앱이 관리한다.
 
 **주요 제약:**
 
@@ -634,11 +635,11 @@ ai-voice-interview/
 │  ├─ .env.example
 │  ├─ .env              # API 키 보관, Git 제외
 │  └─ backup/
-├─ eval/
-│  └─ grading-cases.json
-└─ seed/
-   └─ flowticket-questions.json
+└─ eval/
+   └─ grading-cases.json
 ```
+
+시드 질문은 `backend/src/main/resources/seed/`에 둔다. Docker 빌드 범위가 `backend/`이기 때문이다.
 
 ### 12.1 추천 개발 첫 순서
 

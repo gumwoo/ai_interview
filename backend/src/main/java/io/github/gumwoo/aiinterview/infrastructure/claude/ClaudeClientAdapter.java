@@ -68,9 +68,10 @@ public class ClaudeClientAdapter implements InterviewLlm {
 				<question>%s</question>
 				<expected_points>%s</expected_points>
 				<common_mistakes>%s</common_mistakes>
+				<follow_up_allowed>%s</follow_up_allowed>
 				<answer>%s</answer>
 				""".formatted(request.question(), String.join("\n", request.expectedPoints()),
-				String.join("\n", request.commonMistakes()), request.answer());
+				String.join("\n", request.commonMistakes()), request.followUpAllowed(), request.answer());
 		GradingResult result = call(gradingSystemPrompt, userMessage, GradingResult.class, sessionId);
 		requireText(result.feedbackToSpeak(), "feedbackToSpeak");
 		if (result.verdict() == null || result.nextAction() == null) {
