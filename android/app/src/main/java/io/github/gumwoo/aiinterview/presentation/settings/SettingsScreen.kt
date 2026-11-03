@@ -188,7 +188,7 @@ fun SettingsScreen(
                 Spacer(Modifier.height(32.dp))
             }
             Spacer(Modifier.height(8.dp))
-            PillButton(stringResource(R.string.settings_save), { save() })
+            PillButton(stringResource(R.string.settings_save), { if (save()) onBack() })
             Spacer(Modifier.height(24.dp))
         }
     }

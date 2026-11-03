@@ -178,7 +178,7 @@ fun ScheduleScreen(
                     store.save(InterviewSchedule(enabled, hour, minute, days.map(DayOfWeek::valueOf).toSet()))
                     val apply = {
                         scheduler.reschedule()
-                        message = R.string.settings_saved
+                        onBack()
                     }
                     if (enabled) requestCallPermissions(apply) else apply()
                 },
