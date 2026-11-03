@@ -525,6 +525,75 @@ class InterviewFlowTest {
 	}
 
 	@Test
+	void should_list_history_newest_first_with_verdict_counts() throws Exception {
+		seed("c1", "질문1");
+		seed("c2", "질문2");
+		seed("c3", "질문3");
+		seed("c4", "질문4");
+		Map<String, Object> older = start("MANUAL", UUID.randomUUID());
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.WRONG, NextAction.NEXT_QUESTION, ""));
+		Map<String, Object> answered = answer(older, turnId(older), "틀린 답", UUID.randomUUID());
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.CORRECT, NextAction.NEXT_QUESTION, ""));
+		answer(older, ((Number) answered.get("nextTurnId")).longValue(), "맞는 답", UUID.randomUUID());
+		clock.advance(Duration.ofDays(1));
+		Map<String, Object> newer = start("MANUAL", UUID.randomUUID());
+		answer(newer, turnId(newer), "맞는 답", UUID.randomUUID());
+
+		mockMvc.perform(get("/api/v1/history?from=2026-11-01&to=2026-11-30").header(HttpHeaders.AUTHORIZATION, BEARER))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(2))
+			.andExpect(jsonPath("$[0].sessionId").value(newer.get("sessionId")))
+			.andExpect(jsonPath("$[0].answeredCount").value(1))
+			.andExpect(jsonPath("$[0].source").value("MANUAL"))
+			.andExpect(jsonPath("$[1].sessionId").value(older.get("sessionId")))
+			.andExpect(jsonPath("$[1].answeredCount").value(2))
+			.andExpect(jsonPath("$[1].verdictCounts.WRONG").value(1))
+			.andExpect(jsonPath("$[1].verdictCounts.CORRECT").value(1))
+			.andExpect(jsonPath("$[1].verdictCounts.PARTIAL").value(0));
+	}
+
+	@Test
+	void should_hide_sessions_without_answers_from_history() throws Exception {
+		seed("c1", "질문1");
+		start("MANUAL", UUID.randomUUID());
+
+		mockMvc.perform(get("/api/v1/history?from=2026-11-01&to=2026-11-30").header(HttpHeaders.AUTHORIZATION, BEARER))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(0));
+	}
+
+	@Test
+	void should_limit_history_by_local_date_range() throws Exception {
+		seed("c1", "질문1");
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.CORRECT, NextAction.NEXT_QUESTION, ""));
+		seed("c2", "질문2");
+		clock.set(Instant.parse("2026-11-02T14:59:00Z"));
+		Map<String, Object> monday = start("MANUAL", UUID.randomUUID());
+		answer(monday, turnId(monday), "답", UUID.randomUUID());
+		clock.set(Instant.parse("2026-11-02T15:00:00Z"));
+		Map<String, Object> tuesday = start("MANUAL", UUID.randomUUID());
+		answer(tuesday, turnId(tuesday), "답", UUID.randomUUID());
+
+		mockMvc.perform(get("/api/v1/history?from=2026-11-03&to=2026-11-03").header(HttpHeaders.AUTHORIZATION, BEARER))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.length()").value(1))
+			.andExpect(jsonPath("$[0].sessionId").value(tuesday.get("sessionId")));
+	}
+
+	@Test
+	void should_reject_history_without_valid_dates() throws Exception {
+		mockMvc.perform(get("/api/v1/history").header(HttpHeaders.AUTHORIZATION, BEARER))
+			.andExpect(status().isBadRequest());
+		mockMvc.perform(get("/api/v1/history?from=어제&to=오늘").header(HttpHeaders.AUTHORIZATION, BEARER))
+			.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void should_require_token_for_history() throws Exception {
+		mockMvc.perform(get("/api/v1/history?from=2026-11-01&to=2026-11-30")).andExpect(status().isUnauthorized());
+	}
+
+	@Test
 	void should_delete_session_with_turns() throws Exception {
 		seed("c1", "질문1");
 		Map<String, Object> session = start("MANUAL", UUID.randomUUID());

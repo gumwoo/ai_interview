@@ -17,6 +17,25 @@
     <string name="home_start">지금 연습하기</string>
     <string name="home_setup">서버 연결 설정</string>
     <string name="home_settings">설정</string>
+    <string name="home_history">기록</string>
+    <string name="history_title">통화 기록</string>
+    <string name="history_empty">아직 통화 기록이 없습니다.</string>
+    <string name="history_failed">기록을 불러오지 못했습니다. 서버 연결을 확인해 주세요.</string>
+    <string name="history_retry">다시 시도</string>
+    <string name="history_yesterday">어제</string>
+    <string name="history_manual">직접 시작</string>
+    <string name="history_questions">질문 %1$d개</string>
+    <string name="history_count_correct">맞음 %1$d</string>
+    <string name="history_count_partial">일부 %1$d</string>
+    <string name="history_count_wrong">틀림 %1$d</string>
+    <string name="history_review">복습</string>
+    <string name="history_verdict_correct">맞음</string>
+    <string name="history_verdict_review_correct">이번엔 맞음</string>
+    <string name="history_verdict_partial">일부만 맞음</string>
+    <string name="history_verdict_wrong">틀림</string>
+    <string name="history_delete">이 기록 지우기</string>
+    <string name="history_delete_confirm">한 번 더 누르면 지워집니다</string>
+    <string name="history_delete_notice">이 면접에서 틀린 내용은 복습 목록에서도 빠집니다.</string>
 
     <string name="incoming_label">면접 전화</string>
     <string name="incoming_topics_more">%1$s 외 %2$d개 · %3$d분</string>

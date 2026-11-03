@@ -42,6 +42,7 @@ fun HomeScreen(
     onStart: () -> Unit,
     onOpenSchedule: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenHistory: () -> Unit,
 ) {
     val now = ZonedDateTime.now()
     val next = schedule.nextOccurrence(now)
@@ -53,7 +54,12 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(stringResource(R.string.home_label), style = MaterialTheme.typography.labelMedium, color = CallColors.Muted)
-                SmallButton(stringResource(R.string.home_settings), onOpenSettings)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (canStart) {
+                        SmallButton(stringResource(R.string.home_history), onOpenHistory)
+                    }
+                    SmallButton(stringResource(R.string.home_settings), onOpenSettings)
+                }
             }
             Spacer(Modifier.height(56.dp))
             Text(stringResource(R.string.home_next_call), style = MaterialTheme.typography.labelMedium, color = CallColors.Muted)

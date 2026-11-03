@@ -1,5 +1,6 @@
 package io.github.gumwoo.aiinterview.data
 
+import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
 /** 서버의 면접 API. 형식은 계획서 7.1을 따른다. */
@@ -15,6 +16,42 @@ interface InterviewApi {
 
     suspend fun endSession(sessionId: Long): SummaryResponse
 }
+
+/** 지난 면접 기록 API. */
+interface HistoryApi {
+    suspend fun history(from: LocalDate, to: LocalDate): List<HistoryItem>
+
+    suspend fun session(sessionId: Long): SessionDetail
+
+    suspend fun deleteSession(sessionId: Long)
+}
+
+@Serializable
+data class HistoryItem(
+    val sessionId: Long,
+    val source: String,
+    val startedAt: String,
+    val endedAt: String? = null,
+    val answeredCount: Long,
+    val verdictCounts: Map<String, Long> = emptyMap(),
+)
+
+@Serializable
+data class SessionDetail(
+    val sessionId: Long,
+    val turns: List<SessionTurnDetail> = emptyList(),
+)
+
+@Serializable
+data class SessionTurnDetail(
+    val turnId: Long,
+    val questionText: String,
+    val answerText: String? = null,
+    val processingStatus: String,
+    val verdict: String? = null,
+    val feedbackToSpeak: String? = null,
+    val review: Boolean = false,
+)
 
 @Serializable
 data class StartSessionRequest(

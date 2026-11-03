@@ -1,10 +1,12 @@
 package io.github.gumwoo.aiinterview.data
 
 import java.io.IOException
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -18,7 +20,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class HttpInterviewApi(
     private val connection: () -> ServerConnection,
     private val client: OkHttpClient = defaultClient(),
-) : InterviewApi {
+) : InterviewApi, HistoryApi {
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -48,6 +50,19 @@ class HttpInterviewApi(
 
     override suspend fun endSession(sessionId: Long): SummaryResponse =
         decode(post("/sessions/$sessionId/end", "{}"), SummaryResponse.serializer())
+
+    override suspend fun history(from: LocalDate, to: LocalDate): List<HistoryItem> =
+        decode(
+            call(Request.Builder().url(url("/history?from=$from&to=$to")).get()),
+            ListSerializer(HistoryItem.serializer()),
+        )
+
+    override suspend fun session(sessionId: Long): SessionDetail =
+        decode(call(Request.Builder().url(url("/sessions/$sessionId")).get()), SessionDetail.serializer())
+
+    override suspend fun deleteSession(sessionId: Long) {
+        call(Request.Builder().url(url("/sessions/$sessionId")).delete())
+    }
 
     private suspend fun post(path: String, body: String): String {
         val requestBody: RequestBody = body.toRequestBody(JSON_MEDIA_TYPE)
