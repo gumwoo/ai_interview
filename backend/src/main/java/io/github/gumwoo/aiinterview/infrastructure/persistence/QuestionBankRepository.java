@@ -32,4 +32,23 @@ public interface QuestionBankRepository extends JpaRepository<QuestionBankItem, 
 	Optional<QuestionBankItem> pickNext(@Param("topics") Collection<String> topics,
 			@Param("difficulty") String difficulty, @Param("sessionId") long sessionId);
 
+	/**
+	 * 복습 목록에서 가장 오래 기다린 개념의 질문을 고른다. 같은 개념에 질문이 여럿이면 낸 지 오래된 것이 먼저다.
+	 */
+	@Query(value = """
+			SELECT q.*
+			FROM review_item r
+			JOIN question_bank q ON q.concept_key = r.concept_key
+			WHERE q.topic IN (:topics)
+			  AND q.difficulty = :difficulty
+			  AND NOT EXISTS (
+			    SELECT 1 FROM session_turn t
+			    WHERE t.session_id = :sessionId AND t.concept_key = q.concept_key
+			  )
+			ORDER BY r.id, (SELECT max(t.created_at) FROM session_turn t WHERE t.question_id = q.id) ASC NULLS FIRST, random()
+			LIMIT 1
+			""", nativeQuery = true)
+	Optional<QuestionBankItem> pickReview(@Param("topics") Collection<String> topics,
+			@Param("difficulty") String difficulty, @Param("sessionId") long sessionId);
+
 }

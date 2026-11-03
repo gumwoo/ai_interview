@@ -135,7 +135,7 @@ class InterviewViewModel(
             topics = config.topics,
             difficulty = config.difficulty,
             durationMinutes = config.durationMinutes,
-            reviewRatio = InterviewSettings.REVIEW_RATIO,
+            reviewRatio = config.reviewRatio,
             clientRequestId = requestId,
         )
         val date = call.scheduledDate ?: return api.startSession(request)

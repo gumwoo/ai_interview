@@ -44,12 +44,12 @@ public final class InterviewModels {
 	}
 
 	public record TurnView(Long turnId, int turnNo, String questionText, String answerText,
-			ProcessingStatus processingStatus, Verdict verdict, String feedbackToSpeak) {
+			ProcessingStatus processingStatus, Verdict verdict, String feedbackToSpeak, boolean review) {
 
 		static TurnView of(SessionTurn turn) {
 			return new TurnView(turn.getId(), turn.getTurnNo(), turn.getQuestionText(), turn.getAnswerText(),
 					turn.getProcessingStatus(), turn.getVerdict(),
-					turn.getFeedback() != null ? turn.getFeedback().feedbackToSpeak() : null);
+					turn.getFeedback() != null ? turn.getFeedback().feedbackToSpeak() : null, turn.isReview());
 		}
 
 	}

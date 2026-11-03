@@ -56,6 +56,10 @@ public class SessionTurn {
 	@Column(name = "follow_up_depth", nullable = false)
 	private int followUpDepth;
 
+	/** 전에 틀린 개념을 다시 묻는 질문이다. */
+	@Column(nullable = false)
+	private boolean review;
+
 	@Column(name = "answer_text")
 	private String answerText;
 
@@ -84,6 +88,13 @@ public class SessionTurn {
 
 	public SessionTurn(Long sessionId, int turnNo, Long questionId, String conceptKey, String questionText,
 			List<String> expectedPoints, List<String> commonMistakes, int followUpDepth, Instant createdAt) {
+		this(sessionId, turnNo, questionId, conceptKey, questionText, expectedPoints, commonMistakes, followUpDepth,
+				false, createdAt);
+	}
+
+	public SessionTurn(Long sessionId, int turnNo, Long questionId, String conceptKey, String questionText,
+			List<String> expectedPoints, List<String> commonMistakes, int followUpDepth, boolean review,
+			Instant createdAt) {
 		this.sessionId = sessionId;
 		this.turnNo = turnNo;
 		this.questionId = questionId;
@@ -92,6 +103,7 @@ public class SessionTurn {
 		this.expectedPoints = expectedPoints;
 		this.commonMistakes = commonMistakes;
 		this.followUpDepth = followUpDepth;
+		this.review = review;
 		this.processingStatus = ProcessingStatus.AWAITING_ANSWER;
 		this.createdAt = createdAt;
 	}
@@ -141,6 +153,10 @@ public class SessionTurn {
 
 	public int getFollowUpDepth() {
 		return followUpDepth;
+	}
+
+	public boolean isReview() {
+		return review;
 	}
 
 	public String getAnswerText() {

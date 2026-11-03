@@ -9,6 +9,7 @@ import java.util.UUID;
 import io.github.gumwoo.aiinterview.application.interview.InterviewException.ErrorCode;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.StartSession;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.SubmitAnswer;
+import io.github.gumwoo.aiinterview.application.interview.QuestionPlanner.PlannedQuestion;
 import io.github.gumwoo.aiinterview.application.llm.InterviewLlm.GradingResult;
 import io.github.gumwoo.aiinterview.domain.question.QuestionBankItem;
 import io.github.gumwoo.aiinterview.domain.session.InterviewSession;
@@ -28,13 +29,15 @@ public class InterviewStore {
 
 	private final InterviewSessionRepository sessions;
 	private final SessionTurnRepository turns;
+	private final ReviewScheduler reviews;
 	private final InterviewProperties properties;
 	private final Clock clock;
 
-	public InterviewStore(InterviewSessionRepository sessions, SessionTurnRepository turns,
+	public InterviewStore(InterviewSessionRepository sessions, SessionTurnRepository turns, ReviewScheduler reviews,
 			InterviewProperties properties, Clock clock) {
 		this.sessions = sessions;
 		this.turns = turns;
+		this.reviews = reviews;
 		this.properties = properties;
 		this.clock = clock;
 	}
@@ -62,7 +65,7 @@ public class InterviewStore {
 	}
 
 	@Transactional
-	public InterviewSession createSession(StartSession command, QuestionBankItem question) {
+	public InterviewSession createSession(StartSession command, PlannedQuestion question) {
 		InterviewSession session = sessions.saveAndFlush(new InterviewSession(command.clientRequestId(),
 				command.scheduledDate(), command.source(), command.topics(), command.difficulty(),
 				command.durationMinutes(), command.reviewRatio(), clock.instant()));
@@ -100,7 +103,9 @@ public class InterviewStore {
 
 	@Transactional
 	public void recordGrading(Long turnId, GradingResult result, int responseMs) {
-		turns.findById(turnId).orElseThrow().recordGrading(result, responseMs);
+		SessionTurn turn = turns.findById(turnId).orElseThrow();
+		turn.recordGrading(result, responseMs);
+		reviews.record(turn);
 	}
 
 	@Transactional
@@ -138,9 +143,11 @@ public class InterviewStore {
 		return turns.failInterruptedGradings();
 	}
 
-	static SessionTurn newTurn(Long sessionId, int turnNo, QuestionBankItem question, Instant now) {
+	static SessionTurn newTurn(Long sessionId, int turnNo, PlannedQuestion planned, Instant now) {
+		QuestionBankItem question = planned.question();
 		return new SessionTurn(sessionId, turnNo, question.getId(), question.getConceptKey(), question.getQuestionText(),
-				question.getReferencePoints().expectedPoints(), question.getReferencePoints().commonMistakes(), 0, now);
+				question.getReferencePoints().expectedPoints(), question.getReferencePoints().commonMistakes(), 0,
+				planned.review(), now);
 	}
 
 	public record Claim(SessionTurn turn, boolean needsGrading) {

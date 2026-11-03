@@ -16,6 +16,13 @@ class InterviewSettingsTest {
     }
 
     @Test
+    fun `converts review percent to ratio`() {
+        assertEquals(0.4, InterviewSettings().reviewRatio, 0.0)
+        assertEquals(0.0, InterviewSettings(reviewPercent = 0).reviewRatio, 0.0)
+        assertEquals(0.6, InterviewSettings(reviewPercent = 60).reviewRatio, 0.0)
+    }
+
+    @Test
     fun `parses comma separated topics`() {
         assertEquals(listOf("Kubernetes", "AWS"), InterviewSettings.parseTopics(" Kubernetes, ,AWS ,"))
     }

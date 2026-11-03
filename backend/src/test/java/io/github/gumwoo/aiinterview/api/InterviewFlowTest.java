@@ -399,6 +399,132 @@ class InterviewFlowTest {
 	}
 
 	@Test
+	void should_ask_wrong_concept_again_until_answered_correctly() throws Exception {
+		seed("c1", "질문1");
+		Map<String, Object> first = start("MANUAL", UUID.randomUUID());
+		assertThat(isReview(first)).isFalse();
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.WRONG, NextAction.NEXT_QUESTION, ""));
+		seed("c2", "질문2");
+		answer(first, turnId(first), "틀린 답", UUID.randomUUID());
+		assertThat(reviewConcepts()).containsExactly("c1");
+
+		Map<String, Object> second = start("MANUAL", UUID.randomUUID());
+		assertThat(second.get("questionText")).isEqualTo("질문1");
+		assertThat(isReview(second)).isTrue();
+		answer(second, turnId(second), "또 틀린 답", UUID.randomUUID());
+		assertThat(reviewConcepts()).containsExactly("c1");
+
+		Map<String, Object> third = start("MANUAL", UUID.randomUUID());
+		assertThat(third.get("questionText")).isEqualTo("질문1");
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.CORRECT, NextAction.NEXT_QUESTION, ""));
+		answer(third, turnId(third), "맞는 답", UUID.randomUUID());
+		assertThat(reviewConcepts()).isEmpty();
+
+		assertThat(isReview(start("MANUAL", UUID.randomUUID()))).isFalse();
+	}
+
+	@Test
+	void should_add_partial_answer_to_reviews() throws Exception {
+		seed("c1", "질문1");
+		seed("c2", "질문2");
+		Map<String, Object> session = start("MANUAL", UUID.randomUUID());
+		String concept = jdbc.queryForObject("SELECT concept_key FROM session_turn", String.class);
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.PARTIAL, NextAction.NEXT_QUESTION, ""));
+
+		answer(session, turnId(session), "일부만 맞은 답", UUID.randomUUID());
+
+		assertThat(reviewConcepts()).containsExactly(concept);
+	}
+
+	@Test
+	void should_keep_review_when_only_follow_up_is_correct() throws Exception {
+		seed("c1", "질문1");
+		seed("c2", "질문2");
+		Map<String, Object> session = start("MANUAL", UUID.randomUUID());
+		String concept = jdbc.queryForObject("SELECT concept_key FROM session_turn", String.class);
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.WRONG, NextAction.EXPLAIN_AND_RECHECK, "꼬리질문"));
+		Map<String, Object> wrong = answer(session, turnId(session), "모르겠어요", UUID.randomUUID());
+
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.CORRECT, NextAction.NEXT_QUESTION, ""));
+		answer(session, ((Number) wrong.get("nextTurnId")).longValue(), "설명 듣고 한 답", UUID.randomUUID());
+
+		assertThat(reviewConcepts()).containsExactly(concept);
+	}
+
+	@Test
+	void should_not_add_review_when_answer_cannot_be_judged() throws Exception {
+		seed("c1", "질문1");
+		Map<String, Object> session = start("MANUAL", UUID.randomUUID());
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.UNDETERMINED, NextAction.CLARIFY, ""));
+
+		answer(session, turnId(session), "웅얼웅얼", UUID.randomUUID());
+
+		assertThat(reviewConcepts()).isEmpty();
+	}
+
+	@Test
+	void should_mix_reviews_and_new_questions_by_ratio() throws Exception {
+		failConcepts("c1", "c2");
+		seed("c3", "질문3");
+		seed("c4", "질문4");
+		Map<String, Object> session = parse(postStart("MANUAL", UUID.randomUUID(), "0.4").andExpect(status().isOk()));
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.CORRECT, NextAction.NEXT_QUESTION, ""));
+
+		assertThat(session.get("questionText")).isEqualTo("질문c1");
+		Map<String, Object> second = answer(session, turnId(session), "답", UUID.randomUUID());
+		assertThat(second.get("nextQuestionText")).isIn("질문3", "질문4");
+		Map<String, Object> third = answer(session, ((Number) second.get("nextTurnId")).longValue(), "답",
+				UUID.randomUUID());
+		assertThat(third.get("nextQuestionText")).isEqualTo("질문c2");
+	}
+
+	@Test
+	void should_not_ask_reviews_when_ratio_is_zero() throws Exception {
+		failConcepts("c1");
+		seed("c3", "질문3");
+
+		Map<String, Object> session = parse(postStart("MANUAL", UUID.randomUUID(), "0").andExpect(status().isOk()));
+
+		assertThat(session.get("questionText")).isEqualTo("질문3");
+	}
+
+	@Test
+	void should_not_repeat_concept_answered_wrong_in_same_session() throws Exception {
+		seed("c1", "질문1");
+		seed("c2", "질문2");
+		Map<String, Object> session = start("MANUAL", UUID.randomUUID());
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.WRONG, NextAction.NEXT_QUESTION, ""));
+
+		Map<String, Object> answered = answer(session, turnId(session), "틀린 답", UUID.randomUUID());
+
+		assertThat(answered.get("nextQuestionText")).isNotEqualTo(session.get("questionText"));
+	}
+
+	@Test
+	void should_skip_review_outside_selected_topics() throws Exception {
+		failConcepts("c1");
+		jdbc.update("UPDATE question_bank SET topic = 'AWS' WHERE concept_key = 'c1'");
+		seed("c3", "질문3");
+
+		assertThat(start("MANUAL", UUID.randomUUID()).get("questionText")).isEqualTo("질문3");
+		assertThat(reviewConcepts()).containsExactly("c1");
+	}
+
+	@Test
+	void should_remove_review_when_its_session_is_deleted() throws Exception {
+		seed("c1", "질문1");
+		Map<String, Object> session = start("MANUAL", UUID.randomUUID());
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.WRONG, NextAction.NEXT_QUESTION, ""));
+		seed("c2", "질문2");
+		answer(session, turnId(session), "틀린 답", UUID.randomUUID());
+
+		mockMvc.perform(delete(path(session)).header(HttpHeaders.AUTHORIZATION, BEARER))
+			.andExpect(status().isNoContent());
+
+		assertThat(reviewConcepts()).isEmpty();
+	}
+
+	@Test
 	void should_delete_session_with_turns() throws Exception {
 		seed("c1", "질문1");
 		Map<String, Object> session = start("MANUAL", UUID.randomUUID());
@@ -440,12 +566,16 @@ class InterviewFlowTest {
 	}
 
 	private ResultActions postStart(String source, UUID requestId) throws Exception {
+		return postStart(source, requestId, "0.4");
+	}
+
+	private ResultActions postStart(String source, UUID requestId, String reviewRatio) throws Exception {
 		return mockMvc.perform(post("/api/v1/sessions").header(HttpHeaders.AUTHORIZATION, BEARER)
 			.contentType(MediaType.APPLICATION_JSON)
 			.content("""
 					{"source":"%s","scheduledDate":"2026-11-02","topics":["Kubernetes"],"difficulty":"intermediate",
-					 "durationMinutes":15,"reviewRatio":0.4,"clientRequestId":"%s"}
-					""".formatted(source, requestId)));
+					 "durationMinutes":15,"reviewRatio":%s,"clientRequestId":"%s"}
+					""".formatted(source, reviewRatio, requestId)));
 	}
 
 	private Map<String, Object> answer(Map<String, Object> session, long turnId, String text, UUID requestId)
@@ -471,6 +601,32 @@ class InterviewFlowTest {
 
 	private static long turnId(Map<String, Object> session) {
 		return ((Number) session.get("turnId")).longValue();
+	}
+
+	/** 개념마다 한 면접씩 진행해 틀린 상태를 만든다. 질문 내용은 "질문" + 개념이다. */
+	private void failConcepts(String... concepts) throws Exception {
+		given(llm.gradeAnswer(any(), any())).willReturn(result(Verdict.WRONG, NextAction.NEXT_QUESTION, ""));
+		given(llm.generateQuestion(any(), any())).willAnswer((call) -> generated("extra", "추가 질문"));
+		for (String concept : concepts) {
+			seed(concept, "질문" + concept);
+			Map<String, Object> session = parse(postStart("MANUAL", UUID.randomUUID(), "0").andExpect(status().isOk()));
+			answer(session, turnId(session), "틀린 답", UUID.randomUUID());
+			mockMvc.perform(post(path(session) + "/end").header(HttpHeaders.AUTHORIZATION, BEARER))
+				.andExpect(status().isOk());
+		}
+		jdbc.update("DELETE FROM review_item WHERE concept_key = 'extra'");
+		jdbc.update("DELETE FROM session_turn WHERE concept_key = 'extra'");
+		jdbc.update("DELETE FROM question_bank WHERE concept_key = 'extra'");
+	}
+
+	private List<String> reviewConcepts() {
+		return jdbc.queryForList("SELECT concept_key FROM review_item ORDER BY id", String.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static boolean isReview(Map<String, Object> session) {
+		List<Map<String, Object>> turns = (List<Map<String, Object>>) session.get("turns");
+		return (boolean) turns.get(turns.size() - 1).get("review");
 	}
 
 	private int count(String table) {

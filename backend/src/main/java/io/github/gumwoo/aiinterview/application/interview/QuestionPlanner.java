@@ -1,5 +1,6 @@
 package io.github.gumwoo.aiinterview.application.interview;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
@@ -8,12 +9,14 @@ import io.github.gumwoo.aiinterview.application.llm.InterviewLlm;
 import io.github.gumwoo.aiinterview.domain.question.QuestionBankItem;
 import io.github.gumwoo.aiinterview.domain.question.QuestionBankItem.QuestionOrigin;
 import io.github.gumwoo.aiinterview.domain.question.QuestionBankItem.ReferencePoints;
+import io.github.gumwoo.aiinterview.domain.session.SessionTurn;
 import io.github.gumwoo.aiinterview.infrastructure.persistence.QuestionBankRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 /**
- * 다음 질문을 정한다. 질문 은행을 먼저 쓰고, 후보가 없을 때만 Claude로 생성해 저장한다.
+ * 다음 질문을 정한다. 복습 비율만큼 전에 틀린 개념을 먼저 다시 묻고, 그 밖에는 질문 은행을 쓴다.
+ * 후보가 없을 때만 Claude로 생성해 저장한다.
  * 트랜잭션을 열지 않으므로 Claude를 기다리는 동안 DB 커넥션을 쥐지 않는다.
  */
 @Component
@@ -32,9 +35,25 @@ public class QuestionPlanner {
 		this.clock = clock;
 	}
 
-	public QuestionBankItem next(List<String> topics, String difficulty, long sessionId, List<String> recentConcepts) {
-		Optional<QuestionBankItem> picked = repository.pickNext(topics, difficulty, sessionId);
-		return picked.orElseGet(() -> generate(topics, difficulty, sessionId, recentConcepts));
+	public PlannedQuestion next(List<String> topics, String difficulty, BigDecimal reviewRatio, long sessionId,
+			List<SessionTurn> turns) {
+		if (isReviewTurn(reviewRatio, turns)) {
+			Optional<QuestionBankItem> review = repository.pickReview(topics, difficulty, sessionId);
+			if (review.isPresent()) {
+				return new PlannedQuestion(review.get(), true);
+			}
+		}
+		List<String> recentConcepts = turns.stream().map(SessionTurn::getConceptKey).distinct().toList();
+		QuestionBankItem question = repository.pickNext(topics, difficulty, sessionId)
+			.orElseGet(() -> generate(topics, difficulty, sessionId, recentConcepts));
+		return new PlannedQuestion(question, false);
+	}
+
+	/** 지금까지 낸 복습 질문이 비율에 못 미치면 복습 차례다. 비율이 0보다 크면 첫 질문은 복습이다. */
+	private static boolean isReviewTurn(BigDecimal reviewRatio, List<SessionTurn> turns) {
+		List<SessionTurn> asked = turns.stream().filter((turn) -> turn.getFollowUpDepth() == 0).toList();
+		long reviews = asked.stream().filter(SessionTurn::isReview).count();
+		return BigDecimal.valueOf(reviews).compareTo(reviewRatio.multiply(BigDecimal.valueOf(asked.size() + 1L))) < 0;
 	}
 
 	private QuestionBankItem generate(List<String> topics, String difficulty, long sessionId,
@@ -52,6 +71,9 @@ public class QuestionPlanner {
 		catch (DataIntegrityViolationException ex) {
 			return repository.findByQuestionText(generated.question()).orElseThrow(() -> ex);
 		}
+	}
+
+	public record PlannedQuestion(QuestionBankItem question, boolean review) {
 	}
 
 }

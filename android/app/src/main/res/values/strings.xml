@@ -61,6 +61,9 @@
     <string name="settings_topics">주제</string>
     <string name="settings_difficulty">난이도</string>
     <string name="settings_duration">면접 시간</string>
+    <string name="settings_review">복습 비율</string>
+    <string name="settings_review_none">안 함</string>
+    <string name="settings_review_value">%1$d%%</string>
     <string name="settings_save">저장</string>
     <string name="settings_saved">저장했습니다.</string>
     <string name="settings_check">연결 확인</string>

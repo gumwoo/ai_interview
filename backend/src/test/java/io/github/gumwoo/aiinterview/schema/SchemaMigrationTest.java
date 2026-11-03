@@ -78,8 +78,7 @@ class SchemaMigrationTest {
 	void should_delete_turns_and_reviews_but_keep_usage_when_session_deleted() {
 		long sessionId = insertSession("MANUAL");
 		long turnId = insertTurn(sessionId, 1, UUID.randomUUID());
-		jdbc.update("INSERT INTO review_item (concept_key, source_turn_id, next_review_at) VALUES ('c', ?, now())",
-				turnId);
+		jdbc.update("INSERT INTO review_item (concept_key, source_turn_id) VALUES ('c', ?)", turnId);
 		jdbc.update("""
 				INSERT INTO api_usage_log (session_id, model_id, input_tokens, output_tokens, estimated_cost_usd)
 				VALUES (?, 'claude-haiku-5-5', 10, 20, 0.000011)
