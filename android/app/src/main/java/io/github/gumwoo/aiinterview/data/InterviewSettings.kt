@@ -9,9 +9,11 @@ data class InterviewSettings(
     val topics: List<String> = DEFAULT_TOPICS,
     val difficulty: String = "intermediate",
     val durationMinutes: Int = 15,
+    val reviewPercent: Int = 40,
 ) {
+    val reviewRatio: Double get() = reviewPercent / 100.0
+
     companion object {
-        const val REVIEW_RATIO = 0.4
         val DEFAULT_TOPICS = listOf(
             "Concurrency", "Transaction_Payment", "Redis_Queue", "Event_Outbox", "Spring_JPA", "Auth_Security",
             "Kubernetes", "Deployment_GitOps", "AWS", "Docker_CI", "LoadTest_Observability",
@@ -38,6 +40,7 @@ class InterviewSettingsStore(context: Context) {
             topics = preferences.getString(KEY_TOPICS, null)?.let(InterviewSettings::parseTopics) ?: defaults.topics,
             difficulty = preferences.getString(KEY_DIFFICULTY, defaults.difficulty).orEmpty(),
             durationMinutes = preferences.getInt(KEY_DURATION, defaults.durationMinutes),
+            reviewPercent = preferences.getInt(KEY_REVIEW_PERCENT, defaults.reviewPercent),
         )
     }
 
@@ -47,6 +50,7 @@ class InterviewSettingsStore(context: Context) {
             putString(KEY_TOPICS, settings.topics.joinToString(","))
             putString(KEY_DIFFICULTY, settings.difficulty)
             putInt(KEY_DURATION, settings.durationMinutes)
+            putInt(KEY_REVIEW_PERCENT, settings.reviewPercent)
         }
     }
 
@@ -56,5 +60,6 @@ class InterviewSettingsStore(context: Context) {
         const val KEY_TOPICS = "topics"
         const val KEY_DIFFICULTY = "difficulty"
         const val KEY_DURATION = "duration_minutes"
+        const val KEY_REVIEW_PERCENT = "review_percent"
     }
 }

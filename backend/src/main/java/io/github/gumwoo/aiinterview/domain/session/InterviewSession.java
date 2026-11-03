@@ -115,6 +115,10 @@ public class InterviewSession {
 		return difficulty;
 	}
 
+	public BigDecimal getReviewRatio() {
+		return reviewRatio;
+	}
+
 	public int getDurationMinutes() {
 		return durationMinutes;
 	}

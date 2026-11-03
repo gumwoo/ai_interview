@@ -22,6 +22,7 @@ import io.github.gumwoo.aiinterview.data.InterviewSchedule
 import io.github.gumwoo.aiinterview.data.InterviewSettings
 import io.github.gumwoo.aiinterview.presentation.schedule.daysLabel
 import io.github.gumwoo.aiinterview.presentation.settings.difficultyLabel
+import io.github.gumwoo.aiinterview.presentation.settings.reviewLabel
 import io.github.gumwoo.aiinterview.presentation.theme.CallColors
 import io.github.gumwoo.aiinterview.presentation.theme.PillButton
 import io.github.gumwoo.aiinterview.presentation.theme.SmallButton
@@ -77,6 +78,7 @@ fun HomeScreen(
                 stringResource(difficultyLabel(settings.difficulty)),
             )
             DetailRow(stringResource(R.string.settings_duration), stringResource(R.string.home_duration_value, settings.durationMinutes))
+            DetailRow(stringResource(R.string.settings_review), reviewLabel(settings.reviewPercent))
             if (!canStart) {
                 DetailRow(stringResource(R.string.home_row_server), stringResource(R.string.home_server_missing))
             }

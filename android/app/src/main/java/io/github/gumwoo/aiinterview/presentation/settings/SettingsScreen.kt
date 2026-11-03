@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 private const val MIN_TOKEN_LENGTH = 32
 private val DURATIONS = listOf(10, 15, 20, 30)
 private val DIFFICULTIES = listOf("intermediate", "advanced")
+private val REVIEW_PERCENTS = listOf(0, 20, 40, 60)
 
 @Composable
 fun SettingsScreen(
@@ -68,6 +69,7 @@ fun SettingsScreen(
     var topics by rememberSaveable { mutableStateOf(saved.topics) }
     var difficulty by rememberSaveable { mutableStateOf(saved.difficulty) }
     var duration by rememberSaveable { mutableStateOf(saved.durationMinutes) }
+    var reviewPercent by rememberSaveable { mutableStateOf(saved.reviewPercent) }
     var message by rememberSaveable { mutableStateOf<Int?>(null) }
     var checking by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -86,7 +88,7 @@ fun SettingsScreen(
             message = error
             return false
         }
-        settingsStore.save(InterviewSettings(serverUrl.trim(), topics, difficulty, duration))
+        settingsStore.save(InterviewSettings(serverUrl.trim(), topics, difficulty, duration, reviewPercent))
         if (token.isNotEmpty()) {
             tokenStore.save(token)
             token = ""
@@ -177,6 +179,12 @@ fun SettingsScreen(
                         Tag(stringResource(R.string.home_duration_value, minutes), duration == minutes, { duration = minutes })
                     }
                 }
+                Spacer(Modifier.height(24.dp))
+                TagGroup(stringResource(R.string.settings_review)) {
+                    REVIEW_PERCENTS.forEach { percent ->
+                        Tag(reviewLabel(percent), reviewPercent == percent, { reviewPercent = percent })
+                    }
+                }
                 Spacer(Modifier.height(32.dp))
             }
             Spacer(Modifier.height(8.dp))
@@ -262,6 +270,10 @@ private fun Tag(text: String, selected: Boolean, onClick: () -> Unit) {
         )
     }
 }
+
+@Composable
+internal fun reviewLabel(percent: Int): String =
+    if (percent == 0) stringResource(R.string.settings_review_none) else stringResource(R.string.settings_review_value, percent)
 
 internal fun difficultyLabel(difficulty: String): Int = when (difficulty) {
     "advanced" -> R.string.difficulty_advanced

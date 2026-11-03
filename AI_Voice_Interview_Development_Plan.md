@@ -34,7 +34,7 @@
 4. 사용자는 말을 통해 답한다. STT 결과가 화면에 표시된다.
 5. AI는 답변을 `정답 / 부분정답 / 오답 / 판단보류(STT 또는 정보 부족)`로 구분하고 근거를 설명한다.
 6. 정답이면 심화 꼬리질문, 부분정답이면 누락된 핵심을 묻는 질문, 오답이면 짧은 해설과 재확인 질문으로 진행한다.
-7. 통화 종료 시 학습 요약·오답·추가 복습일을 기록한다.
+7. 통화 종료 시 학습 요약과 오답을 기록한다.
 8. 다음 일정에서 과거 오답을 적절한 비중으로 다시 출제한다.
 
 ### 1.3 MVP 범위와 제외 범위
@@ -214,7 +214,7 @@ SCHEDULED
 2. **QuestionGenerator:** 선택할 후보가 없을 때만 질문 하나와 참고 답안·채점 루브릭을 생성해 `question_bank`에 저장.
 3. **AnswerGrader:** 답변에서 기술적 사실·핵심 개념을 확인하여 판정하고, 꼬리질문과 그 채점 기준까지 **한 번의 호출로** 받는다.
 4. **FollowUpGenerator:** 별도 API 호출 없이 채점 결과의 `next_action`과 꼬리질문을 해석해 다음 턴을 만들고, 꼬리질문 깊이를 제한한다. 상한에 닿으면 채점 요청에 `follow_up_allowed=false`를 넘겨, 예고한 꼬리질문이 사라지지 않게 한다.
-5. **ReviewScheduler:** 오답 우선순위, 다음 복습일 갱신.
+5. **ReviewScheduler:** 채점 결과로 복습 목록을 고친다.
 
 초기에는 같은 Claude 모델을 쓰되 **출제와 채점은 프롬프트·데이터 구조를 분리**한다. 향후 비용 최적화가 필요하면 출제와 채점 모델을 다르게 설정할 수 있게 한다.
 
@@ -281,11 +281,14 @@ SCHEDULED
 
 ### 5.5 복습 로직 v1
 
-- `WRONG` → 다음 학습일에 우선 재출제.
-- `PARTIAL` → 다음 2~3회 학습 중 복습 후보.
-- `CORRECT` → 약 7일 후 변형 질문으로 점검.
-- **3회 연속 정확한 설명** → 해당 개념 출제 가중치 낮춤.
-- 실제 학습효과를 보고 간격과 가중치를 조절한다(위 간격은 초기 설계값이며 검증된 최적값이 아님).
+복습일, 연속 정답 횟수, 우선순위는 두지 않고 단순하게 시작한다(사용자 결정).
+
+- `WRONG`, `PARTIAL` → 복습 목록에 넣는다. 꼬리질문에서 틀려도 같다.
+- 처음부터 다시 물어 `CORRECT` → 목록에서 뺀다. 꼬리질문을 맞힌 것은 방금 들은 설명을 따라 한 것일 수 있어 빼지 않는다.
+- `UNDETERMINED` → 목록을 바꾸지 않는다.
+- 다음 면접부터 복습 비율만큼 목록의 개념을 먼저 다시 묻는다. 오래 기다린 개념이 먼저이고, 비율이 0보다 크면 첫 질문이 복습이다.
+- 같은 면접에서 이미 다룬 개념, 고른 주제와 난이도에 없는 개념은 묻지 않는다.
+- 쓰면서 부족하면 간격을 추가한다.
 
 ### 5.6 질문 카테고리와 출처
 
@@ -389,7 +392,6 @@ android/app/src/main/java/.../
 | `POST /sessions/{id}/hint` | 힌트 요청. Claude를 부르지 않고 채점 기준의 첫 항목을 알려 준다 |
 | `POST /sessions/{id}/end` | 면접 종료 및 요약 저장. 요약은 Claude 호출 없이 DB 집계로 만든다 |
 | `GET /sessions/{id}/summary` | 세션 요약 조회 |
-| `GET /reviews/due` | 복습 대상 조회 |
 | `GET /history?from=&to=` | 날짜별 이력 목록 |
 
 예시 응답:
@@ -443,8 +445,8 @@ backend/src/main/java/.../
 |---|---|---|
 | `interview_session` | `id`, `client_request_id`, `scheduled_date`, `source`, `status`, `topics`, `difficulty`, `duration_minutes`, `review_ratio`, `started_at`, `ended_at`, `topic` | 세션 진행/결과와 시작 시점의 학습 설정 |
 | `question_bank` | `id`, `topic`, `concept_key`, `difficulty`, `question_text`, `reference_points_json`, `rubric_version`, `origin`, `source_ref`, `source_commit` | 질문 및 채점 기준. `origin`은 `SEED`/`GENERATED` |
-| `session_turn` | `id`, `session_id`, `turn_no`, `question_id`(꼬리질문은 null), `concept_key`, `question_text`, `expected_points_json`, `common_mistakes_json`, `follow_up_depth`, `answer_text`, `client_request_id`, `processing_status`, `verdict`, `feedback_json`, `response_ms` | 질문·답변·판정 |
-| `review_item` | `id`, `concept_key`, `source_turn_id`, `next_review_at`, `streak`, `priority` | 복습 상태 |
+| `session_turn` | `id`, `session_id`, `turn_no`, `question_id`(꼬리질문은 null), `concept_key`, `question_text`, `expected_points_json`, `common_mistakes_json`, `follow_up_depth`, `review`, `answer_text`, `client_request_id`, `processing_status`, `verdict`, `feedback_json`, `response_ms` | 질문·답변·판정 |
+| `review_item` | `id`, `concept_key`(유니크), `source_turn_id` | 다시 물을 개념. 맞히면 행을 지운다 |
 | `api_usage_log` | `id`, `session_id`, `model_id`, `input_tokens`, `output_tokens`, `estimated_cost_usd`, `created_at` | 크레딧 사용량 추적 |
 
 스케줄과 사용자 설정 테이블은 두지 않는다(4.1 참고). 사용자가 한 명이므로 `user_id`도 두지 않는다.
@@ -501,7 +503,7 @@ backend/src/main/java/.../
 | **M3 품질 게이트** | 정답·부분정답·오답 예시 30건 이상의 평가셋, 프롬프트 조정 | 채점을 저장소 대조 판정과 비교해 통과. Sonnet 기준 확인용 92%, 일관성 100%, 치명 오류 0건. 통과 전에는 앱 개발 안 함 | 저장소로 답할 수 없는 항목 확인 |
 | **M4 음성 앱** | Compose 앱, TTS와 STT, 수정과 재시도, 요약 화면, Tailscale 연결 | Wi-Fi와 모바일 데이터에서 각각 10분 완주, 접은 화면·펼친 화면 모두 동작 | Tailscale 설치, USB 디버깅 켜기 |
 | **M5 알람** | `AlarmManager`, `BootReceiver`, 받기·거절·미루기, 권한 안내 | 화면이 꺼지고 앱이 종료된 상태에서 울림, 거절 시 Claude 호출 없음 | 폴드 실기기 테스트 |
-| **M6 복습** | `ReviewScheduler`, 복습 출제 | 3회 이상 진행 시 이전 오답이 재출제됨. 여기까지가 MVP | 없음 |
+| **M6 복습** | `ReviewScheduler`, 복습 출제, 복습 비율 선택, 면접 이력 화면 | 3회 이상 진행 시 이전 오답이 재출제됨. 여기까지가 MVP | 없음 |
 
 Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 
@@ -557,11 +559,10 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 
 ### Phase 4. 복습·개인화·운영 안정성 (M6)
 
-- [ ] 주제별 난이도·신규/복습 비율 선택
-- [ ] 오답 복습 스케줄 및 출제 중복 회피
+- [x] 난이도·복습 비율 선택
+- [x] 오답 재출제 및 출제 중복 회피
 - [ ] 면접 이력 화면, 세션 삭제
-- [ ] (선택) 월별 정답률·취약 주제 화면
-- [ ] (선택) Notion 오답 노트 자동 동기화
+- 월별 정답률은 만들지 않는다. Notion 오답 노트는 뺐다(사용자 결정).
 
 **완료 조건:** 3회 이상의 세션을 진행했을 때 이전 세션의 오답·부분정답이 후속 세션에 복습 출제되고, 점수 및 이력이 유지된다.
 

@@ -12,12 +12,12 @@ import io.github.gumwoo.aiinterview.application.interview.InterviewModels.HintVi
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.SessionView;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.StartSession;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.SubmitAnswer;
+import io.github.gumwoo.aiinterview.application.interview.QuestionPlanner.PlannedQuestion;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.SummaryView;
 import io.github.gumwoo.aiinterview.application.llm.InterviewLlm.GradingRequest;
 import io.github.gumwoo.aiinterview.application.llm.InterviewLlm.GradingResult;
 import io.github.gumwoo.aiinterview.application.llm.InterviewLlm.Verdict;
 import io.github.gumwoo.aiinterview.application.llm.LlmException;
-import io.github.gumwoo.aiinterview.domain.question.QuestionBankItem;
 import io.github.gumwoo.aiinterview.domain.session.InterviewSession;
 import io.github.gumwoo.aiinterview.domain.session.SessionTurn;
 import io.github.gumwoo.aiinterview.domain.session.SessionTurn.ProcessingStatus;
@@ -54,8 +54,8 @@ public class InterviewOrchestrator {
 		if (existing.isPresent()) {
 			return view(existing.get());
 		}
-		QuestionBankItem question = planner.next(command.topics(), command.difficulty(), QuestionPlanner.NO_SESSION,
-				List.of());
+		PlannedQuestion question = planner.next(command.topics(), command.difficulty(), command.reviewRatio(),
+				QuestionPlanner.NO_SESSION, List.of());
 		try {
 			return view(store.createSession(command, question));
 		}
@@ -129,13 +129,8 @@ public class InterviewOrchestrator {
 					followUp.expectedPoints(), followUp.commonMistakes(), answered.getFollowUpDepth() + 1,
 					clock.instant());
 		}
-		List<String> concepts = store.getTurns(session.getId())
-			.stream()
-			.map(SessionTurn::getConceptKey)
-			.distinct()
-			.toList();
-		QuestionBankItem question = planner.next(session.getTopics(), session.getDifficulty(), session.getId(),
-				concepts);
+		PlannedQuestion question = planner.next(session.getTopics(), session.getDifficulty(), session.getReviewRatio(),
+				session.getId(), store.getTurns(session.getId()));
 		return InterviewStore.newTurn(session.getId(), nextTurnNo, question, clock.instant());
 	}
 
