@@ -44,6 +44,51 @@ class HttpInterviewApiTest {
     }
 
     @Test
+    fun `reads history with date range`() = runTest {
+        respond(
+            200,
+            """[{"sessionId":3,"source":"MANUAL","startedAt":"2026-11-03T00:00:00Z","endedAt":null,
+                "answeredCount":2,"verdictCounts":{"WRONG":1,"CORRECT":1}}]""",
+        )
+
+        val items = api.history(java.time.LocalDate.parse("2025-11-03"), java.time.LocalDate.parse("2026-11-03"))
+
+        assertEquals(3L, items.single().sessionId)
+        assertEquals(1L, items.single().verdictCounts["WRONG"])
+        val recorded = server.takeRequest()
+        assertEquals("/api/v1/history", recorded.url.encodedPath)
+        assertEquals("2025-11-03", recorded.url.queryParameter("from"))
+        assertEquals("2026-11-03", recorded.url.queryParameter("to"))
+    }
+
+    @Test
+    fun `reads session turns with review flag`() = runTest {
+        respond(
+            200,
+            """{"sessionId":3,"status":"COMPLETED","durationLimitSeconds":900,"turns":[{"turnId":1,"turnNo":1,
+                "questionText":"질문","answerText":"답","processingStatus":"GRADED","verdict":"WRONG",
+                "feedbackToSpeak":"설명","review":true}]}""",
+        )
+
+        val turn = api.session(3L).turns.single()
+
+        assertTrue(turn.review)
+        assertEquals("WRONG", turn.verdict)
+        assertEquals("/api/v1/sessions/3", server.takeRequest().url.encodedPath)
+    }
+
+    @Test
+    fun `deletes session`() = runTest {
+        respond(204, "")
+
+        api.deleteSession(3L)
+
+        val recorded = server.takeRequest()
+        assertEquals("DELETE", recorded.method)
+        assertEquals("/api/v1/sessions/3", recorded.url.encodedPath)
+    }
+
+    @Test
     fun `posts answer to session path`() = runTest {
         respond(
             200,

@@ -75,7 +75,7 @@ fun PillButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier,
 
 /** 화면 안의 보조 동작. 글자만 두면 눌리는지 알 수 없어 배경을 준다. */
 @Composable
-fun SmallButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun SmallButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, color: Color = CallColors.Text) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -84,7 +84,7 @@ fun SmallButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
-        Text(text, style = MaterialTheme.typography.labelMedium, color = CallColors.Text)
+        Text(text, style = MaterialTheme.typography.labelMedium, color = color)
     }
 }
 

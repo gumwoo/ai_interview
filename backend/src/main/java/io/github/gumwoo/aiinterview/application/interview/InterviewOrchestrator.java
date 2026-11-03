@@ -1,6 +1,7 @@
 package io.github.gumwoo.aiinterview.application.interview;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import io.github.gumwoo.aiinterview.application.interview.FollowUpGenerator.Foll
 import io.github.gumwoo.aiinterview.application.interview.InterviewException.ErrorCode;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.AnswerView;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.HintView;
+import io.github.gumwoo.aiinterview.application.interview.InterviewModels.HistoryItem;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.SessionView;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.StartSession;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.SubmitAnswer;
@@ -161,6 +163,10 @@ public class InterviewOrchestrator {
 		return new SummaryView(session.getId(), session.getStatus(), graded.size(), counts,
 				graded.stream().flatMap((turn) -> turn.getFeedback().missingPoints().stream()).distinct().toList(),
 				graded.stream().flatMap((turn) -> turn.getFeedback().incorrectPoints().stream()).distinct().toList());
+	}
+
+	public List<HistoryItem> history(LocalDate from, LocalDate to) {
+		return store.history(from, to);
 	}
 
 	public void delete(Long sessionId) {

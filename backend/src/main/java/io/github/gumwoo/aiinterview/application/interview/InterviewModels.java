@@ -71,6 +71,10 @@ public final class InterviewModels {
 	public record HintView(Long turnId, String hintText) {
 	}
 
+	public record HistoryItem(Long sessionId, SessionSource source, Instant startedAt, Instant endedAt,
+			long answeredCount, Map<Verdict, Long> verdictCounts) {
+	}
+
 	public record SummaryView(Long sessionId, SessionStatus status, int answeredCount, Map<Verdict, Long> verdictCounts,
 			List<String> missingPoints, List<String> incorrectPoints) {
 	}

@@ -30,6 +30,8 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.gumwoo.aiinterview.alarm.AlarmScheduler
 import io.github.gumwoo.aiinterview.audio.InterviewAudioService
+import io.github.gumwoo.aiinterview.presentation.history.HistoryScreen
+import io.github.gumwoo.aiinterview.presentation.history.HistoryViewModel
 import io.github.gumwoo.aiinterview.presentation.home.HomeScreen
 import io.github.gumwoo.aiinterview.presentation.home.IncomingCallScreen
 import io.github.gumwoo.aiinterview.presentation.interview.IncomingCall
@@ -45,6 +47,7 @@ import java.time.LocalDate
 open class MainActivity : ComponentActivity() {
 
     private val interviewViewModel: InterviewViewModel by viewModels { factory() }
+    private val historyViewModel: HistoryViewModel by viewModels { historyFactory() }
     private var micGranted by mutableStateOf(false)
 
     /** 전화 전용 화면인지. 전화 전용 화면은 전화가 끝나면 닫힌다. */
@@ -85,6 +88,7 @@ open class MainActivity : ComponentActivity() {
                     Box(Modifier.fillMaxSize().safeDrawingPadding()) {
                         var showSettings by rememberSaveable { mutableStateOf(false) }
                         var showSchedule by rememberSaveable { mutableStateOf(false) }
+                        var showHistory by rememberSaveable { mutableStateOf(false) }
                         val state by interviewViewModel.state.collectAsStateWithLifecycle()
                         // 접거나 펴면 Activity가 다시 만들어지므로, 화면 상태는 면접 상태에서 매번 정한다.
                         LaunchedEffect(state.phase, state.incoming) {
@@ -149,6 +153,19 @@ open class MainActivity : ComponentActivity() {
                                 onBack = { showSchedule = false },
                             )
 
+                            showHistory -> {
+                                LaunchedEffect(Unit) { historyViewModel.load() }
+                                val history by historyViewModel.state.collectAsStateWithLifecycle()
+                                HistoryScreen(
+                                    state = history,
+                                    onOpen = historyViewModel::open,
+                                    onCloseDetail = historyViewModel::closeDetail,
+                                    onDelete = historyViewModel::requestDelete,
+                                    onRetry = historyViewModel::retry,
+                                    onBack = { showHistory = false },
+                                )
+                            }
+
                             else -> HomeScreen(
                                 settings = app.settingsStore.load(),
                                 schedule = app.scheduleStore.load(),
@@ -156,6 +173,7 @@ open class MainActivity : ComponentActivity() {
                                 onStart = { interviewViewModel.showIncoming(IncomingCall.MANUAL) },
                                 onOpenSchedule = { showSchedule = true },
                                 onOpenSettings = { showSettings = true },
+                                onOpenHistory = { showHistory = true },
                             )
                         }
                     }
@@ -276,6 +294,10 @@ open class MainActivity : ComponentActivity() {
                 settings = { app.settingsStore.load() },
             )
         }
+    }
+
+    private fun historyFactory(): ViewModelProvider.Factory = viewModelFactory {
+        initializer { HistoryViewModel((application as InterviewApplication).api) }
     }
 
     companion object {

@@ -111,6 +111,10 @@ public class InterviewSession {
 		return topics;
 	}
 
+	public SessionSource getSource() {
+		return source;
+	}
+
 	public String getDifficulty() {
 		return difficulty;
 	}

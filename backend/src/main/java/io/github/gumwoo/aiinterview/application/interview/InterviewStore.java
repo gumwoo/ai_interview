@@ -2,15 +2,21 @@ package io.github.gumwoo.aiinterview.application.interview;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import io.github.gumwoo.aiinterview.application.interview.InterviewException.ErrorCode;
+import io.github.gumwoo.aiinterview.application.interview.InterviewModels.HistoryItem;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.StartSession;
 import io.github.gumwoo.aiinterview.application.interview.InterviewModels.SubmitAnswer;
 import io.github.gumwoo.aiinterview.application.interview.QuestionPlanner.PlannedQuestion;
 import io.github.gumwoo.aiinterview.application.llm.InterviewLlm.GradingResult;
+import io.github.gumwoo.aiinterview.application.llm.InterviewLlm.Verdict;
 import io.github.gumwoo.aiinterview.domain.question.QuestionBankItem;
 import io.github.gumwoo.aiinterview.domain.session.InterviewSession;
 import io.github.gumwoo.aiinterview.domain.session.SessionTurn;
@@ -62,6 +68,35 @@ public class InterviewStore {
 	public SessionTurn getTurn(Long sessionId, Long turnId) {
 		return turns.findByIdAndSessionId(turnId, sessionId)
 			.orElseThrow(() -> new InterviewException(ErrorCode.TURN_NOT_FOUND, "질문을 찾을 수 없습니다"));
+	}
+
+	/** 기간 안의 면접을 최근 순으로 돌려준다. 답변이 하나도 없는 면접은 볼 내용이 없어 뺀다. */
+	public List<HistoryItem> history(LocalDate from, LocalDate to) {
+		List<InterviewSession> found = sessions.findByStartedAtGreaterThanEqualAndStartedAtLessThanOrderByStartedAtDesc(
+				from.atStartOfDay(clock.getZone()).toInstant(), to.plusDays(1).atStartOfDay(clock.getZone()).toInstant());
+		if (found.isEmpty()) {
+			return List.of();
+		}
+		Map<Long, Map<Verdict, Long>> counts = new HashMap<>();
+		turns.countVerdicts(found.stream().map(InterviewSession::getId).toList(), ProcessingStatus.GRADED)
+			.forEach((row) -> counts.computeIfAbsent(row.getSessionId(), (id) -> emptyCounts())
+				.put(row.getVerdict(), row.getTotal()));
+		return found.stream()
+			.filter((session) -> counts.containsKey(session.getId()))
+			.map((session) -> {
+				Map<Verdict, Long> verdicts = counts.get(session.getId());
+				return new HistoryItem(session.getId(), session.getSource(), session.getStartedAt(),
+						session.getEndedAt(), verdicts.values().stream().mapToLong(Long::longValue).sum(), verdicts);
+			})
+			.toList();
+	}
+
+	private static Map<Verdict, Long> emptyCounts() {
+		Map<Verdict, Long> counts = new EnumMap<>(Verdict.class);
+		for (Verdict verdict : Verdict.values()) {
+			counts.put(verdict, 0L);
+		}
+		return counts;
 	}
 
 	@Transactional
