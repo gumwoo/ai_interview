@@ -44,10 +44,10 @@ sealed interface InterviewError {
     data object TtsFailed : InterviewError
 }
 
-/** 울리는 전화. [scheduledDate]가 있으면 그날 일정의 전화이고, [ringing]이면 알람으로 온 전화다. */
-data class IncomingCall(val scheduledDate: LocalDate?, val ringing: Boolean) {
+/** 알람으로 울리는 전화. [scheduledDate]가 있으면 그날 일정의 전화다. */
+data class IncomingCall(val scheduledDate: LocalDate?) {
     companion object {
-        val MANUAL = IncomingCall(scheduledDate = null, ringing = false)
+        val MANUAL = IncomingCall(scheduledDate = null)
     }
 }
 

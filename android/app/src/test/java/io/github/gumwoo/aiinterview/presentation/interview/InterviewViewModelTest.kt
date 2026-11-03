@@ -432,7 +432,7 @@ class InterviewViewModelTest {
     fun `does not call server until answered`() = runTest {
         val vm = viewModel()
 
-        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03"), ringing = true))
+        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03")))
         advanceUntilIdle()
         assertTrue(api.startAttempts.isEmpty())
 
@@ -447,7 +447,7 @@ class InterviewViewModelTest {
     fun `answered alarm starts scheduled session for its date`() = runTest {
         input.results += ListenResult.Recognized("답변")
         val vm = viewModel()
-        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03"), ringing = true))
+        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03")))
 
         vm.answer()
         advanceUntilIdle()
@@ -458,10 +458,23 @@ class InterviewViewModelTest {
     }
 
     @Test
+    fun `practice starts call directly without incoming screen`() = runTest {
+        input.results += ListenResult.Recognized("답변")
+        val vm = viewModel()
+
+        vm.answer()
+        assertNull(vm.state.value.incoming)
+        advanceUntilIdle()
+
+        assertEquals(1, api.started.size)
+        assertEquals("MANUAL", api.started.single().source)
+    }
+
+    @Test
     fun `test call and manual start use manual session`() = runTest {
         input.results += ListenResult.Recognized("답변")
         val vm = viewModel()
-        vm.showIncoming(IncomingCall(scheduledDate = null, ringing = true))
+        vm.showIncoming(IncomingCall(scheduledDate = null))
 
         vm.answer()
         advanceUntilIdle()
@@ -474,7 +487,7 @@ class InterviewViewModelTest {
         input.results += ListenResult.Recognized("답변")
         api.scheduledExists = true
         val vm = viewModel()
-        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03"), ringing = true))
+        vm.showIncoming(IncomingCall(LocalDate.parse("2026-11-03")))
 
         vm.answer()
         advanceUntilIdle()

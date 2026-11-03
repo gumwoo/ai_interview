@@ -123,7 +123,6 @@ open class MainActivity : ComponentActivity() {
 
                             incoming != null -> IncomingCallScreen(
                                 settings = app.settingsStore.load(),
-                                ringing = incoming.ringing,
                                 onAnswer = ::answerIncoming,
                                 onDecline = {
                                     stopRinging()
@@ -170,7 +169,7 @@ open class MainActivity : ComponentActivity() {
                                 settings = app.settingsStore.load(),
                                 schedule = app.scheduleStore.load(),
                                 canStart = canStart(app),
-                                onStart = { interviewViewModel.showIncoming(IncomingCall.MANUAL) },
+                                onStart = ::requestPermissionsAndStart,
                                 onOpenSchedule = { showSchedule = true },
                                 onOpenSettings = { showSettings = true },
                                 onOpenHistory = { showHistory = true },
@@ -219,7 +218,7 @@ open class MainActivity : ComponentActivity() {
         setIntent(Intent(this, MainActivity::class.java))
         val inCall = interviewViewModel.state.value.phase != InterviewPhase.IDLE
         if (inCall) return true
-        interviewViewModel.showIncoming(IncomingCall(scheduledDate = date, ringing = true))
+        interviewViewModel.showIncoming(IncomingCall(scheduledDate = date))
         answerOnResume = action == ACTION_ANSWER
         return true
     }

@@ -48,18 +48,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun IncomingCallScreen(
     settings: InterviewSettings,
-    ringing: Boolean,
     onAnswer: () -> Unit,
     onDecline: () -> Unit,
     onSnooze: () -> Unit,
     onTimeout: () -> Unit,
 ) {
     BackHandler(onBack = onDecline)
-    if (ringing) {
-        LaunchedEffect(Unit) {
-            delay(AlarmScheduler.RING_TIMEOUT_MILLIS)
-            onTimeout()
-        }
+    LaunchedEffect(Unit) {
+        delay(AlarmScheduler.RING_TIMEOUT_MILLIS)
+        onTimeout()
     }
     Box(Modifier.fillMaxSize().padding(horizontal = 24.dp), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 480.dp).fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -74,19 +71,17 @@ fun IncomingCallScreen(
             Spacer(Modifier.height(10.dp))
             Text(topicsLine(settings), style = MaterialTheme.typography.bodyMedium, color = CallColors.Muted)
             Spacer(Modifier.weight(1f))
-            if (ringing) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(CallColors.Control)
-                        .clickable(onClick = onSnooze)
-                        .padding(horizontal = 20.dp, vertical = 12.dp),
-                ) {
-                    Text(stringResource(R.string.incoming_snooze), style = MaterialTheme.typography.labelMedium, color = CallColors.Text)
-                }
-                Spacer(Modifier.height(20.dp))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(CallColors.Control)
+                    .clickable(onClick = onSnooze)
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+            ) {
+                Text(stringResource(R.string.incoming_snooze), style = MaterialTheme.typography.labelMedium, color = CallColors.Text)
             }
+            Spacer(Modifier.height(20.dp))
             AnswerSlider(onAnswer, onDecline)
             Spacer(Modifier.height(40.dp))
         }
