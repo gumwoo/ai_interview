@@ -2,6 +2,7 @@ package io.github.gumwoo.aiinterview.domain.question;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -70,6 +71,20 @@ public class QuestionBankItem {
 		this.sourceRef = sourceRef;
 		this.sourceCommit = sourceCommit;
 		this.createdAt = createdAt;
+	}
+
+	/** 시드 파일이 바뀌면 기준 답안과 근거를 맞춘다. 바뀐 것이 있으면 true다. */
+	public boolean refresh(ReferencePoints points, String ref, String commit) {
+		if (points.equals(referencePoints) && Objects.equals(ref, sourceRef) && Objects.equals(commit, sourceCommit)) {
+			return false;
+		}
+		if (!points.equals(referencePoints)) {
+			rubricVersion++;
+		}
+		referencePoints = points;
+		sourceRef = ref;
+		sourceCommit = commit;
+		return true;
 	}
 
 	public Long getId() {

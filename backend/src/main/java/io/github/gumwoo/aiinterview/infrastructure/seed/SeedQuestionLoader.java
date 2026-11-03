@@ -20,7 +20,8 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * {@code classpath:seed/*.json}의 시드 질문을 질문 은행에 넣는다. 같은 질문이 이미 있으면 건너뛴다.
+ * {@code classpath:seed/*.json}의 시드 질문을 질문 은행에 넣는다. 같은 질문이 이미 있으면 기준 답안과 근거를 파일에 맞춘다.
+ * 지난 면접은 턴에 남긴 스냅샷으로 재현되므로 영향을 받지 않는다.
  */
 @Component
 class SeedQuestionLoader implements ApplicationRunner {
@@ -56,12 +57,17 @@ class SeedQuestionLoader implements ApplicationRunner {
 	}
 
 	private boolean save(SeedQuestion seed) {
-		if (repository.existsByQuestionText(seed.question())) {
+		ReferencePoints points = new ReferencePoints(seed.expectedPoints(), seed.commonMistakes());
+		var existing = repository.findByQuestionText(seed.question());
+		if (existing.isPresent()) {
+			QuestionBankItem item = existing.get();
+			if (item.getOrigin() == QuestionOrigin.SEED && item.refresh(points, seed.sourceRef(), seed.sourceCommit())) {
+				repository.save(item);
+			}
 			return false;
 		}
-		repository.save(new QuestionBankItem(seed.topic(), seed.conceptKey(), seed.difficulty(), seed.question(),
-				new ReferencePoints(seed.expectedPoints(), seed.commonMistakes()), QuestionOrigin.SEED, seed.sourceRef(),
-				seed.sourceCommit(), clock.instant()));
+		repository.save(new QuestionBankItem(seed.topic(), seed.conceptKey(), seed.difficulty(), seed.question(), points,
+				QuestionOrigin.SEED, seed.sourceRef(), seed.sourceCommit(), clock.instant()));
 		return true;
 	}
 
