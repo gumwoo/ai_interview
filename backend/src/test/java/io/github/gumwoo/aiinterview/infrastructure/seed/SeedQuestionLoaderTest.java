@@ -22,7 +22,7 @@ class SeedQuestionLoaderTest {
 			"Event_Outbox", "Spring_JPA", "Auth_Security", "Kubernetes", "Deployment_GitOps", "AWS", "Docker_CI",
 			"LoadTest_Observability");
 
-	private static final int SEED_COUNT = 44;
+	private static final int SEED_COUNT = 60;
 
 	@Autowired
 	private SeedQuestionLoader loader;
@@ -49,6 +49,39 @@ class SeedQuestionLoaderTest {
 	}
 
 	@Test
+	void should_refresh_points_and_source_when_seed_file_changes() throws Exception {
+		jdbc.update("""
+				UPDATE question_bank
+				SET reference_points_json = '{"expectedPoints":["낡은 내용"],"commonMistakes":[]}'::jsonb,
+				    source_commit = 'old'
+				WHERE concept_key = 'seat-hold-conditional-update'
+				""");
+
+		loader.run(null);
+
+		assertThat(count("SELECT count(*) FROM question_bank")).isEqualTo(SEED_COUNT);
+		assertThat(count("""
+				SELECT count(*) FROM question_bank
+				WHERE concept_key = 'seat-hold-conditional-update'
+				  AND reference_points_json::text NOT LIKE '%낡은 내용%'
+				  AND source_commit <> 'old' AND rubric_version = 2
+				""")).isEqualTo(1);
+		assertThat(count("SELECT count(*) FROM question_bank WHERE rubric_version <> 1")).isEqualTo(1);
+	}
+
+	@Test
+	void should_not_touch_generated_question_with_same_text() throws Exception {
+		jdbc.update("""
+				UPDATE question_bank SET origin = 'GENERATED', source_commit = 'kept'
+				WHERE concept_key = 'seat-hold-conditional-update'
+				""");
+
+		loader.run(null);
+
+		assertThat(count("SELECT count(*) FROM question_bank WHERE source_commit = 'kept'")).isEqualTo(1);
+	}
+
+	@Test
 	void should_use_known_topics_and_unique_concepts() {
 		List<String> topics = jdbc.queryForList("SELECT DISTINCT topic FROM question_bank", String.class);
 		assertThat(TOPICS).containsAll(topics);
@@ -61,7 +94,7 @@ class SeedQuestionLoaderTest {
 				SELECT count(*) FROM question_bank
 				WHERE jsonb_array_length(reference_points_json -> 'expectedPoints') BETWEEN 2 AND 5
 				  AND jsonb_typeof(reference_points_json -> 'commonMistakes') = 'array'
-				  AND source_ref <> '' AND source_commit = '5947c5c'
+				  AND source_ref <> '' AND source_commit <> ''
 				""")).isEqualTo(SEED_COUNT);
 	}
 
