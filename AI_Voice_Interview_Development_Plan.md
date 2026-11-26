@@ -292,34 +292,28 @@ SCHEDULED
 
 ### 5.6 질문 카테고리와 출처
 
-시드 질문은 사용자의 프로젝트 [FlowTicket](https://github.com/gumwoo/first_come-first_served)의 문서를 근거로 만들고, 개발과 인프라를 모두 다룬다. 면접에서 **자기 프로젝트의 선택과 근거를 말로 설명하는 연습**이 목적이다.
+시드 질문은 사용자가 노션에 정리한 **클라우드 면접 대비 1~7강**을 근거로 만든다. 강의마다 실제 면접 답변, 기술 원리, 꼬리 질문이 있으므로 **경험과 원리를 함께 말로 설명하는 연습**이 목적이다.
 
-| 분야 | 주제 | 질문 유형 | 근거 문서(예) |
-|---|---|---|---|
-| 개발 | Concurrency | 조건부 UPDATE, 초과판매, 멱등성 | ADR-003, ADR-006, TS-013, TS-014, IMP-003 |
-| 개발 | Transaction_Payment | 트랜잭션 경계, 보상, 정산 | ADR-011, ADR-020, ADR-021, TS-030 |
-| 개발 | Redis_Queue | Lua 원자화, ZSet 대기열, 장애 시 동작 | ADR-002, ADR-016, TS-043~045, IMP-028 |
-| 개발 | Event_Outbox | Outbox, Pub/Sub, Kafka 재평가, SSE | ADR-010, ADR-022, ADR-028, TS-012, TS-032 |
-| 개발 | Spring_JPA | 모듈러 모놀리스, 프록시, 시계 주입, 커넥션 풀 | ADR-014, ADR-018, ADR-019, TS-021, IMP-042 |
-| 개발 | Auth_Security | Refresh rotation, 관리자 인증, SSE 티켓 | ADR-007, ADR-017, IMP-001, TS-003, TS-041 |
-| 인프라 | Kubernetes | HPA, requests, probes, PDB, 배치 | ADR-025, ADR-026, ADR-030, ADR-031, TS-019, IMP-017 |
-| 인프라 | Deployment_GitOps | 롤링 배포, `preStop`, Argo CD | ADR-009, TS-022, TS-035, IMP-015 |
-| 인프라 | AWS | 3AZ, NAT, ALB, RDS·Redis 페일오버, 비용 | ADR-012, TS-018, TS-037, IMP-040 |
-| 인프라 | Docker_CI | 이미지 캐시, CI 재현성, 배포 경합 | IMP-014, TS-027, TS-029, TS-048 |
-| 인프라 | LoadTest_Observability | k6, 판정 기준, 측정 오류, 지표 수집 | IMP-029~031, TS-036, TS-054, ADR-029 |
-| 공통 | 일반 CS(Linux, Networking, Database) | 프로젝트 답변에서 이어지는 개념 확인 | 꼬리질문 또는 생성 질문 |
+| 강의 | 주제(`topic`) | 질문 유형 |
+|---|---|---|
+| 1강 | Docker_Container | Dockerfile·레이어 캐시, Multi-stage, Compose, Volume, VM과 컨테이너, 종료 원인 분석 |
+| 2강 | Kubernetes_EKS | EKS 선택, Deployment·ReplicaSet, 컴포넌트, Pod 생성 과정, Service·Ingress, 노드 장애 |
+| 3강 | Resource_Autoscaling | Request·Limit, HPA 계산, Cluster Autoscaler, Pending, 사전 확장, PDB·PriorityClass |
+| 4강 | AWS_Network | VPC·CIDR, Public·Private, IGW·NAT, SG·NACL, ALB, 요청 흐름, Multi-AZ, 장애 대응 |
+| 5강 | Terraform_IaC | Provider·Resource, Module, Plan·Apply, State·Lock, Drift, 버전 고정 |
+| 6강 | CICD_GitOps | 배포 흐름, Argo CD, HPA 충돌, Rolling Update, Probe, preStop·ALB 502, 롤백 |
+| 7강 | Cloud_Security | IAM·STS, 최소 권한, ServiceAccount·RBAC, IRSA, Secrets Manager·ESO, State 민감정보 |
 
-**질문 출처(v1):** 사용자가 검토한 FlowTicket 시드 질문으로 시작하고, 시드가 없거나 소진된 주제는 Claude가 생성한 질문을 `question_bank`에 저장해 재사용한다. 생성 질문의 참고 답안은 검증되지 않은 값이므로 `origin=GENERATED`로 구분한다.
+**질문 출처(v1):** 강의 기반 시드 질문으로 시작하고, 시드가 없거나 소진된 주제는 Claude가 생성한 질문을 `question_bank`에 저장해 재사용한다. 생성 질문의 참고 답안은 검증되지 않은 값이므로 `origin=GENERATED`로 구분한다.
 
 **시드 작성 규칙:**
 
-- 초안은 FlowTicket의 ADR 31개, TS 54개, IMP 54개와 README를 읽고 40개 정도(제안값)를 개발·인프라 반반으로 만든다. 내용은 사용자가 검토한다.
-- 질문마다 근거 문서(`source_ref`)와 기준 커밋(`source_commit`)을 남긴다. 첫 기준 커밋은 `5947c5c`이고, 16개를 더하고 낡은 3개를 고친 기준은 `6bccb64`다. 저장소가 바뀌면 시드를 수동으로 다시 맞춘다. 같은 질문의 기준 답안을 파일에서 고치면 서버가 시작할 때 DB에도 맞추고, 지난 면접은 턴의 스냅샷으로 남는다.
-- 런타임에는 저장소를 읽지 않는다. 문서 내용은 시드 JSON의 `expected_points`로 옮겨 둔다.
-- 대체된 문서는 현재 상태 기준으로 출제한다. ADR-008·010의 Kafka 부분은 ADR-028로 대체됐고, ADR-013은 Proposed이며, ADR-011은 실제 PG로 검증하지 않았다.
-- 수치는 문서에 적힌 조건과 함께 기준 답안에 넣는다. 측정값과 계산값을 구분한다.
-
-노션 학습 자료는 추후 **명시적으로 연결·가져오기**한 후 맞춤형 질문 출제에 사용할 수 있다.
+- 강의의 질문을 소리 내어 읽기 좋게 다듬고, 기준 답안(`expected_points`)과 흔한 오답(`common_mistakes`)은 강의의 실제 면접 답변·기술 원리·꼬리 질문에서 옮긴다. 강의 답변에 나오는 프로젝트 경험은 그대로 둔다.
+- 질문마다 근거(`source_ref`, 예: `클라우드 면접 대비 3강 Q8`)와 강의 페이지의 마지막 수정일(`source_commit`, 예: `notion:2026-11-25`)을 남긴다. 강의가 바뀌면 시드를 수동으로 다시 맞춘다. 같은 질문의 기준 답안을 파일에서 고치면 서버가 시작할 때 DB에도 맞추고, 지난 면접은 턴의 스냅샷으로 남는다.
+- 런타임에는 노션을 읽지 않는다. 강의 내용은 시드 JSON으로 옮겨 둔다.
+- 강의가 학습용 예시라고 밝힌 값(예시 YAML, 가상 수치)은 실제 경험으로 기준 답안에 넣지 않는다. 측정값은 강의에 적힌 조건과 함께 넣는다.
+- 주제가 바뀌면 이전 주제의 질문은 Flyway 마이그레이션으로 질문 은행에서 지운다(V4). 지난 면접 기록은 턴의 스냅샷으로 남는다.
+- 채점 평가셋(`eval/grading-cases.json`)은 아직 이전 출처(FlowTicket) 질문 기준이다. 강의 기준 평가셋은 따로 만든다.
 
 ---
 
@@ -499,7 +493,7 @@ backend/src/main/java/.../
 |---|---|---|---|
 | **M0 기반** | 저장소, 단계별 이슈, CI, 브랜치 보호, Spring Boot, Compose DB, Flyway 스키마, 토큰 필터, `/health` | 토큰 없는 호출이 401, 재기동 후 데이터 유지, CI 통과 후 PR 머지 | 없음 |
 | **M1 Claude 연결** | `ClaudeClientAdapter`, 구조화 출력, 타임아웃과 재시도, `api_usage_log`, 일일 상한 | 질문 생성과 채점 JSON이 스키마대로 오고 토큰이 기록됨 | `infra/.env`에 API 키 입력, 자동 충전 OFF 확인 |
-| **M2 텍스트 면접** | `InterviewOrchestrator`, 세션과 턴 API, FlowTicket 시드 질문, dev 전용 콘솔 | 5문제 이상 진행 후 재조회 가능, 같은 답을 다시 보내도 채점 1회 | 시드 질문 검토 |
+| **M2 텍스트 면접** | `InterviewOrchestrator`, 세션과 턴 API, 시드 질문, dev 전용 콘솔 | 5문제 이상 진행 후 재조회 가능, 같은 답을 다시 보내도 채점 1회 | 시드 질문 검토 |
 | **M3 품질 게이트** | 정답·부분정답·오답 예시 30건 이상의 평가셋, 프롬프트 조정 | 채점을 저장소 대조 판정과 비교해 통과. Sonnet 기준 확인용 92%, 일관성 100%, 치명 오류 0건. 통과 전에는 앱 개발 안 함 | 저장소로 답할 수 없는 항목 확인 |
 | **M4 음성 앱** | Compose 앱, TTS와 STT, 수정과 재시도, 요약 화면, Tailscale 연결 | Wi-Fi와 모바일 데이터에서 각각 10분 완주, 접은 화면·펼친 화면 모두 동작 | Tailscale 설치, USB 디버깅 켜기 |
 | **M5 알람** | `AlarmManager`, `BootReceiver`, 받기·거절·미루기, 권한 안내 | 화면이 꺼지고 앱이 종료된 상태에서 울림, 거절 시 Claude 호출 없음 | 폴드 실기기 테스트 |
@@ -526,7 +520,7 @@ Phase와의 관계: Phase 1 = M0~M3, Phase 2 = M4, Phase 3 = M5, Phase 4 = M6.
 - [ ] `QuestionPlanner` / `QuestionGenerator` / `AnswerGrader` / `FollowUpGenerator` 구현
 - [ ] JSON 형식 응답 검증, 재시도, 타임아웃 처리
 - [ ] 세션/턴/채점 결과 DB 저장
-- [ ] FlowTicket 문서 기반 시드 질문 작성, 저장소 문서와 코드로 대조
+- [ ] 시드 질문 작성, 근거 자료와 대조
 - [ ] 평가셋 30건 이상 작성, 판정을 저장소 문서와 코드로 대조
 - [ ] dev 전용 콘솔로 **텍스트 면접 전체 흐름** 검증
 
@@ -661,7 +655,7 @@ ai-voice-interview/
 - [x] 상시 PC: 이 Windows 11 데스크톱, Docker Desktop. 자동 로그인은 쓰지 않음
 - [x] 모델: 기본 `claude-sonnet-5-5`. M3 평가로 결정
 - [x] 요금: Ultra, API 키 발급 완료, 자동 충전 금지
-- [x] 시드 질문: FlowTicket 문서 기반, 개발·인프라 모두 포함
+- [x] 시드 질문: 노션 클라우드 면접 대비 1~7강 기반(처음에는 FlowTicket 문서 기반이었고 2026-11-26에 교체)
 - [x] ID 타입: PK는 `bigint`, `client_request_id`만 `uuid`
 
 **미결정·검증:**

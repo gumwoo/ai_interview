@@ -94,17 +94,13 @@
     <string name="difficulty_intermediate">중급</string>
     <string name="difficulty_advanced">고급</string>
 
-    <string name="topic_concurrency">동시성</string>
-    <string name="topic_transaction_payment">트랜잭션·결제</string>
-    <string name="topic_redis_queue">Redis 대기열</string>
-    <string name="topic_event_outbox">이벤트·Outbox</string>
-    <string name="topic_spring_jpa">Spring·JPA</string>
-    <string name="topic_auth_security">인증·보안</string>
-    <string name="topic_kubernetes">Kubernetes</string>
-    <string name="topic_deployment_gitops">배포·GitOps</string>
-    <string name="topic_aws">AWS</string>
-    <string name="topic_docker_ci">Docker·CI</string>
-    <string name="topic_loadtest_observability">부하 테스트·관측</string>
+    <string name="topic_docker_container">Docker·컨테이너</string>
+    <string name="topic_kubernetes_eks">Kubernetes·EKS</string>
+    <string name="topic_resource_autoscaling">자원·오토스케일링</string>
+    <string name="topic_aws_network">AWS·네트워크</string>
+    <string name="topic_terraform_iac">Terraform·IaC</string>
+    <string name="topic_cicd_gitops">CI/CD·GitOps</string>
+    <string name="topic_cloud_security">클라우드 보안</string>
     <string name="topic_unknown">기타</string>
 
     <string name="call_connecting">연결 중</string>

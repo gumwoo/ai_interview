@@ -14,12 +14,17 @@ data class InterviewSettings(
     val reviewRatio: Double get() = reviewPercent / 100.0
 
     companion object {
+        /** 클라우드 면접 대비 1~7강 순서다. 서버 시드 질문의 topic과 같은 이름을 쓴다. */
         val DEFAULT_TOPICS = listOf(
-            "Concurrency", "Transaction_Payment", "Redis_Queue", "Event_Outbox", "Spring_JPA", "Auth_Security",
-            "Kubernetes", "Deployment_GitOps", "AWS", "Docker_CI", "LoadTest_Observability",
+            "Docker_Container", "Kubernetes_EKS", "Resource_Autoscaling", "AWS_Network",
+            "Terraform_IaC", "CICD_GitOps", "Cloud_Security",
         )
 
         fun parseTopics(text: String): List<String> = text.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+
+        /** 예전 주제 이름으로 저장된 설정은 지금 목록에 있는 것만 남기고, 하나도 없으면 기본값으로 돌린다. */
+        fun knownTopicsOrDefault(saved: List<String>): List<String> =
+            saved.filter { it in DEFAULT_TOPICS }.ifEmpty { DEFAULT_TOPICS }
 
         /** https만 허용한다. 디버그 빌드의 에뮬레이터 주소만 예외다. */
         fun isValidServerUrl(url: String): Boolean {
@@ -37,7 +42,9 @@ class InterviewSettingsStore(context: Context) {
         val defaults = InterviewSettings()
         return InterviewSettings(
             serverUrl = preferences.getString(KEY_SERVER_URL, defaults.serverUrl).orEmpty(),
-            topics = preferences.getString(KEY_TOPICS, null)?.let(InterviewSettings::parseTopics) ?: defaults.topics,
+            topics = preferences.getString(KEY_TOPICS, null)
+                ?.let { InterviewSettings.knownTopicsOrDefault(InterviewSettings.parseTopics(it)) }
+                ?: defaults.topics,
             difficulty = preferences.getString(KEY_DIFFICULTY, defaults.difficulty).orEmpty(),
             durationMinutes = preferences.getInt(KEY_DURATION, defaults.durationMinutes),
             reviewPercent = preferences.getInt(KEY_REVIEW_PERCENT, defaults.reviewPercent),

@@ -281,16 +281,12 @@ internal fun difficultyLabel(difficulty: String): Int = when (difficulty) {
 }
 
 internal fun topicLabel(topic: String): Int = when (topic) {
-    "Concurrency" -> R.string.topic_concurrency
-    "Transaction_Payment" -> R.string.topic_transaction_payment
-    "Redis_Queue" -> R.string.topic_redis_queue
-    "Event_Outbox" -> R.string.topic_event_outbox
-    "Spring_JPA" -> R.string.topic_spring_jpa
-    "Auth_Security" -> R.string.topic_auth_security
-    "Kubernetes" -> R.string.topic_kubernetes
-    "Deployment_GitOps" -> R.string.topic_deployment_gitops
-    "AWS" -> R.string.topic_aws
-    "Docker_CI" -> R.string.topic_docker_ci
-    "LoadTest_Observability" -> R.string.topic_loadtest_observability
+    "Docker_Container" -> R.string.topic_docker_container
+    "Kubernetes_EKS" -> R.string.topic_kubernetes_eks
+    "Resource_Autoscaling" -> R.string.topic_resource_autoscaling
+    "AWS_Network" -> R.string.topic_aws_network
+    "Terraform_IaC" -> R.string.topic_terraform_iac
+    "CICD_GitOps" -> R.string.topic_cicd_gitops
+    "Cloud_Security" -> R.string.topic_cloud_security
     else -> R.string.topic_unknown
 }
