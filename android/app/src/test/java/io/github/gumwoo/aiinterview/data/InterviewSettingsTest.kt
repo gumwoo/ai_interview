@@ -26,4 +26,16 @@ class InterviewSettingsTest {
     fun `parses comma separated topics`() {
         assertEquals(listOf("Kubernetes", "AWS"), InterviewSettings.parseTopics(" Kubernetes, ,AWS ,"))
     }
+
+    @Test
+    fun `drops topics that are no longer offered`() {
+        assertEquals(
+            listOf("Kubernetes_EKS"),
+            InterviewSettings.knownTopicsOrDefault(listOf("Concurrency", "Kubernetes_EKS")),
+        )
+        assertEquals(
+            InterviewSettings.DEFAULT_TOPICS,
+            InterviewSettings.knownTopicsOrDefault(listOf("Concurrency", "Redis_Queue")),
+        )
+    }
 }
