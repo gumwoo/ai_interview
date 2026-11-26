@@ -11,8 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 @SpringBootTest(properties = { "app.api-token=" + TestcontainersConfiguration.TEST_API_TOKEN,
 		"app.claude.api-key=test-key" })
@@ -93,6 +95,36 @@ class SchemaMigrationTest {
 	}
 
 	@Test
+	void should_remove_non_lecture_questions_but_keep_past_turns() {
+		long oldQuestion = insertQuestion("Concurrency", "old-concept");
+		long lectureQuestion = insertQuestion("Kubernetes_EKS", "pod-creation-flow");
+		long sessionId = insertSession("MANUAL");
+		long oldTurn = insertTurn(sessionId, 1, UUID.randomUUID());
+		long lectureTurn = insertTurn(sessionId, 2, UUID.randomUUID());
+		jdbc.update("UPDATE session_turn SET question_id = ?, concept_key = 'old-concept' WHERE id = ?", oldQuestion,
+				oldTurn);
+		jdbc.update("UPDATE session_turn SET question_id = ?, concept_key = 'pod-creation-flow' WHERE id = ?",
+				lectureQuestion, lectureTurn);
+		jdbc.update("INSERT INTO review_item (concept_key, source_turn_id) VALUES ('old-concept', ?)", oldTurn);
+		jdbc.update("INSERT INTO review_item (concept_key, source_turn_id) VALUES ('pod-creation-flow', ?)",
+				lectureTurn);
+
+		new ResourceDatabasePopulator(
+				new ClassPathResource("db/migration/V4__replace_seed_with_cloud_lectures.sql"))
+			.execute(jdbc.getDataSource());
+
+		assertThat(jdbc.queryForList("SELECT concept_key FROM question_bank", String.class))
+			.containsExactly("pod-creation-flow");
+		assertThat(count("session_turn")).isEqualTo(2);
+		assertThat(jdbc.queryForObject("SELECT question_id FROM session_turn WHERE id = ?", Long.class, oldTurn))
+			.isNull();
+		assertThat(jdbc.queryForObject("SELECT question_id FROM session_turn WHERE id = ?", Long.class, lectureTurn))
+			.isEqualTo(lectureQuestion);
+		assertThat(jdbc.queryForList("SELECT concept_key FROM review_item", String.class))
+			.containsExactly("pod-creation-flow");
+	}
+
+	@Test
 	void should_have_index_on_every_foreign_key() {
 		assertThat(jdbc.queryForList(UNINDEXED_FOREIGN_KEYS, String.class)).isEmpty();
 	}
@@ -115,6 +147,14 @@ class SchemaMigrationTest {
 				VALUES (?, ?, 'c', 'q', '[]'::jsonb, ?)
 				RETURNING id
 				""", Long.class, sessionId, turnNo, requestId);
+	}
+
+	private long insertQuestion(String topic, String conceptKey) {
+		return jdbc.queryForObject("""
+				INSERT INTO question_bank (topic, concept_key, difficulty, question_text, reference_points_json, origin)
+				VALUES (?, ?, 'intermediate', ?, '{"expectedPoints":[],"commonMistakes":[]}'::jsonb, 'SEED')
+				RETURNING id
+				""", Long.class, topic, conceptKey, conceptKey + " 질문");
 	}
 
 	private int count(String table) {

@@ -18,11 +18,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Import(TestcontainersConfiguration.class)
 class SeedQuestionLoaderTest {
 
-	private static final Set<String> TOPICS = Set.of("Concurrency", "Transaction_Payment", "Redis_Queue",
-			"Event_Outbox", "Spring_JPA", "Auth_Security", "Kubernetes", "Deployment_GitOps", "AWS", "Docker_CI",
-			"LoadTest_Observability");
+	private static final Set<String> TOPICS = Set.of("Docker_Container", "Kubernetes_EKS", "Resource_Autoscaling",
+			"AWS_Network", "Terraform_IaC", "CICD_GitOps", "Cloud_Security");
 
-	private static final int SEED_COUNT = 60;
+	private static final int SEED_COUNT = 80;
 
 	@Autowired
 	private SeedQuestionLoader loader;
@@ -54,7 +53,7 @@ class SeedQuestionLoaderTest {
 				UPDATE question_bank
 				SET reference_points_json = '{"expectedPoints":["낡은 내용"],"commonMistakes":[]}'::jsonb,
 				    source_commit = 'old'
-				WHERE concept_key = 'seat-hold-conditional-update'
+				WHERE concept_key = 'pod-creation-flow'
 				""");
 
 		loader.run(null);
@@ -62,7 +61,7 @@ class SeedQuestionLoaderTest {
 		assertThat(count("SELECT count(*) FROM question_bank")).isEqualTo(SEED_COUNT);
 		assertThat(count("""
 				SELECT count(*) FROM question_bank
-				WHERE concept_key = 'seat-hold-conditional-update'
+				WHERE concept_key = 'pod-creation-flow'
 				  AND reference_points_json::text NOT LIKE '%낡은 내용%'
 				  AND source_commit <> 'old' AND rubric_version = 2
 				""")).isEqualTo(1);
@@ -73,7 +72,7 @@ class SeedQuestionLoaderTest {
 	void should_not_touch_generated_question_with_same_text() throws Exception {
 		jdbc.update("""
 				UPDATE question_bank SET origin = 'GENERATED', source_commit = 'kept'
-				WHERE concept_key = 'seat-hold-conditional-update'
+				WHERE concept_key = 'pod-creation-flow'
 				""");
 
 		loader.run(null);
