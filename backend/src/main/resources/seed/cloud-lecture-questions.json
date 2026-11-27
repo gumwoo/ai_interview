@@ -1439,5 +1439,329 @@
     ],
     "sourceRef": "클라우드 면접 대비 7강 Q13",
     "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "monitoring-stack-overview",
+    "difficulty": "intermediate",
+    "question": "FlowTicket에서 모니터링 환경을 어떻게 구축했나요? 모니터링과 장애 대응은 어떻게 다른지도 말씀해 주세요.",
+    "expectedPoints": [
+      "Prometheus Operator 환경에서 ServiceMonitor로 API와 대기열 지표를 수집하고 PrometheusRule로 장애 알림 조건을 정의했다",
+      "Grafana 대시보드로 요청률, 응답시간, DB 커넥션, HPA 복제본 수 등을 확인했다",
+      "CloudWatch로 ALB 오류를 감시하고 Slack으로 알림을 전달했다",
+      "모니터링은 상태를 지속적으로 관찰하는 것이고 장애 대응은 원인을 분석하고 복구하는 과정이다"
+    ],
+    "commonMistakes": [
+      "Prometheus와 Grafana를 같은 역할의 도구로 설명한다",
+      "모니터링과 장애 대응을 같은 것으로 설명한다(지속 관찰과 원인 분석·복구의 차이)"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q1",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "prometheus-vs-grafana",
+    "difficulty": "intermediate",
+    "question": "Prometheus와 Grafana는 어떻게 다른가요? Grafana가 중단되면 지표 수집도 멈추나요?",
+    "expectedPoints": [
+      "Prometheus는 애플리케이션과 인프라의 지표를 수집해 시계열 데이터로 저장하고 질의하는 도구다",
+      "Grafana는 Prometheus 같은 데이터 소스에 질의해 지표를 대시보드로 시각화하는 도구다",
+      "Grafana가 중단돼도 Prometheus가 정상이면 수집은 계속될 수 있다",
+      "Grafana는 CloudWatch, Loki, PostgreSQL 등 다른 데이터 소스도 쓸 수 있다"
+    ],
+    "commonMistakes": [
+      "Grafana가 수집 주기를 관리하므로 Grafana가 멈추면 Scrape도 멈춘다고 답한다",
+      "Grafana는 Prometheus 없이는 쓸 수 없다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q2",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "metric-log-trace",
+    "difficulty": "intermediate",
+    "question": "Metric, Log, Trace는 각각 무엇을 확인하는 데이터인가요? 특정 요청의 병목 구간을 찾으려면 무엇을 보겠어요?",
+    "expectedPoints": [
+      "Metric은 CPU 사용률이나 응답시간처럼 상태를 수치로 표현해 언제, 얼마나 문제가 생겼는지 보여 준다",
+      "Log는 시스템에서 발생한 이벤트와 오류를 기록한 데이터다",
+      "Trace는 개별 요청이 여러 구성 요소를 거쳐 처리되는 경로와 구간별 처리 시간을 추적한다",
+      "장애가 나면 Metric으로 발생 시점과 범위를 확인하고 Log나 Trace로 구체적인 원인을 좁힌다",
+      "특정 요청의 병목 구간은 해당 요청의 Trace가 적합하고 Log와 Metric도 함께 활용한다"
+    ],
+    "commonMistakes": [
+      "전체 p95 같은 Metric만으로 특정 요청의 병목 구간을 알 수 있다고 답한다",
+      "분산 Trace를 실제로 구축했다고 말한다(제출 자료로 확인되지 않은 경험이다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q3",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "prometheus-pull-scrape",
+    "difficulty": "intermediate",
+    "question": "Prometheus는 지표를 어떤 방식으로 수집하나요? up 값이 1이면 서비스가 정상이라고 볼 수 있나요?",
+    "expectedPoints": [
+      "일반적으로 Pull 방식으로, 애플리케이션이 노출한 메트릭 Endpoint에 설정된 주기마다 HTTP 요청을 보내 지표를 가져온다",
+      "가져온 값은 시간, Label, 값으로 시계열 데이터에 저장한다",
+      "Kubernetes에서는 Service Discovery나 ServiceMonitor로 바뀌는 수집 대상을 관리한다",
+      "up=1은 해당 대상의 Scrape가 성공했다는 뜻일 뿐 비즈니스 기능이 정상임을 보장하지 않는다"
+    ],
+    "commonMistakes": [
+      "애플리케이션이 Prometheus로 지표를 보내는 Push 방식이 기본이라고 답한다",
+      "up=1이면 서비스 전체가 정상이라고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q4",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "servicemonitor-target-discovery",
+    "difficulty": "intermediate",
+    "question": "Prometheus Operator와 ServiceMonitor는 무엇이고 FlowTicket에서 어떻게 썼나요? ServiceMonitor가 수집 대상을 찾지 못하면 무엇을 확인하나요?",
+    "expectedPoints": [
+      "Prometheus Operator는 Kubernetes Custom Resource로 Prometheus와 모니터링 설정을 선언적으로 관리하게 해 주는 컨트롤러다",
+      "ServiceMonitor는 어떤 Service와 Endpoint에서 지표를 수집할지 정의하는 리소스이고, FlowTicket에서는 API Pod와 대기열 Pod의 지표를 수집하도록 구성했다",
+      "ServiceMonitor의 selector는 Service의 Label을, endpoints.port는 Service의 포트 이름을 참조한다",
+      "수집이 안 되면 Prometheus의 Monitor 선택 조건, Namespace, Service Label, 포트 이름, 경로, 네트워크와 대상 상태를 확인한다"
+    ],
+    "commonMistakes": [
+      "ServiceMonitor가 Pod를 직접 선택한다고 답한다(Pod를 직접 고르는 것은 PodMonitor다)",
+      "이미지 태그나 HPA 설정, 알림 이름부터 확인한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q5",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "counter-gauge-histogram",
+    "difficulty": "intermediate",
+    "question": "Counter, Gauge, Histogram은 어떻게 다른가요? Counter 값만으로 현재 요청률을 알 수 있나요?",
+    "expectedPoints": [
+      "Counter는 요청 수나 오류 수처럼 누적되는 값이고 재시작하면 초기화될 수 있다",
+      "Gauge는 CPU 사용량이나 현재 DB 커넥션 수처럼 증가하거나 감소할 수 있는 값이다",
+      "Histogram은 응답시간 같은 관측값을 구간별 분포로 관리해 백분위를 분석하는 데 쓴다",
+      "Counter 누적값만으로는 현재 요청률을 알기 어렵고 rate() 등으로 증가율을 계산한다"
+    ],
+    "commonMistakes": [
+      "현재 대기열 인원처럼 줄어들 수 있는 값을 Counter로 표현한다고 답한다",
+      "Counter의 현재 값을 그대로 초당 요청 수로 읽는다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q6",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "promql-rate-error-ratio",
+    "difficulty": "intermediate",
+    "question": "PromQL로 어떤 지표를 확인하나요? rate와 increase는 어떻게 다른지도 말씀해 주세요.",
+    "expectedPoints": [
+      "PromQL은 Prometheus에 수집된 지표를 조회하고 계산하는 질의 언어이고, 요청 수 Counter에 rate를 적용해 초당 요청률을 구한다",
+      "5xx 요청의 rate를 전체 요청의 rate로 나눠 오류 비율을 구하고, 백분율로 보려면 100을 곱한다",
+      "Histogram bucket의 증가율을 집계해 histogram_quantile로 p95 같은 응답시간 백분위를 계산한다",
+      "rate는 구간의 초당 평균 증가율이고 increase는 구간 전체의 증가량이다"
+    ],
+    "commonMistakes": [
+      "rate와 increase를 같은 값으로 설명한다",
+      "오류율을 계산할 때 분모가 0이거나 트래픽이 아주 적은 경우를 고려하지 않는다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q7",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "percentile-over-average",
+    "difficulty": "intermediate",
+    "question": "응답시간을 평균보다 p95나 p99로 보는 이유는 무엇인가요? p95가 200ms면 모든 요청이 200ms 이하라는 뜻인가요?",
+    "expectedPoints": [
+      "평균만 보면 일부 사용자에게 생긴 긴 지연이 평균에 가려질 수 있다",
+      "FlowTicket 부하 테스트에서는 p95 등 백분위 응답시간과 오류율, 처리량을 함께 확인했다",
+      "p95는 관측값의 약 95%가 그 값 이하인 지점이므로 나머지 요청은 더 느릴 수 있다",
+      "Pod별 p95를 평균한 값은 일반적으로 전체 p95가 아니며 전체 Histogram 데이터를 합산해 계산해야 한다"
+    ],
+    "commonMistakes": [
+      "p95 200ms를 모든 요청이 200ms 이하라는 뜻으로 해석한다",
+      "Pod별 p95의 단순 평균을 전체 p95로 쓴다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q8",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "prometheusrule-alertmanager",
+    "difficulty": "intermediate",
+    "question": "PrometheusRule과 Alertmanager는 각각 어떤 역할을 하나요? CPU가 80%를 넘는 즉시 알림을 보내는 규칙은 어떻게 보시나요?",
+    "expectedPoints": [
+      "PrometheusRule은 수집한 지표를 기준으로 장애 알림 조건을 정의하는 Kubernetes Custom Resource다",
+      "for로 지속 시간을 두면 조건이 연속으로 충족될 때만 Pending에서 Firing으로 넘어가 일시적인 변화와 지속적인 이상을 구분할 수 있다",
+      "규칙 평가는 Prometheus가 하고, Alertmanager는 발생한 알림을 그룹화하고 중복을 제거해 설정된 수신자에게 전달한다",
+      "CPU 순간값 하나로 즉시 알리기보다 지속 시간, 오류율, 응답시간, 최소 트래픽 등을 함께 고려한다"
+    ],
+    "commonMistakes": [
+      "Alertmanager가 지표를 저장하거나 규칙을 평가한다고 답한다",
+      "for: 5m 조건에서 3분만 충족되고 정상화돼도 알림이 발생한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q9",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "alert-rule-testing-promtool",
+    "difficulty": "intermediate",
+    "question": "장애 알림 규칙이 의도대로 동작하는지 어떻게 검증했나요? promtool 테스트가 통과하면 Slack 알림까지 확실히 오나요?",
+    "expectedPoints": [
+      "PrometheusRule로 알림 조건을 정의하고 promtool로 규칙이 의도대로 동작하는지 테스트했다",
+      "장애 조건에서 알림이 발생하는지뿐 아니라 정상 조건에서 알림이 발생하지 않는지도 확인한다",
+      "PrometheusRule CRD 전체가 아니라 필요하면 spec.groups를 일반 규칙 파일 형식으로 추출해 검사한다",
+      "규칙 테스트가 통과해도 실제 지표 수집, 규칙 선택, 알림 전달 경로는 따로 검증해야 한다"
+    ],
+    "commonMistakes": [
+      "promtool 테스트가 통과하면 실제 Slack 전송도 보장된다고 답한다",
+      "알림이 발생하는 경우만 테스트하고 정상 입력에서 알림이 없는지는 확인하지 않는다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q10",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "grafana-dashboard-as-code",
+    "difficulty": "intermediate",
+    "question": "Grafana 대시보드는 어떤 지표로 구성했고 어떻게 관리했나요? CPU 지표만 보면 왜 부족한가요?",
+    "expectedPoints": [
+      "요청률, 응답시간 백분위, DB 커넥션, Outbox 미발행 건수, HPA 복제본 수 등을 볼 수 있게 구성했다",
+      "대시보드를 JSON으로 정의하고 ConfigMap으로 Git에서 관리해 클러스터를 다시 구축해도 같은 구성을 재현할 수 있게 했다",
+      "DB나 Redis 대기, 스레드 경합은 CPU가 낮아도 생길 수 있어 연결 대기와 응답 지연을 함께 봐야 한다"
+    ],
+    "commonMistakes": [
+      "시계열 데이터까지 ConfigMap에 저장한다고 답한다",
+      "CPU가 낮으면 서비스에 문제가 없다고 판단한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q11",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "db-gauge-blocked-scrape",
+    "difficulty": "advanced",
+    "question": "DB 지연 장애를 주입했을 때 Prometheus 지표 수집까지 중단된 문제를 어떻게 찾고 해결했나요? 갱신에 실패해도 같은 값이 계속 보이는 문제는 어떻게 보완했나요?",
+    "expectedPoints": [
+      "일부 운영 Gauge가 Prometheus의 Scrape 요청마다 DB 쿼리를 실행하고 있어 DB가 지연되면 전체 Scrape가 실패할 수 있었다",
+      "DB 조회를 전용 스레드로 분리해 10초마다 값을 갱신하고 Scrape에서는 저장된 값만 반환하도록 바꿨다",
+      "그 결과 DB 지연의 영향이 DB Gauge 갱신으로 제한되고 진단에 필요한 다른 지표는 계속 수집할 수 있다",
+      "마지막으로 값이 갱신된 뒤 지난 시간을 지표로 제공해 오래된 값을 최신 값으로 판단하지 않게 했다"
+    ],
+    "commonMistakes": [
+      "Scrape Timeout만 무조건 늘리거나 DB 지표를 전부 지워서 해결한다고 답한다",
+      "조회 주기를 1초로 줄이면 무조건 좋다고 답한다(신선도는 나아질 수 있지만 DB 부하와 조회 비용이 늘어난다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q12",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "cloudwatch-sns-lambda-slack",
+    "difficulty": "intermediate",
+    "question": "CloudWatch, SNS, Lambda로 장애 알림을 어떻게 구성했나요? Prometheus가 있는데 CloudWatch를 함께 쓴 이유도 말씀해 주세요.",
+    "expectedPoints": [
+      "CloudWatch로 ALB의 운영 상태와 오류를 감시했다",
+      "CloudWatch Alarm 이벤트를 SNS로 Lambda에 전달하고, Lambda가 SSM Parameter Store에서 웹훅 URL을 조회해 Slack으로 보냈다",
+      "ELB 5xx와 Target 5xx를 나눠 보면 ALB가 만든 오류와 Target이 반환한 오류를 구분할 수 있다",
+      "CloudWatch로 AWS 관리형 지표를, Prometheus로 Kubernetes와 애플리케이션 세부 지표를 함께 관측한다"
+    ],
+    "commonMistakes": [
+      "ELB 5xx는 늘었는데 Target 5xx는 늘지 않았으면 앱이 정상이라고 단정한다(ALB 오류 생성과 Target 연결·응답·종료 상태를 더 조사해야 한다)",
+      "SNS와 SQS를 같은 것으로 설명한다(Pub/Sub 전달과 큐에 보관 후 소비의 차이)"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q13",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "low-cpu-high-latency",
+    "difficulty": "advanced",
+    "question": "CPU 사용률은 낮은데 응답시간이 늘어나면 어떻게 분석하겠어요? 이때 커넥션 풀 크기를 늘리면 해결될까요?",
+    "expectedPoints": [
+      "CPU가 낮아도 요청 처리 스레드가 DB나 Redis 응답을 기다리면 지연이 생길 수 있다",
+      "응답시간과 요청률을 먼저 보고 Tomcat 스레드 수와 HikariCP의 Active, Pending 연결 상태를 비교한다",
+      "이후 DB 쿼리 지연과 락 경합, Redis 응답 지연, JVM 상태를 확인해 요청이 어느 구간에서 대기하는지 찾는다",
+      "Pool을 늘리면 DB 수용 능력에 따라 부하가 더 커질 수 있으므로 연결을 점유하는 원인부터 확인한다"
+    ],
+    "commonMistakes": [
+      "CPU가 낮으니 지연이 정상이라고 판단한다",
+      "CPU 기반 HPA나 Pod 증설로 해결된다고 답한다(CPU가 낮으면 확장하지 않을 수 있고 외부 병목이면 Pod 증설도 해결책이 아닐 수 있다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q14",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "jfr-sse-lock-contention",
+    "difficulty": "advanced",
+    "question": "JFR로 성능 문제를 분석한 경험을 말씀해 주세요. 그 상황에서 CPU를 늘렸다면 해결됐을까요?",
+    "expectedPoints": [
+      "ESS 성능평가 시스템에서 동시 SSE 연결 1,000개를 재현하자 실시간 메시지가 최대 14초 지연됐고, CPU에 여유가 있어 스레드 대기 문제를 의심했다",
+      "JFR로 여러 수신 스레드가 같은 SseEmitter의 send 메서드를 호출하며 락 경합이 생기는 것을 확인했다",
+      "메시지 수신과 전송을 분리하고 같은 연결에는 순차적으로 보내도록 바꿨고, 재시험에서 JavaMonitorEnter 이벤트가 341건에서 0건으로 줄고 지연이 해소됐다",
+      "같은 락 경합이 원인이면 CPU를 늘려도 효과가 제한적이다"
+    ],
+    "commonMistakes": [
+      "JavaMonitorEnter 이벤트를 무조건 데드락으로 설명한다(Monitor 락 획득 과정의 대기·경합 이벤트다)",
+      "모든 연결에 전역 Lock을 걸어 해결했다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q15",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "ai-incident-analysis",
+    "difficulty": "advanced",
+    "question": "AI를 활용해 장애를 분석한 경험이 있나요? AI가 잘못된 원인을 제시하면 어떻게 하나요?",
+    "expectedPoints": [
+      "Prometheus 지표와 k6 결과의 시간을 맞추고 이상 구간의 CPU, 스레드, DB 커넥션, Redis 지표를 JSON으로 묶어 Claude API에 전달했다",
+      "AI가 원인 후보, 근거, 반대 지표, 추가 확인 항목을 반환하게 하고 결과는 원자료와 대조했다",
+      "장애 3종을 주입한 시험 18회에서 규칙 기반은 12회, AI는 15회 원인을 맞혔고 정상 시험 6회의 오탐은 0회, 초기 조사 시간 중앙값은 8분에서 3분으로 줄었다(특정 시험 결과다)",
+      "실제 설정 변경은 AI가 하지 않고, 근거가 부족하면 판단 불가로 처리하며 최종 판단은 사람이 한다"
+    ],
+    "commonMistakes": [
+      "AI 분석 결과로 검증 없이 설정을 바꾼다고 답한다",
+      "시험 결과를 모든 환경에서 AI가 규칙보다 낫다는 뜻으로 일반화한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q16",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "incident-response-order",
+    "difficulty": "intermediate",
+    "question": "운영 중 장애가 나면 어떤 순서로 대응하나요? 새 배포 직후 많은 요청이 실패하면 원인 분석부터 끝내야 하나요?",
+    "expectedPoints": [
+      "먼저 장애 범위와 사용자 영향을 확인하고, 최근 배포나 설정 변경 여부를 본다",
+      "요청률, 응답시간, 오류율로 장애 구간을 좁히고 해당 구간의 로그, Kubernetes 이벤트, 외부 의존성 상태를 확인해 원인에 맞게 대응한다",
+      "복구 뒤 실제 요청 처리와 지표가 정상화됐는지 검증하고 원인과 대응 절차를 기록해 재발을 막는다",
+      "사용자 피해가 크면 근본 원인 분석을 끝내기 전에 안전한 롤백이나 우회 조치로 피해를 먼저 줄인다"
+    ],
+    "commonMistakes": [
+      "근본 원인 분석이 끝날 때까지 복구하지 않는다고 답한다",
+      "원인 확인 없이 모든 DB를 즉시 재시작한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q17",
+    "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Monitoring_Incident",
+    "conceptKey": "sli-slo-sla-runbook",
+    "difficulty": "intermediate",
+    "question": "SLI, SLO, SLA는 어떻게 다르고 Runbook은 왜 필요한가요? 가용성 목표가 99.9%면 30일 동안 얼마나 중단될 수 있는지도 계산해 주세요.",
+    "expectedPoints": [
+      "SLI는 서비스 상태를 실제로 측정한 지표다",
+      "SLO는 그 지표에 대해 정한 내부 운영 목표이고 SLA는 고객과 합의한 계약상 서비스 수준이다",
+      "30일은 43,200분이므로 시간 기반 가용성 99.9%면 허용 중단 시간은 43.2분이다",
+      "Runbook은 알림 의미, 확인할 지표와 명령어, 대응 방법, 정상화 검증 절차를 정리해 운영자마다 대응이 달라지는 문제를 줄인다"
+    ],
+    "commonMistakes": [
+      "SLI, SLO, SLA를 같은 의미로 쓰거나 SLO를 고객과의 계약으로 설명한다",
+      "Runbook을 모든 장애에 같은 재시작을 강제하는 문서로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 8강 Q18",
+    "sourceCommit": "notion:2026-11-26"
   }
 ]
