@@ -288,5 +288,6 @@ internal fun topicLabel(topic: String): Int = when (topic) {
     "Terraform_IaC" -> R.string.topic_terraform_iac
     "CICD_GitOps" -> R.string.topic_cicd_gitops
     "Cloud_Security" -> R.string.topic_cloud_security
+    "Monitoring_Incident" -> R.string.topic_monitoring_incident
     else -> R.string.topic_unknown
 }
