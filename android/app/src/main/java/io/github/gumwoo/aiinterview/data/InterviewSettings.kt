@@ -14,10 +14,10 @@ data class InterviewSettings(
     val reviewRatio: Double get() = reviewPercent / 100.0
 
     companion object {
-        /** 클라우드 면접 대비 1~7강 순서다. 서버 시드 질문의 topic과 같은 이름을 쓴다. */
+        /** 클라우드 면접 대비 1~8강 순서다. 서버 시드 질문의 topic과 같은 이름을 쓴다. */
         val DEFAULT_TOPICS = listOf(
             "Docker_Container", "Kubernetes_EKS", "Resource_Autoscaling", "AWS_Network",
-            "Terraform_IaC", "CICD_GitOps", "Cloud_Security",
+            "Terraform_IaC", "CICD_GitOps", "Cloud_Security", "Monitoring_Incident",
         )
 
         fun parseTopics(text: String): List<String> = text.split(',').map { it.trim() }.filter { it.isNotEmpty() }

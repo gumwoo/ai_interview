@@ -101,6 +101,7 @@
     <string name="topic_terraform_iac">Terraform·IaC</string>
     <string name="topic_cicd_gitops">CI/CD·GitOps</string>
     <string name="topic_cloud_security">클라우드 보안</string>
+    <string name="topic_monitoring_incident">모니터링·장애 대응</string>
     <string name="topic_unknown">기타</string>
 
     <string name="call_connecting">연결 중</string>
