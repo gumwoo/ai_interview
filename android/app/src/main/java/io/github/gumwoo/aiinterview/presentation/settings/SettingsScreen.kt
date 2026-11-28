@@ -289,5 +289,12 @@ internal fun topicLabel(topic: String): Int = when (topic) {
     "CICD_GitOps" -> R.string.topic_cicd_gitops
     "Cloud_Security" -> R.string.topic_cloud_security
     "Monitoring_Incident" -> R.string.topic_monitoring_incident
+    "Linux_Virtualization" -> R.string.topic_linux_virtualization
+    "DB_Redis_Messaging" -> R.string.topic_db_redis_messaging
+    "FlowTicket_Project" -> R.string.topic_flowticket_project
+    "ESS_Grid_Practice" -> R.string.topic_ess_grid_practice
+    "AI_Incident_Analysis" -> R.string.topic_ai_incident_analysis
+    "Cost_CloudOps" -> R.string.topic_cost_cloudops
+    "Motivation_Collaboration" -> R.string.topic_motivation_collaboration
     else -> R.string.topic_unknown
 }

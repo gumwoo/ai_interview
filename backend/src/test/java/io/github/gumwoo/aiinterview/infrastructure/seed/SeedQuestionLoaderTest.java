@@ -19,9 +19,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 class SeedQuestionLoaderTest {
 
 	private static final Set<String> TOPICS = Set.of("Docker_Container", "Kubernetes_EKS", "Resource_Autoscaling",
-			"AWS_Network", "Terraform_IaC", "CICD_GitOps", "Cloud_Security", "Monitoring_Incident");
+			"AWS_Network", "Terraform_IaC", "CICD_GitOps", "Cloud_Security", "Monitoring_Incident",
+			"Linux_Virtualization", "DB_Redis_Messaging", "FlowTicket_Project", "ESS_Grid_Practice",
+			"AI_Incident_Analysis", "Cost_CloudOps", "Motivation_Collaboration");
 
-	private static final int SEED_COUNT = 98;
+	private static final int SEED_COUNT = 249;
 
 	@Autowired
 	private SeedQuestionLoader loader;

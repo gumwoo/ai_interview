@@ -1763,5 +1763,2722 @@
     ],
     "sourceRef": "클라우드 면접 대비 8강 Q18",
     "sourceCommit": "notion:2026-11-26"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "linux-experience-kernel-runtime",
+    "difficulty": "intermediate",
+    "question": "Linux 환경을 사용해 본 경험을 설명해 주세요. Linux 기반 컨테이너는 호스트 커널과 어떤 관계인가요?",
+    "expectedPoints": [
+      "FlowTicket에서 AWS EKS 환경에 컨테이너 기반 애플리케이션을 구축하고 CPU와 메모리 사용 상태를 확인하며 자원 설정을 조정했다",
+      "독립계통 컨설팅 프로그램에서 Docker Compose로 애플리케이션과 PostgreSQL을 배포하고 비루트 실행, 볼륨 분리, 백업 환경을 구성했다",
+      "Linux 기반 컨테이너는 호스트 Linux 커널의 CPU, 메모리, 네트워크, 파일 기능을 활용하고 Container Runtime은 컨테이너를 생성하고 실행을 관리한다",
+      "Linux는 서버 운영·자동화 도구가 다양하고 Docker, Kubernetes 등의 실행 기반으로 활용된다"
+    ],
+    "commonMistakes": [
+      "Container Runtime이 앱의 모든 시스템 호출을 대신 중계한다고 답한다",
+      "컨테이너 운영과 자원 관리 경험을 커널 개발이나 커널 수정 경험처럼 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q1",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "os-kernel-distribution",
+    "difficulty": "intermediate",
+    "question": "운영체제와 커널은 어떻게 다른가요? 컨테이너마다 별도의 커널이 있나요?",
+    "expectedPoints": [
+      "운영체제는 애플리케이션이 실행될 환경을 제공하고 시스템 자원을 관리하는 소프트웨어다",
+      "커널은 CPU 스케줄링, 메모리 관리, 파일시스템, 네트워크 등 하드웨어 자원을 직접 관리하는 핵심 부분이고 Shell은 사용자 명령을 해석해 프로그램을 실행한다",
+      "Linux는 엄밀히 커널을 뜻하고 Ubuntu, Debian, Rocky Linux는 Linux 커널과 사용자 공간 프로그램을 포함한 배포판이다",
+      "일반 Linux 컨테이너는 별도 커널 없이 호스트 커널을 공유한다"
+    ],
+    "commonMistakes": [
+      "Ubuntu 기반 이미지로 실행하면 이미지 안의 Ubuntu 커널을 따로 부팅한다고 답한다",
+      "Ubuntu 같은 배포판 자체를 커널이라고 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q2",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "user-kernel-mode-system-call",
+    "difficulty": "intermediate",
+    "question": "User Mode와 Kernel Mode는 어떻게 다른가요? System Call을 할 때마다 Context Switching이 일어나나요?",
+    "expectedPoints": [
+      "User Mode는 일반 애플리케이션이 제한된 권한으로 실행되는 영역이고 Kernel Mode는 운영체제 핵심 기능이 높은 권한으로 실행되는 영역이다",
+      "애플리케이션이 파일이나 네트워크 같은 시스템 자원이 필요하면 System Call로 커널에 요청하고, 커널이 권한과 FD를 확인해 처리한 뒤 반환한다",
+      "open, read/write, socket, fork, execve 같은 호출이 있고 보통 라이브러리를 통해 간접적으로 이용한다",
+      "System Call은 권한 모드 전환이고 실행 스레드 교체와는 달라서 호출마다 Context Switching이 일어나는 것은 아니다"
+    ],
+    "commonMistakes": [
+      "System Call을 하면 반드시 다른 프로세스로 Context Switching이 일어난다고 답한다",
+      "파일 권한 확인을 User Mode에서 하거나 애플리케이션이 디스크 하드웨어를 직접 제어한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q3",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "process-thread-shared-heap",
+    "difficulty": "intermediate",
+    "question": "프로세스와 스레드는 어떻게 다른가요? 같은 프로세스의 스레드들이 자원을 공유하면 어떤 문제가 생길 수 있나요?",
+    "expectedPoints": [
+      "프로세스는 독립적인 주소 공간을 가진 실행 중인 프로그램이고 스레드는 프로세스 내부에서 작업을 수행하는 실행 단위다",
+      "같은 프로세스의 스레드는 Heap 등의 자원을 공유하지만 각자의 Stack과 레지스터 같은 실행 상태를 가진다",
+      "데이터 공유는 편리하지만 같은 자원에 동시에 접근하면 동시성 문제나 락 경합이 생길 수 있다",
+      "ESS에서 같은 Heap 객체인 SseEmitter에 여러 수신 스레드가 send로 접근하며 생긴 락 경합을 분석했고, 수신과 전송을 분리해 동일 연결은 순차 전송하도록 개선했다"
+    ],
+    "commonMistakes": [
+      "같은 프로세스의 스레드가 Stack까지 공유한다거나 Heap과 Stack이 모두 독립이라고 답한다",
+      "FlowTicket의 SSE 메모리 부족(OOM) 사례와 ESS의 SseEmitter 락 경합 사례를 같은 원인으로 섞어 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q4",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "context-switching-thread-count",
+    "difficulty": "intermediate",
+    "question": "Context Switching이란 무엇인가요? 스레드 수를 늘리면 처리 성능이 항상 좋아지나요?",
+    "expectedPoints": [
+      "CPU에서 실행 중인 프로세스나 스레드의 상태를 저장하고 다른 실행 대상의 상태를 복원해 여러 작업을 번갈아 실행하는 과정이다",
+      "상태 저장·복원과 캐시 효율 저하 같은 비용이 있으므로 스레드 수는 CPU 자원과 외부 의존성의 처리 능력을 함께 고려해 정한다",
+      "FlowTicket에서 Tomcat 스레드 200개와 400개를 비교했지만 하위 의존성이 느린 조건에서는 400개로 늘려도 처리 성능이 개선되지 않았다",
+      "일반 블로킹 I/O에서는 DB 응답을 기다리는 동안 스레드가 대기하고 CPU는 다른 작업을 실행할 수 있다"
+    ],
+    "commonMistakes": [
+      "Tomcat 200→400 비교에서 개선이 없었던 원인을 Context Switching이라고 단정한다(직접 원인으로 입증되지 않았다)",
+      "같은 프로세스 안의 스레드 전환은 비용이 없다거나 스레드를 두 배로 늘리면 처리량도 두 배가 된다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q5",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "cpu-usage-vs-load-average",
+    "difficulty": "advanced",
+    "question": "CPU 사용률과 Load Average는 어떻게 다른가요? CPU 사용률은 낮은데 Load Average가 높다면 무엇을 확인하나요?",
+    "expectedPoints": [
+      "CPU 사용률은 CPU가 실제 작업을 수행하는 시간의 비율이다",
+      "Linux Load Average는 실행 중이거나 실행을 기다리는 작업과 중단 불가능 대기(D 상태) 작업 수를 1·5·15분 감쇠 평균한 지표라 순간 작업 수와 같지 않다",
+      "CPU가 낮은데 Load가 높으면 D 상태 작업과 I/O 지연을 실행 대기와 구분해 조사하고 uptime, top, vmstat 1로 확인한다",
+      "Load 값만으로 장애를 판단하지 않고 코어 수, 작업 상태, 지속 시간, 응답시간과 오류율을 함께 본다"
+    ],
+    "commonMistakes": [
+      "Load Average가 높으면 곧 CPU 병목이라고 단정한다",
+      "모든 DB 응답 대기나 Java 락 대기가 D 상태로 Load에 잡힌다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q6",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "virtual-memory-page-table-mmu",
+    "difficulty": "intermediate",
+    "question": "가상 메모리와 물리 메모리는 어떻게 다른가요? 가상 메모리와 Swap은 같은 개념인가요?",
+    "expectedPoints": [
+      "물리 메모리는 실제 RAM이고 가상 메모리는 프로세스가 독립적인 주소 공간을 쓰도록 제공하는 메모리 관리 방식이다",
+      "운영체제가 Page Table을 관리하고 MMU가 가상 주소를 물리 주소로 변환하며 TLB는 최근 주소 변환을 캐시한다",
+      "이를 통해 프로세스 간 메모리 접근을 격리하고 물리 메모리를 효율적으로 관리한다",
+      "Swap은 가상 메모리 관리의 일부일 뿐 가상 메모리와 같은 개념이 아니다"
+    ],
+    "commonMistakes": [
+      "가상 메모리를 RAM이 부족할 때만 쓰는 디스크 영역이라고 설명한다",
+      "Page Fault가 발생하면 반드시 디스크 I/O나 메모리 장애라고 단정한다(최초 페이지 할당 등 정상 상황에서도 발생한다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q7",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "swap-available-memory",
+    "difficulty": "intermediate",
+    "question": "Swap은 무엇이고 메모리가 부족하면 어떻게 동작하나요? free 값이 작으면 바로 메모리 부족이라고 볼 수 있나요?",
+    "expectedPoints": [
+      "Swap은 메모리 페이지를 디스크의 Swap 영역으로 옮겨 물리 메모리 부족에 대응하는 기능이다",
+      "디스크는 RAM보다 느려 Swap 활동이 과도하면 응답시간이 늘 수 있으므로 vmstat 1의 si/so 같은 Swap I/O를 함께 본다",
+      "free가 작아도 회수 가능한 캐시가 있을 수 있어 새 작업에 쓸 수 있다고 추정되는 available을 free -h로 같이 확인한다",
+      "실제 Linux는 RAM이 가득 차기 전에도 Swap을 쓸 수 있고 페이지 회수, 파일 캐시, cgroup 제한이 동작에 영향을 준다"
+    ],
+    "commonMistakes": [
+      "free 값만 보고 메모리 부족을 판단하거나 파일 캐시를 모두 누수로 본다",
+      "Kubernetes 노드는 Swap을 쓸 수 없다고 단정한다(버전과 kubelet 설정에 따라 지원 여부와 동작이 다르다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q8",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "jvm-oom-vs-oom-killer",
+    "difficulty": "advanced",
+    "question": "Linux OOM Killer와 Java OutOfMemoryError는 어떻게 다른가요? 컨테이너 메모리 Limit과 Xmx를 같게 설정하면 어떤 문제가 있나요?",
+    "expectedPoints": [
+      "FlowTicket에서 대기열 상태를 SSE로 전달할 때 Pod 메모리 1Gi 조건에서 약 3,300~3,500개 연결을 유지하는 시점에 OOM이 발생해, 장시간 연결 유지 비용을 고려해 대기열 상태 조회를 Polling으로 바꿨다",
+      "Java OutOfMemoryError는 JVM 내부 메모리 할당 실패 등으로 JVM이 내는 오류이고, OOM Kill은 시스템이나 cgroup 메모리 부족 시 커널이 프로세스를 강제 종료하는 것이다",
+      "JVM은 Heap 외에도 Metaspace, 스레드 Stack, Direct Buffer 등을 쓰므로 Xmx를 Limit과 같게 두지 않고 여유를 둔다",
+      "Exit Code 137은 일반적으로 SIGKILL 종료일 뿐 OOM 확정 증거가 아니므로 OOMKilled 표시와 커널 로그를 함께 확인한다"
+    ],
+    "commonMistakes": [
+      "FlowTicket OOM의 원인을 Heap 누수나 FD 고갈로 단정한다(JVM 메모리 영역별 증가량과 Heap 누수 여부는 확인되지 않았다)",
+      "OOM이 나면 정상 부하 증가, 누수, 연결 관리를 분석하지 않고 무조건 Limit부터 증설한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q9",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "file-descriptor-open-files",
+    "difficulty": "intermediate",
+    "question": "File Descriptor란 무엇인가요? FD 제한만 높이면 SSE 대량 연결 문제가 해결되나요?",
+    "expectedPoints": [
+      "프로세스가 열린 파일이나 네트워크 소켓 같은 자원을 참조하기 위해 쓰는 식별자이고 0, 1, 2는 stdin, stdout, stderr다",
+      "동시 연결이 많으면 FD 사용량도 늘고 제한에 도달하면 Too many open files 오류가 날 수 있다",
+      "ulimit -n은 현재 Shell의 제한이므로 대상 프로세스는 /proc/<PID>/limits로 제한을 보고 lsof -p나 /proc/<PID>/fd 개수로 실제 열린 파일·소켓 수를 확인한다",
+      "FD 제한만 높여서는 안 되고 메모리, 네트워크, 앱 처리 구조도 함께 확인해야 한다"
+    ],
+    "commonMistakes": [
+      "ulimit -n 값을 대상 프로세스의 제한으로 그대로 읽는다",
+      "FlowTicket SSE OOM의 원인이 FD 고갈이라고 답한다(그런 근거는 없다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q10",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "namespace-cgroups-pod-sharing",
+    "difficulty": "intermediate",
+    "question": "Namespace와 cgroups는 어떻게 다른가요? 같은 Pod 안의 컨테이너들은 네트워크와 프로세스 공간을 어떻게 공유하나요?",
+    "expectedPoints": [
+      "Namespace는 프로세스가 바라보는 PID, 네트워크, 마운트, 호스트 이름, IPC, UID/GID 매핑 등의 범위를 격리한다",
+      "cgroups는 프로세스 그룹의 CPU, 메모리, 생성 가능한 작업 수, 블록 I/O 사용량을 계측하고 제한한다",
+      "Docker와 Kubernetes는 이 Linux 커널 기능으로 컨테이너 실행 환경을 분리하고 자원을 관리하며 컨테이너들은 호스트 커널을 공유한다",
+      "같은 Pod의 컨테이너는 일반적으로 네트워크 Namespace와 Pod IP를 공유해 localhost로 통신하지만, PID Namespace는 shareProcessNamespace 같은 설정이 있어야 공유된다"
+    ],
+    "commonMistakes": [
+      "Namespace가 CPU를 제한하고 cgroups가 네트워크를 격리한다고 역할을 반대로 답한다",
+      "같은 Pod의 컨테이너가 모든 Namespace를 공유한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q11",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "cgroup-cpu-quota-throttling",
+    "difficulty": "advanced",
+    "question": "CPU Request와 Limit은 Linux에서 어떻게 동작하나요? CPU Limit을 넘을 때와 Memory Limit을 넘을 때는 결과가 어떻게 다른가요?",
+    "expectedPoints": [
+      "CPU Request는 Scheduler가 Pod를 배치하는 기준이자 CPU 경합 시 상대적 자원 배분에 반영되고, Limit이 없으면 노드에 여유가 있을 때 Request보다 많이 쓸 수 있다",
+      "CPU Limit은 cgroups로 CPU 실행 시간의 상한을 거는 것이라 너무 낮으면 노드에 CPU 여유가 있어도 스로틀링으로 응답시간이 늘 수 있다",
+      "CPU Limit을 넘으면 스로틀링되고 Memory Limit을 넘으면 회수와 할당 실패 뒤 OOM Kill될 수 있다",
+      "cgroups v2 환경에서는 cpu.max, cpu.weight, cpu.stat, memory.current, memory.max, memory.events 등으로 확인한다",
+      "FlowTicket에서는 10만 건/10초 목표, 요청당 CPU 시간 중앙값 0.826ms와 20% 여유를 반영해 CPU Request를 300m에서 1100m으로 조정하고 HPA와 노드 수용량도 고려했다"
+    ],
+    "commonMistakes": [
+      "CPU Request를 절대 상한으로 보고 Request 이상은 쓸 수 없다고 답한다",
+      "노드에 CPU 여유가 있으면 CPU Limit이 적용되지 않는다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q12",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "vm-container-eks-ec2-layers",
+    "difficulty": "intermediate",
+    "question": "VM과 컨테이너는 어떻게 다른가요? EC2 Worker Node를 쓰는 EKS에서는 VM과 컨테이너가 어떤 구조로 함께 쓰이나요?",
+    "expectedPoints": [
+      "VM은 Hypervisor로 하드웨어 자원을 가상화하고 VM마다 독립적인 Guest OS와 커널을 실행한다",
+      "컨테이너는 호스트 커널을 공유하면서 Namespace와 cgroups로 실행 환경과 자원을 분리한다",
+      "EKS에서는 EC2가 Worker Node이고 각 노드의 Guest Linux 커널 위에서 containerd로 컨테이너가 실행되므로 VM과 컨테이너를 함께 쓰는 구조다",
+      "Type 1 Hypervisor는 하드웨어에 직접 접근하는 형태(ESXi), Type 2는 호스트 OS 위에서 실행되는 형태(VirtualBox)이고 KVM은 Linux 커널에 통합돼 단순 분류에 한계가 있다"
+    ],
+    "commonMistakes": [
+      "컨테이너가 VM보다 항상 안전하거나 빠르다고 단정한다(격리와 성능은 환경에 따라 다르다)",
+      "Pod마다 별도 Hypervisor가 설치된다거나 EKS가 VM과 컨테이너 중 하나만 쓴다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q13",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "linux-file-permission-chmod",
+    "difficulty": "intermediate",
+    "question": "Linux 파일 권한과 비루트 실행에 대해 설명해 주세요. 비루트 컨테이너에서 볼륨 쓰기가 실패하면 어떻게 대응하나요?",
+    "expectedPoints": [
+      "독립계통 컨설팅 프로그램을 Docker Compose로 배포할 때 애플리케이션을 비루트 사용자로 실행해, 필요 이상의 권한으로 생기는 보안 문제의 영향 범위를 줄였다",
+      "r=4, w=2, x=1이고 chmod 640은 소유자 읽기·쓰기, 그룹 읽기, 기타 권한 없음이며 디렉터리의 x 권한은 경로 통과와 접근에 관련된다",
+      "볼륨을 쓸 때는 실행 사용자에게 필요한 읽기·쓰기 권한이 있는지 고려하고, 쓰기 실패 시 UID/GID와 소유권을 먼저 확인해 최소 권한을 준다",
+      "USER 지정만으로 완전히 안전하지 않으며 Capability, 특권 설정, 파일시스템과 호스트 접근 범위도 고려한다"
+    ],
+    "commonMistakes": [
+      "볼륨 쓰기가 실패하면 chmod 777이나 privileged 설정으로 해결한다고 답한다",
+      "chmod 640을 그룹 읽기·쓰기 권한으로 해석한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q14",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "linux-incident-command-flow",
+    "difficulty": "advanced",
+    "question": "Linux 서버에 장애가 나면 어떤 순서로 어떤 명령어를 사용하나요? df로는 디스크가 가득 찼는데 du 합계는 작다면 무엇을 확인하나요?",
+    "expectedPoints": [
+      "장애 범위와 최근 변경을 먼저 확인하고 top, free, df로 CPU, 메모리, 디스크 전체 상태를 본 뒤 장애 유형별 세부 지표와 로그, 프로세스를 확인한다",
+      "CPU는 top -H -p, mpstat, pidstat로 코어·스레드별 사용량을, 메모리는 free -h, ps의 RSS 정렬, vmstat, dmesg의 OOM 기록과 JVM·cgroup 제한을 본다",
+      "디스크는 df -h와 df -i로 용량과 inode를, iostat -xz로 I/O 지연을 보고 네트워크는 ip addr, ip route, ss -lntp, dig, curl -v로 확인한다",
+      "df는 가득 찼는데 du가 작으면 삭제됐지만 열려 있는 파일을 lsof +L1로 찾고, 원인에 맞게 조치한 뒤 운영 지표와 실제 요청으로 검증한다"
+    ],
+    "commonMistakes": [
+      "사용률이 높다는 이유만으로 원인 확인 없이 서버를 재시작하거나 자원을 증설한다",
+      "df -h 용량이 충분하면 파일 생성 실패 원인에서 디스크를 배제한다(inode가 고갈됐을 수 있다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q15",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Linux_Virtualization",
+    "conceptKey": "pid1-signal-exec-form",
+    "difficulty": "intermediate",
+    "question": "SIGTERM과 SIGKILL의 차이와 컨테이너에서 PID 1의 역할을 설명해 주세요. ENTRYPOINT를 Exec Form으로 쓰면 모든 요청을 정상 완료할 수 있나요?",
+    "expectedPoints": [
+      "SIGTERM(15)은 정상 종료 요청이라 앱이 처리해 진행 중인 요청과 자원을 정리할 수 있고, SIGKILL(9)은 처리할 수 없는 강제 종료라 정리 기회를 주지 않는다",
+      "컨테이너에서는 PID 1로 실행되는 프로세스가 종료 신호를 제대로 처리하는지가 중요하다",
+      "Shell Form ENTRYPOINT는 Shell이 PID 1이 되어 Java 자식 프로세스에 신호가 전달되지 않을 수 있고, Exec Form은 불필요한 Shell 없이 Java가 PID 1로 신호를 받는다",
+      "Exec Form만으로 끝나지 않고 앱의 종료 처리, Kubernetes 종료 유예 시간, 로드밸런서 연결 해제를 함께 검증해야 한다"
+    ],
+    "commonMistakes": [
+      "Exec Form이면 모든 요청이 정상 완료된다고 단정한다",
+      "SIGKILL도 애플리케이션이 받아서 정리 작업을 할 수 있다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 9강 Q16",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "rds-postgresql-multi-az",
+    "difficulty": "intermediate",
+    "question": "FlowTicket에서 RDS PostgreSQL을 사용한 이유는 무엇인가요? Multi-AZ와 Read Replica는 어떻게 다른지도 설명해 주세요.",
+    "expectedPoints": [
+      "좌석, 주문, 결제처럼 데이터 정합성이 중요한 정보를 PostgreSQL에 저장했다",
+      "백업과 장애 전환 같은 운영 부담을 줄이려고 RDS를 쓰고 Multi-AZ로 구성해 가용성을 고려했다",
+      "RDS를 써도 인덱스, 쿼리, 트랜잭션, 커넥션 Pool은 사용자가 관리해야 하는 영역이다",
+      "Multi-AZ는 가용성과 장애 전환, Read Replica는 읽기 부하 분산이 목적이며 일반 Multi-AZ DB 인스턴스의 Standby는 읽기 분산 용도가 아니다(Multi-AZ DB Cluster와는 구분한다)"
+    ],
+    "commonMistakes": [
+      "RDS가 쿼리 최적화나 인덱스 설계까지 대신해 준다고 답한다",
+      "일반 Multi-AZ DB 인스턴스의 Standby로 읽기 부하를 분산할 수 있다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q1",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "postgresql-btree-index",
+    "difficulty": "intermediate",
+    "question": "PostgreSQL에서 인덱스를 사용하는 이유는 무엇인가요? 인덱스가 있으면 항상 사용되는지도 설명해 주세요.",
+    "expectedPoints": [
+      "인덱스는 필요한 데이터를 효율적으로 찾기 위한 별도 탐색 구조로, 적절한 조건에서 전체 테이블을 검사하는 비용을 줄인다",
+      "B-tree는 Root, 내부 페이지, Leaf를 거쳐 대상 데이터 위치를 찾고 범위 검색과 정렬에 활용할 수 있다",
+      "별도 공간과 INSERT·UPDATE·DELETE 때 인덱스 관리 비용이 생기므로 조회 패턴과 쓰기 비용을 함께 고려해 설정한다",
+      "옵티마이저는 데이터 분포, 조회 비율, 예상 비용을 고려하므로 넓은 범위를 조회하면 Seq Scan이 더 유리할 수 있다"
+    ],
+    "commonMistakes": [
+      "인덱스가 있으면 옵티마이저가 반드시 사용한다고 답한다",
+      "인덱스가 있는데 Seq Scan이 선택되면 DB 오류라고 단정하거나 인덱스를 바로 삭제한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q2",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "ess-query-tuning-explain",
+    "difficulty": "advanced",
+    "question": "ESS 성능평가 시스템에서 DB 조회 성능을 개선한 경험을 설명해 주세요. 느린 쿼리가 있으면 인덱스부터 추가하면 되나요?",
+    "expectedPoints": [
+      "대량 시험 데이터를 조회하는 기능의 응답시간이 길어져 동일한 조회 조건을 재현하고 PostgreSQL 실행계획과 데이터 조회 패턴을 확인했다",
+      "조회 단위와 데이터 처리 방식을 개선하고 변경 전후 결과가 동일한지 검증해 응답시간을 3.26초에서 223ms로 약 93.2% 줄였다",
+      "느린 쿼리는 인덱스부터 추가하지 않고 실행계획, 조회량, 정렬, 조인, Lock 대기 등 병목을 먼저 확인한다",
+      "EXPLAIN ANALYZE는 SQL을 실제로 실행하므로 운영 환경의 변경 쿼리나 대량 조회에서는 주의한다"
+    ],
+    "commonMistakes": [
+      "DB 쿼리 시간과 API 응답시간이 같다고 단정한다(연결 대기, 데이터 전송·연산·직렬화 시간도 포함될 수 있다)",
+      "EXPLAIN ANALYZE도 일반 EXPLAIN처럼 쿼리를 실행하지 않는다고 생각하고 운영에서 그대로 실행한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q3",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "transaction-acid-external-call",
+    "difficulty": "intermediate",
+    "question": "트랜잭션과 ACID가 무엇인지 설명해 주세요. @Transactional 안에서 외부 결제 API는 성공했는데 DB 저장이 실패하면 외부 결제도 취소되나요?",
+    "expectedPoints": [
+      "트랜잭션은 여러 DB 작업을 하나의 논리적인 단위로 처리하는 방식이다",
+      "ACID는 함께 성공하거나 실패하는 원자성, 제약조건과 규칙을 만족하는 일관성, 동시 작업 간 간섭을 제어하는 격리성, 확정된 변경을 보존하는 지속성이다",
+      "FlowTicket에서는 주문과 결제 상태처럼 연관된 데이터가 일부만 변경되지 않도록 트랜잭션 경계를 고려했다(예: 주문 변경, 좌석 변경, Outbox 저장을 묶어 정상이면 COMMIT, 오류면 ROLLBACK)",
+      "로컬 DB 트랜잭션은 외부 결제를 자동으로 취소하지 않으므로 외부 결제 상태 조회, 재시도, 취소를 별도로 처리해야 한다"
+    ],
+    "commonMistakes": [
+      "DB가 롤백되면 외부 결제 API 호출도 자동으로 취소된다고 답한다",
+      "주문 변경과 Outbox 저장을 함께 확정하거나 취소하는 특성을 Durability나 Isolation으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q4",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "isolation-level-snapshot",
+    "difficulty": "intermediate",
+    "question": "트랜잭션 격리 수준이 무엇인지 설명해 주세요. PostgreSQL에서 Read Committed와 Repeatable Read는 같은 행을 다시 조회할 때 어떻게 다르게 보이나요?",
+    "expectedPoints": [
+      "동시에 실행되는 트랜잭션이 다른 트랜잭션의 변경 사항을 어느 범위까지 볼 수 있는지 정하는 기준이다",
+      "Dirty Read는 미확정 데이터 읽기, Non-repeatable Read는 같은 행을 다시 조회할 때 값이 바뀌는 것, Phantom Read는 같은 조건으로 다시 조회할 때 행 집합이 바뀌는 것이다",
+      "PostgreSQL 기본값인 Read Committed는 SQL 문 단위 스냅샷이라 재조회 때 다른 트랜잭션이 확정한 값을 보고, Repeatable Read는 트랜잭션 안에서 같은 스냅샷으로 일반 조회한다",
+      "격리 수준을 높이면 특정 동시성 문제를 줄일 수 있지만 Serializable처럼 충돌에 따른 재시도 비용이 생기므로 업무 요구사항에 맞게 선택한다"
+    ],
+    "commonMistakes": [
+      "모든 트랜잭션을 Serializable로 두면 항상 좋다고 답한다",
+      "Read Committed가 Dirty Read를 허용하거나 트랜잭션 시작 시점의 스냅샷을 계속 유지한다고 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q5",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "seat-hold-conditional-update",
+    "difficulty": "intermediate",
+    "question": "좌석 중복 선점을 어떻게 방지했는지 설명해 주세요. Redis 분산 락 대신 DB에서 처리한 이유는 무엇인가요?",
+    "expectedPoints": [
+      "PostgreSQL 조건부 UPDATE로 좌석 상태가 AVAILABLE일 때만 HELD로 바꾸고 영향받은 행 수로 선점 성공 여부를 판단했다",
+      "SELECT로 확인한 뒤 UPDATE하면 두 요청이 모두 AVAILABLE을 보고 둘 다 성공으로 판단할 위험이 있어 DB에서 상태 전이 조건을 직접 검증했다",
+      "Read Committed와 같은 행 충돌을 가정하면 먼저 커밋한 요청은 1행이 바뀌고, 뒤 요청은 기다린 뒤 조건을 재평가해 0행이 바뀐다",
+      "최종 상태가 DB에 있어 단일 상태 전이는 DB에서 직접 검증하는 편이 단순하고, 분산 락은 락 만료와 DB 정합성까지 고려해야 한다"
+    ],
+    "commonMistakes": [
+      "조건부 UPDATE는 락을 전혀 쓰지 않는다고 답한다(UPDATE 자체는 행 락을 사용할 수 있다)",
+      "선행 SELECT 결과나 요청이 도착한 순서만으로 선점 성공을 판단한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q6",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "db-lock-vs-deadlock",
+    "difficulty": "intermediate",
+    "question": "DB Lock과 Deadlock의 차이를 설명해 주세요. Deadlock을 줄이기 위한 설계 방법도 말씀해 주세요.",
+    "expectedPoints": [
+      "Lock은 동시 데이터 접근에서 정합성을 유지하기 위한 정상적인 제어 방식이지만 과도한 대기는 병목이 될 수 있다",
+      "Deadlock은 A가 Row 1을 갖고 Row 2를, B가 Row 2를 갖고 Row 1을 기다리는 것처럼 서로 상대의 락을 기다리는 순환 대기이며 PostgreSQL은 이를 감지해 한 트랜잭션을 중단할 수 있다",
+      "트랜잭션 안의 자원 접근 순서를 일관되게 유지하고 불필요하게 긴 트랜잭션을 피하며 실패한 트랜잭션을 안전하게 재시도할 수 있게 설계한다",
+      "pg_stat_activity의 wait_event와 pg_blocking_pids로 어떤 세션이 대기하고 누가 막고 있는지 확인한다"
+    ],
+    "commonMistakes": [
+      "모든 Lock을 장애로 단정한다",
+      "Deadlock을 한쪽 트랜잭션만 오래 기다리는 상태로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q7",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "hikaricp-pool-settings",
+    "difficulty": "intermediate",
+    "question": "DB 커넥션 풀과 HikariCP를 설명해 주세요. Pool 크기를 늘리면 항상 성능이 좋아지나요?",
+    "expectedPoints": [
+      "커넥션 풀은 DB 연결을 재사용해 연결 생성 비용을 줄이는 방식이고 Spring Boot에서 HikariCP를 활용했다",
+      "연결이 부족하면 요청 스레드가 대기하므로 Pool의 Active와 Pending 상태를 확인하는 것이 중요하다",
+      "maximumPoolSize는 최대 연결 수, minimumIdle은 유지하려는 최소 유휴 연결 수, connectionTimeout은 연결 획득 대기 상한이며 SQL 실행 Timeout과는 별개다",
+      "Pool을 늘려도 DB 동시 처리량을 넘으면 경합과 부하가 늘 수 있어 전체 Pod 수까지 고려해 정해야 한다"
+    ],
+    "commonMistakes": [
+      "connectionTimeout을 SQL 최대 실행시간이나 트랜잭션 시간으로 설명한다",
+      "Pool을 늘리면 무조건 처리량이 늘어난다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q8",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "k8s-db-connection-budget",
+    "difficulty": "advanced",
+    "question": "Kubernetes에서 Pod가 늘어날 때 DB 커넥션 수를 어떻게 관리했나요? HPA 최대 복제본을 늘리면 어떤 문제가 생길 수 있는지도 설명해 주세요.",
+    "expectedPoints": [
+      "Pod가 확장되면 Pod마다 커넥션 풀도 함께 늘어나므로 DB 최대 연결 수를 기준으로 연결 예산을 정했다",
+      "FlowTicket에서는 RDS 최대 연결 79개에서 예약 3개와 운영 여유 20개를 뺀 56개를 애플리케이션 연결 예산으로 잡았다",
+      "롤링 배포 중 추가되는 Pod까지 포함해 API (3+1 surge)×5=20, Queue (6+1 surge)×3=21로 최대 수요 41개, 잔여 15개로 계산했다(제출 CASE 포트폴리오의 계획값이며 실제 연결 수는 Pool 설정과 사용 상태에 따라 다르다)",
+      "HPA 상한을 늘리면 CPU뿐 아니라 DB 연결 예산도 넘을 수 있고, 종료 중인 Pod나 다른 DB 사용자도 함께 고려해야 한다"
+    ],
+    "commonMistakes": [
+      "Pool 최대가 5면 Pod마다 항상 연결 5개가 열려 있다고 답한다(최대치일 뿐이다)",
+      "롤링 배포 중 surge로 추가되는 Pod를 빼고 최대 복제본 수만으로 연결 수요를 계산한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q9",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "redis-shared-queue-state",
+    "difficulty": "intermediate",
+    "question": "Redis가 무엇이고 FlowTicket과 ESS에서 왜 사용했나요? 로컬 캐시 대신 Redis를 쓴 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "FlowTicket에서는 여러 API Pod가 같은 대기열 상태와 입장 토큰을 공유하고 원자적으로 변경해야 해서 ElastiCache Redis를 썼다",
+      "Sorted Set으로 대기 순서를 관리하고 Lua Script로 대기열 관련 연산을 원자적으로 처리했다",
+      "ESS에서는 수집한 설비 데이터를 Redis Pub/Sub으로 백엔드에 전달하고 SSE로 사용자 화면에 제공했다",
+      "Redis는 메모리 중심의 Key-Value·다양한 자료구조와 TTL을 제공하고 PostgreSQL은 주문·결제 같은 관계형 영속 데이터를 맡으며, Redis도 RDB/AOF 설정으로 영속성을 둘 수 있다"
+    ],
+    "commonMistakes": [
+      "Redis는 메모리 기반이라 반드시 휘발성이라고 단정한다",
+      "로컬 메모리가 항상 느려서 Redis를 쓴다고 답하거나 Redis가 모든 데이터의 영속성을 자동으로 보장한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q10",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "cache-aside-stampede",
+    "difficulty": "intermediate",
+    "question": "Redis 캐싱 방식 중 Cache Aside를 설명해 주세요. 인기 키가 만료된 직후 DB 조회가 몰리는 Stampede는 어떻게 대응하나요?",
+    "expectedPoints": [
+      "애플리케이션이 캐시를 먼저 조회해 Hit면 바로 반환하고, Miss면 DB에서 조회한 뒤 캐시에 저장하고 반환한다",
+      "반복 조회의 DB 부하를 줄이지만 원본 데이터가 바뀌면 캐시 무효화와 만료 정책을 함께 고려해야 한다",
+      "Stampede는 요청 병합·락·선제 갱신, Penetration은 Negative Cache, Avalanche는 TTL 분산, Stale Data는 무효화·갱신 정책으로 대응한다",
+      "좌석 판매 가능 여부는 화면 표시에 캐시를 쓸 수 있지만 실제 선점은 DB에서 최종 검증해야 한다"
+    ],
+    "commonMistakes": [
+      "좌석 판매 가능 여부를 캐시 값만으로 판단해 선점을 확정한다",
+      "FlowTicket의 핵심 Redis 용도를 단순 캐시라고 설명한다(핵심은 공유 대기열이다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q11",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "redis-zset-waiting-queue",
+    "difficulty": "intermediate",
+    "question": "Redis Sorted Set으로 대기열을 어떻게 구현했나요? List 대신 Sorted Set을 선택한 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "사용자별 순서를 Score로 표현해 정렬 상태를 유지하고 ZRANK 등으로 현재 대기 순번을 확인했다",
+      "여러 Pod가 동시에 접근하므로 입장 가능 인원 확인과 승격 같은 연산은 Lua Script로 원자적으로 처리했다",
+      "ZADD는 추가·갱신, ZRANGE는 범위 조회, ZPOPMIN은 가장 낮은 Score 제거와 반환, ZCARD는 Member 수이며 ZRANK는 0부터 시작한다",
+      "특정 사용자의 대기 순번 조회 요구에는 List보다 ZSET이 적합하고, 동일 Score는 사전식 순서 등의 영향을 받으므로 순서 발급 정책이 중요하다"
+    ],
+    "commonMistakes": [
+      "ZRANK가 0이면 Member가 없거나 Score가 0이라고 답한다",
+      "Score가 같아도 들어온 순서대로 정렬된다고 단정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q12",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "redis-lua-atomic-admission",
+    "difficulty": "advanced",
+    "question": "대기열 승격에 Redis Lua Script를 사용한 이유는 무엇인가요? Lua 실행 중 오류가 나면 DB처럼 Rollback되나요?",
+    "expectedPoints": [
+      "여러 Pod가 동시에 입장 가능 인원을 확인하고 승격하면 둘 다 남은 정원을 보고 승격해 정원을 초과하는 경쟁 조건이 생길 수 있었다",
+      "정원 확인, 사용자 승격, 입장 인원 변경, 토큰 발급을 하나의 Lua Script로 묶어 그 연산 중간에 다른 요청이 끼어들지 않게 했다",
+      "실제 초기 synthetic test에서 정원 3명·동시 요청 10개 조건으로 초과 입장 7건이 발생했고, 원자 처리 적용 후 목표는 초과 입장 0건이다",
+      "Lua는 중간 명령 개입을 막지만 이미 수행한 쓰기를 자동 취소하지 않으며, 긴 스크립트는 다른 명령을 지연시키므로 짧게 구성하고 Redis Cluster에서는 다중 키가 같은 hash slot에 있는지도 고려한다"
+    ],
+    "commonMistakes": [
+      "Lua 실행 중 오류가 나면 DB 트랜잭션처럼 모든 쓰기가 자동 Rollback된다고 답한다",
+      "개별 Redis 명령이 원자적이면 정원 확인·제거·인원 증가를 따로 실행해도 전체 작업이 원자적이라고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q13",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "redis-pubsub-vs-streams",
+    "difficulty": "intermediate",
+    "question": "Redis Pub/Sub이 무엇이고 ESS에서 어떻게 사용했나요? Redis Streams와는 어떻게 다른지도 설명해 주세요.",
+    "expectedPoints": [
+      "채널에 발행한 메시지를 현재 그 채널을 구독 중인 Subscriber에게 전달하는 방식이다",
+      "ESS에서는 설비 데이터를 실시간으로 전달하려고 Redis Pub/Sub으로 메시지를 받아 SSE로 사용자 화면에 전달했다",
+      "기본 Pub/Sub은 메시지를 영속 보관하거나 끊긴 Subscriber에게 재전송하지 않아 재연결해도 과거 메시지가 재생되지 않으므로 유실 가능성을 고려해야 한다",
+      "Streams는 메시지를 보관하고 ID 기반 조회와 Consumer Group을 활용할 수 있으며 Pub/Sub은 현재 구독자 전달 중심이다"
+    ],
+    "commonMistakes": [
+      "같은 채널 이름으로 재연결하면 끊긴 동안의 메시지를 다시 받을 수 있다고 답한다",
+      "Pub/Sub과 Streams를 둘 다 메시지를 보관하는 같은 방식으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q14",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "kafka-vs-redis-pubsub",
+    "difficulty": "intermediate",
+    "question": "Kafka와 Redis Pub/Sub의 차이를 설명해 주세요. Kafka에서 Consumer Group을 나누면 같은 이벤트를 각각 받을 수 있나요?",
+    "expectedPoints": [
+      "Kafka는 이벤트를 Topic과 Partition에 기록하고 Consumer가 Offset을 기준으로 읽어 처리하는 이벤트 스트리밍 플랫폼이다",
+      "Kafka는 Retention 정책으로 이벤트를 보관하고 Offset으로 재처리할 수 있어 구독이 중단돼도 보관 기간 안이면 처리할 수 있다",
+      "Redis Pub/Sub은 기본 보관과 재생이 없어 구독 중단 시 유실될 수 있지만 기존 Redis를 활용하면 실시간 알림에 비교적 단순하게 쓸 수 있다",
+      "서로 다른 Consumer Group은 소비 위치를 독립적으로 관리해 같은 이벤트를 각각 받고, 같은 그룹 안에서는 Partition을 나눠 처리하며 순서는 일반적으로 Partition 내부 단위다"
+    ],
+    "commonMistakes": [
+      "Kafka가 클러스터나 Topic 전체에서 이벤트 순서를 보장한다고 답한다",
+      "Redis Pub/Sub도 Kafka처럼 지난 메시지를 다시 읽을 수 있다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q15",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "transactional-outbox-relay",
+    "difficulty": "advanced",
+    "question": "결제 이벤트에 Transactional Outbox를 도입한 이유는 무엇인가요? Outbox를 쓰면 이벤트가 정확히 한 번 전달되나요?",
+    "expectedPoints": [
+      "결제 상태를 DB에 저장한 뒤 따로 이벤트를 발행하면 DB 변경은 성공하고 발행은 실패해 이벤트가 유실될 수 있다(Dual Write 문제)",
+      "결제 상태 변경(주문 PAID)과 Outbox 이벤트(PENDING) 저장을 같은 트랜잭션으로 커밋했다",
+      "별도 Relay가 미발행 이벤트를 조회해 메시지 시스템으로 발행하고 발행 상태를 기록하며, 실패하면 기록을 기반으로 재시도한다",
+      "발행 성공 후 상태 기록 전에 장애가 나면 중복 발행될 수 있어 소비 측 멱등성이 필요하고, Pub/Sub 최종 전달 구간의 유실까지 보장하지는 않는다"
+    ],
+    "commonMistakes": [
+      "Outbox가 정확히 한 번 전달을 자동으로 보장한다고 답한다",
+      "Outbox의 목적을 외부 결제 성공 보장이나 메시지 시스템의 영구 보관으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q16",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "kafka-removal-simplification",
+    "difficulty": "intermediate",
+    "question": "FlowTicket에서 Kafka를 도입했다가 제거한 이유는 무엇인가요? 어떤 상황이 되면 Kafka를 다시 도입하겠습니까?",
+    "expectedPoints": [
+      "초기에는 Transactional Outbox와 Kafka(Strimzi, Broker 3대)로 결제 완료 이벤트를 전달했고 최종 사용자 전달은 Redis Pub/Sub과 SSE를 썼다",
+      "실제 비즈니스 이벤트가 order.paid 한 종류여서 요구사항에 비해 Broker 3대 운영 복잡성이 크다고 판단해 Outbox와 Redis Pub/Sub 구조로 단순화했다",
+      "Kafka의 이벤트 재생과 독립 소비자 기능은 포기했고 Outbox 기록과 발행 재시도는 유지했다",
+      "정산·분석·알림 같은 독립 소비자나 이벤트 보관·재생 요구가 늘어나면 다시 도입을 검토한다"
+    ],
+    "commonMistakes": [
+      "Kafka가 이벤트 재생을 지원하지 않아서 제거했다고 답한다",
+      "Pub/Sub 알림이 유실되면 결제 상태를 알 수 없다고 답한다(알림과 실제 결제 상태를 구분하고 DB 상태 조회 같은 복구 경로를 둔다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q17",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "sse-polling-websocket",
+    "difficulty": "intermediate",
+    "question": "SSE, Polling, WebSocket의 차이를 설명해 주세요. SSE 대신 Polling을 쓰면 부하가 항상 줄어드나요?",
+    "expectedPoints": [
+      "SSE는 HTTP 연결을 유지하며 서버가 클라이언트로 이벤트를 보내고, Polling은 클라이언트가 일정 간격으로 상태를 조회하며, WebSocket은 연결 수립 후 양방향 통신을 한다",
+      "FlowTicket 대기열 SSE가 Pod 메모리 1Gi 조건에서 약 3,300~3,500개 연결 시 OOM을 일으켜 대기 상태 전달을 Polling으로 바꿨다",
+      "ESS는 실시간 설비 데이터 전달 요구에 맞게 SSE를 유지하면서 동일 Emitter 전송 경합을 개선하는 등 전송 구조를 고쳤다",
+      "Polling은 연결 유지 비용 대신 주기적 요청 비용이 늘어나므로 사용자 수, 요청 간격, 처리 비용을 측정해 판단한다"
+    ],
+    "commonMistakes": [
+      "Polling으로 바꾸면 부하가 항상 줄어든다고 답한다",
+      "FlowTicket과 ESS의 SSE 문제를 같은 원인과 같은 해결로 설명한다(FlowTicket은 OOM 뒤 Polling 전환, ESS는 Emitter 경합 개선)"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q18",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "redis-failure-isolation",
+    "difficulty": "advanced",
+    "question": "FlowTicket에서 Redis 장애가 다른 기능으로 전파되는 문제를 어떻게 해결했나요? 그렇다면 모든 Pod의 Readiness에서 Redis를 빼면 되나요?",
+    "expectedPoints": [
+      "Redis 장애 시 모든 API의 Readiness가 실패해 Redis를 쓰지 않는 정상 DB 조회까지 트래픽에서 제외되는 구조를 확인했다",
+      "API는 DB 중심 Readiness, Queue는 DB와 Redis Readiness로 필수 의존성을 나눴다",
+      "Readiness만 바꾸면 Redis 대기가 길어져 Tomcat 스레드를 점유하므로 Redis Timeout을 줄이고 실패 처리를 함께 개선했다",
+      "Redis가 필수인 기능은 정합성을 보존하며 실패 처리하고 다른 조회 기능에는 장애가 전파되지 않게 했다"
+    ],
+    "commonMistakes": [
+      "모든 Pod의 Readiness에서 Redis를 제거하면 된다고 답한다(대기열처럼 Redis가 필수면 Readiness에 포함한다)",
+      "Readiness 조건 변경만으로 장애 전파가 모두 해결된다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q19",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "DB_Redis_Messaging",
+    "conceptKey": "payment-idempotency-key",
+    "difficulty": "intermediate",
+    "question": "멱등성이 무엇이며 결제에서 왜 중요한가요? 멱등성 키를 Redis에만 저장하면 충분한지도 설명해 주세요.",
+    "expectedPoints": [
+      "멱등성은 같은 작업이 여러 번 요청돼도 의도한 최종 상태나 효과가 중복으로 생기지 않게 하는 특성이다",
+      "FlowTicket에서는 결제 재시도나 더블클릭으로 인한 중복 처리를 막으려고 멱등성 키와 명시적인 주문 상태 전이를 활용했다",
+      "같은 키의 재요청은 기존 결과를 확인해 추가 결제를 막고, 같은 키에 요청 내용이 다르면 충돌로 처리하며, DB Unique Constraint 등으로 동시 중복을 검증한다",
+      "Redis 키는 만료와 장애를 고려해야 하므로 영속적인 DB 제약조건·상태 검증과 외부 결제 상태 확인이 필요할 수 있고, 응답 유실과 실제 실패를 구분해야 한다"
+    ],
+    "commonMistakes": [
+      "외부 결제 API가 Timeout이면 항상 실패로 보고 바로 다시 결제한다(외부에서 이미 완료됐을 수 있다)",
+      "같은 멱등성 키에 다른 금액이 오면 추가 승인하거나 금액을 합산한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 10강 Q20",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-project-purpose",
+    "difficulty": "intermediate",
+    "question": "FlowTicket은 어떤 프로젝트이고 왜 개발했나요? 게시판이 아니라 선착순 예매를 주제로 고른 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "대규모 사용자가 동시에 접속하는 선착순 예매 시스템이다. 회사에서 백엔드 성능을 개선한 경험은 있었지만 서버 확장이나 인프라 장애 상황에서 서비스 안정성을 검증할 기회가 부족해 직접 경험하려고 만들었다",
+      "AWS EKS에 시스템을 구축하고 10초 동안 10만 명이 대기열에 진입하는 것을 목표로 부하 시험을 했다",
+      "개발뿐 아니라 자원 산정, 오토스케일링, 장애 대응, 배포 자동화까지 직접 구성하고 성능·안정성·정합성·비용을 검증했다",
+      "예매는 오픈 순간 트래픽이 집중돼 동시성·확장·정합성을 함께 검증하기 적합하고, 개인 프로젝트로 개발부터 인프라·시험·분석까지 직접 수행했다"
+    ],
+    "commonMistakes": [
+      "10만 명/10초 시험을 실제 상용 고객이나 실제 결제 10만 건으로 설명한다(가상 사용자와 Mock 결제 범위다)",
+      "제출한 자기소개서(3회)와 최신 포트폴리오(4회)의 시험 횟수와 지표를 구분하지 않고 섞어 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q1",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-architecture-overview",
+    "difficulty": "intermediate",
+    "question": "FlowTicket의 전체 아키텍처를 설명해 주세요. Web, API, 대기열을 별도 Deployment로 나눴다면 MSA라고 볼 수 있나요?",
+    "expectedPoints": [
+      "Terraform으로 AWS에 VPC, EKS, RDS, ElastiCache를 구축하고 외부 요청은 ALB로 받았다",
+      "EKS 안에서 Web(Next.js), 예매 API(Spring Boot), 대기열을 별도 Deployment로 구성했고 주문·결제 데이터는 PostgreSQL, 여러 Pod가 공유하는 대기열 상태는 Redis에서 관리했다",
+      "배포는 GitHub Actions와 Argo CD, 운영 지표는 Prometheus·Grafana·CloudWatch로 확인했다. 결제 알림은 Outbox Relay에서 Pub/Sub을 거쳐 SSE로 보내고 대기열 상태 조회는 Polling이다",
+      "별도 Deployment는 같은 이미지로 요청과 확장 단위를 나눈 것이며 독립 데이터 소유권을 갖는 MSA와는 구분한다"
+    ],
+    "commonMistakes": [
+      "Deployment를 나눴으니 MSA라고 단정한다",
+      "대기열 상태 조회도 SSE 장기 연결로 처리한다고 답한다(대기열은 Polling으로 바꿨다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q2",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-eks-over-compose",
+    "difficulty": "intermediate",
+    "question": "EC2와 Docker Compose 대신 EKS를 선택한 이유는 무엇인가요? 같은 AWS 서비스인 ECS는 왜 제외했나요?",
+    "expectedPoints": [
+      "단순히 서비스를 배포하는 목적이라면 EC2와 Docker Compose로도 충분하다",
+      "목적이 대규모 트래픽에서 Pod 확장, 노드 장애, 스케줄링과 자동 복구를 직접 검증하는 것이라 Scheduler, HPA, CA, PDB 등을 검증할 수 있는 EKS를 선택했다",
+      "인프라 비용과 관리 복잡성이 커지므로 시험할 때만 환경을 구축하고 시험 후에는 Terraform으로 정리할 수 있게 구성했다",
+      "ECS도 자동 확장이 가능하지만 Kubernetes 운영 원리를 검증하는 것이 목적이었고, 작은 서비스라면 요구·팀 역량·비용에 따라 ECS나 EC2를 고를 수 있다"
+    ],
+    "commonMistakes": [
+      "EC2에서는 컨테이너를 운영할 수 없어서 EKS를 골랐다고 답한다",
+      "EKS가 항상 ECS보다 저렴하다거나 서비스 규모와 관계없이 EKS가 정답이라고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q3",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-100k-10s-target",
+    "difficulty": "intermediate",
+    "question": "왜 10초 동안 10만 건이라는 목표를 설정했나요? 이 목표가 평균 몇 RPS이고 그 숫자가 무엇을 뜻하는지도 설명해 주세요.",
+    "expectedPoints": [
+      "선착순 예매는 티켓 오픈 시점에 트래픽이 집중되므로 평균 트래픽보다 순간적인 요청 폭증을 검증하려고 했다",
+      "100,000 ÷ 10 = 평균 10,000 RPS이며 매초 정확히 같은 도착률을 뜻하지는 않는다",
+      "이 목표를 기준으로 필요한 CPU 자원과 복제본 수를 산정하고 실제 EKS 환경에서 부하 시험을 진행했다",
+      "실제 상용 트래픽을 근거로 한 값이 아니라 순간 폭증을 검증하기 위한 시험 목표다"
+    ],
+    "commonMistakes": [
+      "실제 상용 트래픽 데이터를 근거로 정한 목표라고 답한다",
+      "평균 10,000 RPS를 매초 정확히 10,000건이 균일하게 도착한다는 뜻으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q4",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-arrival-verification-alb-log",
+    "difficulty": "intermediate",
+    "question": "10만 건이 실제로 서버에 도착했다는 것을 어떻게 검증했나요? 부하 도구가 보낸 요청 수만 확인하면 왜 부족한지도 설명해 주세요.",
+    "expectedPoints": [
+      "k6 부하 발생기 3대로 서로 다른 사용자 토큰 10만 개를 써서 사용자마다 대기열 진입을 1회씩 요청했다",
+      "부하 도구가 발생시킨 요청 수만 보지 않고 ALB Access Log로 실제 도착한 요청 건수와 도착 시각을 확인했다",
+      "Prometheus로 처리 시간·요청률·오류율을 보고 DB와 Redis에서 정원 초과와 상태 위반을 확인했으며 최신 4회 모두 정원 초과·정합성 위반이 0이었다",
+      "최신 시험에서 진입 서버 p95는 46ms, 15분 폴링 서버 p95는 8ms였다"
+    ],
+    "commonMistakes": [
+      "10만 명이 모두 결제까지 했다고 답한다(진입 시험과 100명·100석 Mock 결제 시험은 별개다)",
+      "k6가 보낸 요청 수나 Grafana CPU 그래프만으로 서버 도착을 검증했다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q5",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-cpu-request-1100m-calc",
+    "difficulty": "advanced",
+    "question": "CPU Request를 300m에서 1100m로 바꾼 근거는 무엇인가요? 요청당 CPU 시간으로 중앙값을 쓴 이유와 그 한계도 설명해 주세요.",
+    "expectedPoints": [
+      "10초에 10만 건이면 평균 10,000 RPS가 필요했고 당시 API Pod 9개 기준으로 Pod당 약 1,111 RPS를 처리해야 했다",
+      "요청당 CPU 시간 중앙값 0.826ms를 적용하면 10,000 ÷ 9 × 0.826 ≈ 917.8m이고 20% 여유를 더해 1101.3m, 약 1100m로 산정했다(1000m = 1코어)",
+      "중앙값은 대표 비용을 잡는 초기 추정이라 일부 고비용 요청의 영향을 놓칠 수 있어 평균·분포와 실제 부하 시험으로 검증했다",
+      "Request는 배치와 경합 시 상대 배분 기준이며 Pod가 실제로 항상 1100m를 사용한다는 뜻은 아니다"
+    ],
+    "commonMistakes": [
+      "20% 여유를 빼고 918m를 최종 Request로 답한다",
+      "중앙값 기반 추정이 평균이나 p95와 같다고 보고 실측 검증 없이 확정값으로 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q6",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-api-pod-pending-9-nodes",
+    "difficulty": "intermediate",
+    "question": "노드 9대가 모두 Ready였는데 API Pod가 8개만 실행된 이유는 무엇인가요? kubectl top에서 CPU 사용률이 낮은데도 Pending이 생길 수 있나요?",
+    "expectedPoints": [
+      "노드 9대가 모두 Ready였지만 API Pod는 8개만 실행되고 1개가 Pending이었다",
+      "Scheduler 이벤트와 노드별 CPU 예약 자원을 확인해 Web과 시스템 Pod가 차지한 Request 때문에 남은 Allocatable이 API Request보다 작아 FailedScheduling이 났다는 것을 확인했다",
+      "Web Pod의 우선순위(PriorityClass)를 낮춰 API가 우선 배치되게 했고 API 9개와 Web 2개가 모두 Ready가 된 것을 확인했다",
+      "배치는 실제 사용량이 아니라 예약 자원 기준이므로 kubectl top의 CPU가 낮아도 예약 자원이 부족하면 Pending이 될 수 있다"
+    ],
+    "commonMistakes": [
+      "Ready 노드 수만큼 API Pod를 반드시 배치할 수 있다고 단정한다",
+      "PDB가 PriorityClass에 의한 선점을 절대 막아 준다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q7",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-pre-scaling-over-hpa",
+    "difficulty": "intermediate",
+    "question": "HPA만 쓰지 않고 사전 확장을 적용한 이유는 무엇인가요? 확장할 때 kubectl scale 대신 Git PR을 쓴 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "HPA와 Cluster Autoscaler는 부하가 생긴 뒤 확장하는데 시험에서 관측한 Pod 확장 시작은 40~70초, 노드 추가는 100~150초로 10초 진입 폭증보다 길었다",
+      "HPA, Scheduler, Pending, CA 노드 추가로 이어지는 반응형 확장만으로는 짧은 폭증에 대응하기 어렵다",
+      "티켓 오픈 시간을 안다는 점을 이용해 Git PR로 필요한 자원을 미리 확보하고, 오픈 후에는 HPA 하한을 다시 낮춰 자동 확장·축소에 맡겨 비용을 관리했다",
+      "kubectl scale 대신 Git PR을 쓴 것은 GitOps 변경 이력과 선언 상태를 일치시키기 위해서다"
+    ],
+    "commonMistakes": [
+      "관측 시간(40~70초, 100~150초)을 무조건 합산해 확장 시간이라고 말한다",
+      "HPA가 CPU 지표를 지원하지 않거나 축소가 안 돼서 사전 확장했다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q8",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-queue-deployment-split",
+    "difficulty": "advanced",
+    "question": "대기열을 별도 Deployment로 분리한 이유는 무엇인가요? 분리 후 대기열 조회 지연은 오히려 늘었는데 성공이라고 볼 수 있나요?",
+    "expectedPoints": [
+      "대기열과 예매가 같은 Deployment에서 실행돼 폴링이 폭증하면 좌석·결제 요청까지 지연됐고, 통합 구조에서는 HPA 신규 Pod가 예매 요청의 약 61%를 처리하며 서버 처리시간이 길었다",
+      "같은 이미지를 쓰되 대기열 전용 Deployment를 분리하고 Service와 확장 정책을 독립적으로 관리했다(Polling은 Queue 2~6 Pods, 좌석·결제는 API 3 Pods)",
+      "동일 일자·Pod 예산 9로 비교한 결과 예매 p95는 1.6~2.6초에서 184~272ms로 개선됐고 대기열 조회 p95는 13~18ms에서 259~523ms로, 시험 노드 사용 시간은 15~28% 늘었으며 오류·정합성 위반은 양쪽 모두 0이었다",
+      "모든 지표가 좋아진 것이 아니라 구매 구간 응답시간을 우선 보호하고 대기열 지연을 허용한 트레이드오프이며, 좌석의 Redis 입장 검증 의존성이 남아 코드 분리보다 배포 분리부터 검증했다"
+    ],
+    "commonMistakes": [
+      "대기열 분리로 모든 p95와 비용이 개선됐다고 답한다",
+      "비교 시험의 대기열 조회 p95(259~523ms)와 최신 시험의 15분 폴링 서버 p95(8ms)를 같은 조건의 결과로 섞어 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q9",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-queue-request-cost-tuning",
+    "difficulty": "intermediate",
+    "question": "대기열 분리 후 늘어난 비용은 어떻게 개선했나요? 오픈 때도 대기열 CPU Request를 200m로 유지하면 어떤 문제가 생기나요?",
+    "expectedPoints": [
+      "분리 후 평상시 노드가 4대에서 5대로 늘었는데, 오픈 순간 부하를 위해 대기열 CPU Request를 1100m로 잡았지만 평소에는 거의 쓰지 않았기 때문이다",
+      "평시에는 대기열 CPU Request를 200m로 낮추고 오픈 전에 Git PR로 1100m까지 높이는 방식으로 바꿨다",
+      "그 결과 평상시 노드를 3대까지 줄이면서 오픈 시 필요한 용량은 확보했다",
+      "오픈 때도 200m를 유지하면 과소 Request로 같은 노드의 자원 경합이 생기고 HPA CPU 사용률 산정에도 영향을 줄 수 있다"
+    ],
+    "commonMistakes": [
+      "월 약 $170·$85 노드 비용 절감을 실제 청구액 절감으로 말한다(평시 계속 운영을 가정한 추정값이다)",
+      "평시와 오픈 Request를 구분하지 않고 하나의 고정값으로 비용과 용량을 모두 맞출 수 있다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q10",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-scale-down-after-open",
+    "difficulty": "intermediate",
+    "question": "사전 확장 이후 축소 과정은 어떻게 구성했나요? 오픈이 끝나자마자 평시 설정으로 되돌리지 않은 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "오픈 직전 Git PR로 대기열 CPU Request와 HPA 최소 복제본을 높여 노드 9대, Queue Pod 6개, Request 1100m로 사전 확장했다(평시는 노드 3대, Queue Pod 2개, 200m)",
+      "오픈 후 HPA 하한을 다시 낮춰 부하에 따라 줄게 했고, 오픈 후 25분 관측 사례에서는 노드 7대, Queue Pod 2개, Request 1100m였다",
+      "대기열이 모두 소진된 뒤 평시 설정으로 되돌려 노드가 3대에서 9대로 늘었다가 다시 3대로 줄어드는 것을 EKS에서 확인했다",
+      "3대에서 9대로의 사전 확장은 Git PR 동기화 후 6분 26초가 걸렸고 전환 중 조회 실패는 0이었다(API 3개 고정, Queue HPA 2~6, CPU 60%)",
+      "대기 중인 사용자의 폴링이 계속되므로 오픈 직후가 아니라 대기열 소진을 확인한 뒤 평시 설정을 복원했다"
+    ],
+    "commonMistakes": [
+      "오픈이 끝나면 대기자가 남아 있어도 즉시 200m로 되돌린다고 답한다",
+      "평시와 오픈 대기열 Request를 1100m와 200m로 거꾸로 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q11",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-pod-placement-rules",
+    "difficulty": "intermediate",
+    "question": "Pod 배치 규칙을 추가한 이유는 무엇인가요? PDB만으로도 Pod를 여러 노드에 분산할 수 있나요?",
+    "expectedPoints": [
+      "평시 자원 설정을 바꾸면서 Cluster Autoscaler가 노드를 축소할 때 API Pod가 한 노드에 모일 가능성을 확인했다",
+      "먼저 kwok으로 스케줄링을 시뮬레이션하고 분산 규칙을 적용한 뒤 EKS에서도 배치가 의도대로 유지되는지 검증해 노드 장애의 영향 범위를 줄였다",
+      "Anti-Affinity는 동시 배치 제한, Topology Spread는 분산, PriorityClass는 우선순위와 선점, PDB는 자발적 중단 시 가용 수 보호, CA는 노드 추가·축소를 맡는다",
+      "PDB만으로는 분산되지 않으며 배치 제약이 너무 강하면 자원이 있어도 조건을 못 맞춰 Pending이 될 수 있다"
+    ],
+    "commonMistakes": [
+      "PDB만 설정하면 Pod가 노드에 분산된다고 답한다",
+      "배치 제약은 강할수록 안전하다고 보고 조건 미충족으로 인한 Pending 가능성을 고려하지 않는다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q12",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-alb-bypass-nextjs-proxy",
+    "difficulty": "intermediate",
+    "question": "ALB에서 Next.js 프록시를 우회한 이유는 무엇인가요? /api 경로 전체가 아니라 두 경로만 직접 연결한 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "진입 요청의 CPU 비용을 Web과 API로 나눠 측정하니 Next.js 프록시가 약 44~49%를 쓰고 있었다",
+      "ALB 경로 기반 라우팅으로 대기열 진입(POST)과 상태 조회(GET) 두 경로만 Web을 거치지 않고 Queue로 직접 보냈다",
+      "1,000 RPS 비교 시험에서 요청당 CPU 비용은 3.04ms에서 1.08ms로, p95는 157.5ms에서 15ms로 줄었고 Web+API CPU는 약 64.5% 감소했다(사전 판정 기준은 CPU 24.7% 이상 개선, p95 1.1배 이하, 오류·정합성 위반 0)",
+      "/api 전체를 우회하면 Actuator나 관리자 경로가 외부에 노출될 위험이 있어 지정한 두 경로만 연결했고 앱의 인증·인가도 함께 필요하다"
+    ],
+    "commonMistakes": [
+      "ALB가 경로 하나만 라우팅할 수 있어서 두 경로만 연결했다고 답한다",
+      "Web 프록시의 CPU 비중 44~49%를 통합 구조 신규 Pod의 예매 처리 비중 61%와 혼동한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q13",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-metrics-server-version-pin",
+    "difficulty": "advanced",
+    "question": "metrics-server 버전 때문에 배포가 실패한 문제는 어떻게 해결했나요? 원인이 metrics-server라고 판단한 근거는 무엇인가요?",
+    "expectedPoints": [
+      "새 EKS 클러스터 구축 후 Terraform은 성공했지만 Helm 설치와 Argo CD 동기화가 실패했다",
+      "OpenAPI 요청(/openapi/v2)을 분석해 JSON 응답은 200으로 정상인데 Protobuf 응답에서 503이 나는 차이를 발견했다",
+      "APIService를 하나씩 분리해 metrics-server의 영향을 확인하고, 같은 클러스터에서 애드온 버전만 바꿔 eksbuild.12 실패, .11 정상이 반복되는 것을 재현했다",
+      "Terraform에서 정상 동작하는 버전을 고정해 재구축 때 같은 문제가 없게 했고 Argo Synced·Healthy와 ALB 연결을 확인했다. 해당 시험 버전에 국한한 결과다"
+    ],
+    "commonMistakes": [
+      "Helm 검증을 끄면 해결된다고 답한다(Argo의 API 조회 문제가 남는다)",
+      "클러스터를 다시 만들어 한 번 정상이 된 것만으로 원인을 단정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q14",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-redis-failure-isolation",
+    "difficulty": "advanced",
+    "question": "Redis 장애가 전체 서비스로 전파되는 문제는 어떻게 해결했나요? Readiness 조건만 바꿔서는 왜 해결되지 않았나요?",
+    "expectedPoints": [
+      "Redis 장애 시 모든 API Pod의 공통 Readiness가 실패해 Redis가 필요 없는 조회 기능까지 차단됐다",
+      "Readiness만 바꿨을 때는 Redis 명령 Timeout 60초 동안 Tomcat 요청 스레드가 계속 점유되는 문제가 남았다",
+      "API는 DB, Queue는 DB와 Redis로 Readiness 필수 의존성을 구분하고 Redis 명령 Timeout을 2초로 줄여, Redis가 필수인 기능은 503으로 실패 처리하고 가능한 조회는 유지했다",
+      "개선 후 공연 상세·내 주문은 약 60초에서 약 2초로, 대기열 진입·좌석 선점은 75초 내 무응답에서 약 4초 후 503으로 바뀌었고 공연 목록·좌석 조회는 즉시 응답했다. 연결 끊김과 응답 정지 상황을 구분해 시험했다"
+    ],
+    "commonMistakes": [
+      "Readiness에서 Redis만 빼면 장애 전파가 해결된다고 답한다",
+      "Redis 장애 중에도 좌석 선점을 DB만으로 계속 처리하면 된다고 답한다(입장 검증을 생략하면 정원 정책 위반 위험이 있다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q15",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-rolling-alb-502-504",
+    "difficulty": "advanced",
+    "question": "롤링 배포 중 발생한 ALB 502·504 오류는 어떻게 해결했나요? preStop 시간은 종료 유예 시간과 어떤 관계인가요?",
+    "expectedPoints": [
+      "롤링 배포 중 6,001건 가운데 16건이 ALB 502·504로 실패했지만 애플리케이션 자체 5xx는 0이었고, Web만 재시작해도 13/6001로 재현됐다",
+      "실패 시점과 10초 연결 Timeout을 보고 ALB Target 등록 해제가 반영되기 전에 컨테이너가 종료되는 문제로 판단했다",
+      "preStop을 5초에서 25초로, 종료 유예 시간을 30초에서 60초로 늘린 뒤 같은 부하에서 실패가 0/6001이 됐고 Queue 분리 후 직접 ALB Target이 된 Queue에도 같은 값을 적용했다",
+      "preStop은 일반적으로 종료 유예 시간에 포함된다. 등록 해제의 정확한 시간은 단정하지 않으며 관측 결과일 뿐 모든 환경의 무중단을 보장하지는 않는다"
+    ],
+    "commonMistakes": [
+      "preStop을 25초로 두면 어떤 환경에서도 무조건 무중단이라고 단정한다",
+      "ALB 오류를 애플리케이션 오류로 보고 앱 5xx와 ALB 오류, 종료 시점을 구분해 분석하지 않는다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q16",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-ci-stale-deploy-guard",
+    "difficulty": "intermediate",
+    "question": "GitHub Actions에서 잘못된 배포가 생길 수 있었던 이유는 무엇인가요? 이전 CI가 취소됐을 때 직전 커밋과만 비교하면 왜 위험한가요?",
+    "expectedPoints": [
+      "CI가 동시에 실행되면 빌드 완료 순서와 Git 커밋 순서가 달라, 늦게 끝난 오래된 이미지가 최신 배포 태그를 덮어써 되돌릴 수 있었다",
+      "A 배포 후 B의 코드 변경 CI가 취소되고 C가 설정만 바꿨다면 B~C만 비교할 때 B의 미배포 코드를 놓친다. 현재 배포된 A를 기준으로 A~C를 비교해야 한다",
+      "main 포함 여부와 현재 배포 태그와의 커밋 조상 관계를 검증하고, 이미지 빌드 여부를 현재 배포된 태그 기준으로 판단하게 바꿨으며 설정만 바꾼 PR은 이미지 재빌드를 생략했다",
+      "백엔드 CI 잡은 9분 46초에서 3분 8초로 줄었지만 다른 최적화의 영향과 구분해서 말한다"
+    ],
+    "commonMistakes": [
+      "concurrency 설정만 쓰면 취소된 CI의 미배포 코드까지 해결된다고 답한다",
+      "빌드 완료 시간이나 직전 커밋을 기준으로 이미지 재빌드 여부를 판단한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q17",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-node-failure-payment-consistency",
+    "difficulty": "intermediate",
+    "question": "실제 노드 장애와 결제 정합성은 어떻게 검증했나요? 그 시험 결과를 완전 무장애였다고 말할 수 있나요?",
+    "expectedPoints": [
+      "대량 진입과 별도로 100명·100석 조건에서 Mock 결제로 정상 예매, 좌석 경합, 더블클릭, 실패 후 재시도·포기, 1인 한도를 섞어 3회 시험했고 클라이언트·DB·이벤트 정합성 위반이 없었다",
+      "API와 대기열 Pod가 있는 노드를 각각 종료해 API는 54초, 대기열은 82초 만에 다시 가용 상태가 됐다",
+      "장애 후 5분 동안 Queue 5xx는 0.3% 이하였고 예매 오류와 정합성 위반은 0이었다",
+      "Queue 일부 5xx가 관측됐으므로 완전 무장애가 아니라 영향 범위와 복구 시간을 검증했다고 표현하며, 실제 장애 감지·복구 경로는 환경에 따라 다르다"
+    ],
+    "commonMistakes": [
+      "노드 장애 복구 시간을 API 82초, Queue 54초로 뒤바꿔 말한다",
+      "100명·100석 시험을 실제 PG 결제나 10만 명 진입 시험과 같은 시험으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q18",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-tech-choice-reversal",
+    "difficulty": "intermediate",
+    "question": "기술적인 선택을 다시 바꾼 경험이 있나요? Kafka를 Outbox와 Redis Pub/Sub으로 바꾸면서 포기한 것은 무엇인지도 설명해 주세요.",
+    "expectedPoints": [
+      "특정 기술을 정답으로 두지 않고 부하 시험 결과에 따라 구조를 바꿨다. 대기열 SSE는 장기 연결 메모리 문제로 Polling으로 바꿨다",
+      "결제 완료 이벤트 한 종류에 Kafka Broker 3대를 운영하는 것은 과하다고 보고 Outbox와 Redis Pub/Sub으로 단순화했다. 대신 Kafka의 재생·독립 소비자 기능을 포기했고 Outbox는 최종 구독자 수신을 보장하지 않는다",
+      "Queue 분리, 평시·오픈 Request 분리, ALB 경로 우회, Queue Pool 5→3처럼 자원 설정도 비용만이 아니라 실제 응답시간을 함께 확인했다",
+      "기준을 충족하지 못한 변경은 되돌렸다. 오픈 CPU Request 650m 시험은 결제 p95 기준을 넘어 원복했고 Pool 5→3만 채택했다"
+    ],
+    "commonMistakes": [
+      "Kafka가 재생을 지원하지 않거나 Lua보다 느려서 제거했다고 답한다",
+      "Outbox와 Pub/Sub으로 바꾸면 최종 구독자 수신이나 정확히 한 번 전달이 보장된다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q19",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "FlowTicket_Project",
+    "conceptKey": "flowticket-production-readiness",
+    "difficulty": "intermediate",
+    "question": "FlowTicket을 상용 서비스로 운영한다면 무엇을 개선하겠습니까? 개인 프로젝트와 회사 운영은 어떤 점이 다른지도 설명해 주세요.",
+    "expectedPoints": [
+      "지금은 대기열 진입, 데이터 정합성, 인프라 장애 복구를 가상 사용자와 Mock 결제 환경에서 검증했다는 범위를 먼저 밝힌다",
+      "실제 PG 승인·취소·응답 유실·정산 등 외부 결제와의 정합성을 먼저 검증하고 장기 부하·메모리 누수, 백업 복구와 RTO/RPO, Rate Limiting·인증·인가 같은 보안·비정상 요청 대응을 추가한다",
+      "SLI/SLO와 Error Budget을 정해 성능·가용성·운영 비용을 계속 관리하고 Runbook과 알림을 고도화한다",
+      "개인 프로젝트는 통제된 실험이고 회사 운영은 실제 고객 영향, 보안, 비용, 변경 승인, 호환성까지 고려해야 한다"
+    ],
+    "commonMistakes": [
+      "향후 개선 항목을 이미 구현한 경험처럼 말한다",
+      "현재 시험 결과로 충분해 상용화에 추가 검증이 필요 없다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 11강 Q20",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-current-role-scope",
+    "difficulty": "intermediate",
+    "question": "현재 회사에서 어떤 업무를 담당하고 있는지 설명해 주세요. 회사에서도 Kubernetes를 운영했나요?",
+    "expectedPoints": [
+      "SI 기업 백엔드 개발자로 ESS 성능평가 시스템의 실시간 설비 모니터링, 시험 결과 분석, 안전평가, 보고서 기능을 개발했다",
+      "대량 데이터 조회와 실시간 전송 과정의 성능 문제를 분석해 개선했고 프로젝트 후반에는 고객사 요구사항 협의와 감리 대응까지 맡았다",
+      "독립계통 용량산정 프로그램은 요구사항 검토부터 FastAPI 기반 개발, Docker 배포까지 단독으로 수행했다",
+      "회사에서는 백엔드와 Docker 배포·운영 안정화 경험이고 Kubernetes(EKS)와 Terraform은 FlowTicket 개인 프로젝트에서 직접 검증했다"
+    ],
+    "commonMistakes": [
+      "회사에서 Kubernetes를 운영했다고 말한다(EKS는 FlowTicket 개인 프로젝트 경험이다)",
+      "ESS 담당 범위를 배터리 셀 제조나 PCS 펌웨어 같은 하드웨어 영역까지 포함해 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q1",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-performance-evaluation-system",
+    "difficulty": "intermediate",
+    "question": "ESS 성능평가 시스템은 어떤 시스템인가요? 부족한 도메인 지식은 어떻게 보완했는지 설명해 주세요.",
+    "expectedPoints": [
+      "에너지저장장치 시험 과정에서 발생하는 설비 데이터를 수집하고 시험 결과를 분석해 성능과 안전성을 평가하는 업무 시스템이다",
+      "Java, Spring Boot, PostgreSQL로 실시간 모니터링, 결과 분석, 안전평가, 보고서 기능을 개발했다",
+      "PCS는 교류·직류 전력 변환, BMS는 배터리 상태·안전 관리, SOC는 충전 상태, SOH는 건강 상태이고 kW는 전력, kWh는 에너지다",
+      "시험 기준서와 통신 명세를 확인하고 고객 및 장비 업체와 협의했으며 계산식과 단위를 실제 측정값과 대조했다"
+    ],
+    "commonMistakes": [
+      "kW와 kWh를 같은 의미로 혼용한다(kW는 전력, kWh는 에너지다)",
+      "SOC와 SOH를 같은 개념으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q2",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-redis-pubsub-sse-monitoring",
+    "difficulty": "intermediate",
+    "question": "ESS 실시간 모니터링 전체 구조를 설명해 주세요. WebSocket 대신 SSE를 쓴 이유는 무엇인가요?",
+    "expectedPoints": [
+      "설비 데이터가 수집 시스템에서 Redis Pub/Sub으로 들어오면 Spring Boot가 수신·상태 처리해 SSE로 브라우저에 실시간 전달했다",
+      "실시간 모니터링 경로와 시험 결과 조회 경로를 구분해 현재 설비 상태는 SSE로, 과거 시험 데이터는 PostgreSQL에서 조회했다",
+      "핵심 요구가 서버에서 화면으로의 지속적인 상태 전달이라 단방향 전송인 SSE를 사용했다",
+      "Redis Pub/Sub은 기본적으로 메시지 재생 기능이 없으므로 실시간 전달과 반드시 보존할 시험 데이터를 구분했다"
+    ],
+    "commonMistakes": [
+      "Redis Pub/Sub이 메시지를 보존하고 다시 재생해 준다고 단정한다",
+      "양방향 채팅 같은 통신이 필요해서 SSE를 썼다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q3",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-sse-14s-delay-cause",
+    "difficulty": "advanced",
+    "question": "ESS SSE에서 최대 14초의 전송 지연이 발생한 원인은 무엇이었나요? 스레드를 늘리는 것으로는 왜 해결되지 않는지도 설명해 주세요.",
+    "expectedPoints": [
+      "1,000개 SSE 연결로 부하 시험을 했을 때 메시지 전송이 최대 14초 지연됐고, 예상 동시 접속의 2~3배로 재현했다",
+      "당시 CPU 사용률이 약 5%로 여유가 있어 단순 자원 부족보다 스레드 대기 문제를 의심했다",
+      "JFR로 분석해 여러 Redis 수신 스레드가 동일한 SseEmitter에 동시에 전송하면서 Monitor 락 경합이 발생한 것을 확인했다",
+      "같은 객체에 대한 락 경합이 원인이라 스레드를 늘려도 대기하는 스레드만 늘어날 가능성이 크다"
+    ],
+    "commonMistakes": [
+      "CPU 스로틀링이나 DB 연결 초과 같은 자원 부족을 원인으로 단정한다",
+      "CPU 사용률이 낮으면 서버 쪽 지연 원인은 없다고 판단한다(공유 자원 대기로 지연될 수 있다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q4",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-jfr-monitor-enter-analysis",
+    "difficulty": "advanced",
+    "question": "JFR은 무엇이고 ESS 지연 원인을 어떻게 분석했나요? JavaMonitorEnter가 0건이 됐다면 모든 Lock이 사라졌다는 뜻인가요?",
+    "expectedPoints": [
+      "JFR은 JVM의 스레드, 메모리, GC, 락 경합 같은 이벤트를 .jfr로 기록하는 성능 분석 도구이고 JMC로 분석한다",
+      "CPU에 여유가 있는데도 실시간 메시지가 지연돼 JFR로 스레드 상태를 분석했고 JavaMonitorEnter 이벤트와 호출 경로로 동일 SseEmitter 접근 경합을 확인했다",
+      "JavaMonitorEnter는 Monitor 진입 경합, ThreadPark는 스레드 대기, Execution Sample은 CPU를 쓰는 메서드를 보여 준다",
+      "0건은 해당 기록 조건에서 관측된 Monitor 경합이 0건이라는 의미이지 모든 Lock이 제거됐다는 뜻이 아니다"
+    ],
+    "commonMistakes": [
+      "JavaMonitorEnter 0건을 모든 Lock 제거나 스레드 대기가 불가능해진 것으로 해석한다",
+      "Grafana 대시보드만으로 경합이 생긴 메서드와 객체까지 알 수 있다고 답한다(Grafana는 이상 징후 확인용이다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q5",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-sse-per-connection-queue",
+    "difficulty": "advanced",
+    "question": "SSE 전송 구조를 어떻게 개선했나요? 연결별 Queue에 크기 제한이 필요한 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "Redis 수신과 SSE 전송을 분리하고 메시지는 한 번만 직렬화한 뒤 각 연결의 Queue에 넣었다",
+      "연결마다 한 번에 하나의 전송 작업만 수행하는 Single Writer로 바꿨다. 이는 연결별 전송 중첩 방지이지 연결마다 전용 OS 스레드를 만든다는 뜻이 아니다",
+      "무제한 Queue는 느린 연결 때문에 메모리가 계속 늘어나므로 크기를 제한하고, 가득 차면 해당 연결만 종료해 영향을 격리했다",
+      "동일한 1,000개 연결 조건으로 재시험한 결과 JavaMonitorEnter 이벤트가 341건에서 0건으로 줄고 약 14초 메시지 정지가 해소됐다"
+    ],
+    "commonMistakes": [
+      "Single Writer를 전역 단일 스레드나 연결별 전용 OS 스레드로 설명한다",
+      "전역 Lock 추가나 전체 Polling 전환으로 해결했다고 답한다(Polling 전환은 FlowTicket 대기열 사례다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q6",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-query-resolution-split",
+    "difficulty": "advanced",
+    "question": "593만 건의 데이터 조회 문제를 어떻게 해결했나요? 분 단위로 집계하면 순간 이상값이 누락되지 않는지도 설명해 주세요.",
+    "expectedPoints": [
+      "결과 분석 화면이 일주일치 시험 데이터를 초 단위로 조회해 약 593만 건을 한 번에 처리하고 있었다",
+      "고객에게 사용 목적을 확인해 전체 구간은 충·방전 흐름을, 이상 구간만 자세히 본다는 것을 알고 전체는 분 단위, 선택한 15분 구간만 초 단위로 조회하게 바꿨다",
+      "전체 조회 데이터가 약 9.9만 건(약 98.3% 감소)으로 줄고 응답시간이 3.26초에서 223ms(약 93.2% 감소)로 개선됐다",
+      "평균만 보면 순간 이상값이 희석될 수 있어 min/max와 초 단위 원본 조회를 함께 고려한다"
+    ],
+    "commonMistakes": [
+      "DB 증설이나 인덱스 추가만으로 초 단위 전체 조회를 유지하면 된다고 답한다(불필요한 조회량 자체를 줄이는 것이 근본 개선이다)",
+      "분 단위 평균만으로도 모든 이상값이 보존된다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q7",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-chart-batch-api",
+    "difficulty": "intermediate",
+    "question": "차트에서 발생한 다수의 HTTP 요청을 어떻게 개선했나요? Batch API를 만들 때 주의할 점도 설명해 주세요.",
+    "expectedPoints": [
+      "내부저항과 EIS 데이터를 표시하면서 여러 차트와 모듈이 동일한 데이터를 반복 요청하고 있었다",
+      "Chrome Network Timing으로 보니 개별 서버 응답은 40~145ms인데 요청 전 대기가 1.25초로 더 길었다",
+      "모듈 목록을 한 번에 조회하는 Batch API를 만들고 화면에서 같은 응답을 공유해 HTTP 요청을 약 50회에서 1회로, 전체 로딩을 1.5~2.5초에서 약 0.33초로 줄였다",
+      "Batch API는 요청 개수, 조회 기간, 응답량, 실제 DB 접근 횟수를 제한해야 하고 HTTP 1회가 DB 1회를 보장하지 않는다"
+    ],
+    "commonMistakes": [
+      "HTTP/2를 쓰면 중복 요청 문제가 사라진다고 단정한다(다중화가 중복 API·DB 처리를 없애지 않는다)",
+      "요청 전 대기 1.25초를 보고 DB Lock 문제로 확정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q8",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-device-value-mismatch",
+    "difficulty": "advanced",
+    "question": "고객이 장비값과 화면값이 다르다고 했을 때 어떻게 대응했나요? 비교할 때 측정 시각과 적재 시각을 맞춘 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "조회 SQL과 계산식을 확인했지만 문제가 없었고 DB 저장값도 화면과 일치했다",
+      "장비 업체와 수집 업체에 같은 시점의 장비 표시값, 통신 원시값, DB 저장값을 요청해 측정 시각과 적재 시각을 맞춰 비교했다. 서로 다른 시점의 값을 비교하면 원인을 잘못 판단할 수 있다",
+      "통신 명세서와 장비별 단위·배율 표를 확인해 수집 단계에서 단위와 배율 변환이 누락된 것을 찾았다",
+      "변환 기준을 수정한 뒤 다른 장비와 기존 시험 결과의 영향 범위도 함께 확인했다"
+    ],
+    "commonMistakes": [
+      "DB 값과 화면 값이 일치하면 원천 데이터도 정확하다고 단정한다",
+      "화면 표시만 수정하거나 장비 오류로 확정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q9",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-wh-kwh-normalization",
+    "difficulty": "intermediate",
+    "question": "Wh와 kWh 단위 불일치를 어떻게 해결했나요? 이미 저장된 과거 데이터는 어떻게 다뤄야 하는지도 설명해 주세요.",
+    "expectedPoints": [
+      "장비가 보내는 누적 에너지값과 DB 저장값은 Wh였는데 결과 분석 화면은 이를 kWh로 표시하고 있었다",
+      "화면에서만 고치면 다른 분석 기능이나 보고서에서 같은 문제가 반복되므로 수집 단계에서 Wh를 kWh로 변환하도록 기준을 수정하고 장비 측정값부터 DB, 결과 분석값까지 일치하는지 확인했다",
+      "1kWh는 1000Wh이므로 1000으로 나눈다. 교육용 예로 393500Wh는 393.5kWh다",
+      "과거 데이터는 적용 시점과 장비별 단위를 확인해 혼용과 중복 변환을 막고, 검증과 백업 후 보정 계획을 세운다"
+    ],
+    "commonMistakes": [
+      "기존 데이터를 확인 없이 전부 1000으로 나누거나 큰 숫자는 무조건 Wh라고 판단한다(중복 변환 위험)",
+      "화면 표기만 kWh로 통일하면 된다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q10",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-elapsed-time-comparison",
+    "difficulty": "intermediate",
+    "question": "서로 다른 날짜의 ESS 시험 결과를 어떻게 비교했나요? 시험 길이나 측정 간격이 다르면 어떻게 처리하나요?",
+    "expectedPoints": [
+      "기존에는 시험 결과를 개별 화면에서만 볼 수 있어 고객이 이전 시험과 비교하려고 화면을 반복 이동하고 있었다",
+      "시험 시작 시점부터의 경과시간을 기준으로 데이터를 정렬해 같은 차트에서 비교하는 기능을 제안했고 고객 협의를 거쳐 반영했다",
+      "예를 들어 7/1 09:00에 시작한 시험의 09:30 값과 7/8 14:00에 시작한 시험의 14:30 값은 모두 경과 30분으로 같은 축에 놓인다",
+      "길이나 간격이 다르면 실제 측정 범위를 유지하고 필요할 때 공통 간격으로 집계하며 미측정 구간을 임의로 만들지 않는다"
+    ],
+    "commonMistakes": [
+      "날짜를 강제로 같은 날로 바꾸거나 평균값 하나로 비교한다",
+      "짧은 시험의 미측정 구간을 임의로 채워 길이를 맞춘다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q11",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-server-side-data-integrity",
+    "difficulty": "intermediate",
+    "question": "시험 결과와 보고서의 데이터 정합성은 어떻게 검증했나요? 프론트에서 이미 검증했는데 서버에서 다시 확인하는 이유는 무엇인가요?",
+    "expectedPoints": [
+      "화면에서 전달한 장비 정보와 조회 시간을 그대로 쓰지 않고 실제 시험에 포함된 장비인지, 허용 조회 범위인지 서버에서 다시 검증했다",
+      "사용 가능한 에너지 용량과 효율처럼 평가에 영향을 주는 값은 화면 계산 결과를 저장하지 않고 원천 측정값으로 서버에서 다시 계산했다",
+      "시험 존재 여부, 대상 장비, 허용 기간, 원천 데이터와 단위를 검증하며 권한 검사도 일반적으로 함께 고려한다",
+      "사용자 요청은 변경될 수 있으므로 업무 규칙은 서버에서 확인해야 한다"
+    ],
+    "commonMistakes": [
+      "브라우저 검증만으로 충분하다고 답한다",
+      "화면이 계산한 효율·용량 값을 그대로 저장해 보고서에 쓴다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q12",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-report-change-small-team",
+    "difficulty": "intermediate",
+    "question": "개발 인원이 줄어든 상황에서 보고서 양식 변경에 어떻게 대응했나요? 그 과정에서 가장 어려웠던 점은 무엇이었나요?",
+    "expectedPoints": [
+      "프로젝트 후반 개발 인원이 4명에서 1명으로 줄어든 상황에서 6대 안전성 평가 보고서 양식이 전면 변경됐다",
+      "확정 항목과 고객 확인이 필요한 항목을 나누고, 미확정 항목은 데이터 출처·산식·단위·출력 위치를 표로 정리해 확인을 요청한 뒤 회신을 기다리는 동안 다른 기능을 개발했다",
+      "이후 양식 변경이 계산 로직에 미치는 영향을 줄이도록 산식과 출력을 분리했고 안정화와 감리 대응까지 완료했다. 이 과정에서 단독 고객 미팅을 10회 이상 진행했다",
+      "미확정 평가 기준이 계속 바뀌어 재작업이 생길 수 있다는 점이 가장 어려웠고 고객 확인 항목을 분리해 대응했다"
+    ],
+    "commonMistakes": [
+      "기준이 확정될 때까지 전체 개발을 중단하거나 확인 없이 임의로 개발한다",
+      "모든 요구사항을 고정하고 변경을 받지 않는 방식으로 대응했다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q13",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-report-calc-render-split",
+    "difficulty": "intermediate",
+    "question": "보고서 계산 로직과 출력 로직을 분리한 이유는 무엇인가요? 산식이 바뀌면 과거 시험도 다시 계산해야 하나요?",
+    "expectedPoints": [
+      "양식이 반복 변경되는 상황에서 산식과 출력 코드가 결합돼 있으면 양식 수정이 평가 결과에 영향을 줄 수 있었다",
+      "원천 데이터에서 공통 계산 결과를 만들고 결과 화면과 여러 보고서가 그 결과를 출력하도록 계산과 출력을 분리했다",
+      "양식이 바뀌어도 계산 기준을 불필요하게 고치지 않고 계산 결과와 보고서 수치를 각각 검증할 수 있다",
+      "산식이 바뀌면 고객이 확정한 기준의 적용 시점과 소급 여부를 확인하고 필요하면 계산 버전을 관리한다"
+    ],
+    "commonMistakes": [
+      "계산과 출력을 분리하면 계산 검증을 생략해도 된다고 답한다",
+      "산식이 바뀌면 과거 시험을 무조건 재계산한다고 단정한다(적용 시점과 소급 여부를 먼저 확인한다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q14",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "ess-db-audit-ai-agent",
+    "difficulty": "intermediate",
+    "question": "감리 대응에서 AI를 활용한 경험을 설명해 주세요. 정형 비교라면 AI 대신 코드로 처리하면 되지 않나요?",
+    "expectedPoints": [
+      "2차 DB 감리 때 개발과 감리 대응을 혼자 병행하며 운영 DB와 설계서의 테이블, 컬럼, PK·FK, 제약조건, Comment를 반복 비교해야 했다",
+      "운영 DB 스키마를 SQL로 추출하고 AI Agent로 설계서와의 불일치 항목을 분류한 뒤 결과를 실제 DB와 문서에 다시 대조해 검증했다",
+      "이전에 개발자 4명이 약 1주 진행한 점검 범위를 혼자 약 4시간에 처리했다. 이는 점검 범위 비교이지 전체 감리 기간이나 정확한 생산성 배수가 아니다",
+      "정형 비교는 코드가 결정적이고, 비정형 문서 분류는 AI가 보조하며 최종 확인은 사람이 한다"
+    ],
+    "commonMistakes": [
+      "전체 감리 기간이 정확히 몇십 배 단축됐다고 과장한다",
+      "AI가 운영 DB를 자동 변경하거나 최종 감리 승인을 했다고 답한다(AI 결과는 사람이 원자료와 재대조했다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q15",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "grid-consulting-system-overview",
+    "difficulty": "intermediate",
+    "question": "독립계통 컨설팅 프로그램은 어떤 시스템인가요? 전기 설계 기준도 직접 만들었나요?",
+    "expectedPoints": [
+      "부지 정보, 전력 사용량, 기상자료를 바탕으로 태양광, 풍력, ESS 등 필요한 설비 용량과 경제성을 비교하는 업무 시스템이다",
+      "최적비용안, 안전여유안, 무디젤안 세 가지 대안을 비교하고 지도 기반 설치 면적 산출과 PDF·DOCX·XLSX·JSON 보고서 출력을 제공한다",
+      "요구사항 검토부터 FastAPI 기반 계산 API, 외부 데이터 연계, 화면 개발, Docker 배포까지 단독으로 담당했다",
+      "고객과 확정한 기준을 구현하고 계산을 검증했으며 전기공학적 기준은 전문가와 협의했다"
+    ],
+    "commonMistakes": [
+      "전기 설계 기준을 직접 정했다고 답한다",
+      "Spring Boot·Kafka·EKS 기반으로 만들었다고 답한다(실제는 FastAPI·Jinja2·HTMX·PostgreSQL·Compose다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q16",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "grid-fastapi-choice",
+    "difficulty": "intermediate",
+    "question": "독립계통 프로그램에서 FastAPI를 사용한 이유는 무엇인가요? async를 쓰면 CPU 계산도 빨라지나요?",
+    "expectedPoints": [
+      "설비 용량과 경제성 계산, 외부 데이터 처리가 중요해 Python의 계산·데이터 처리 기능을 쓰면서 웹 API를 제공하려고 ASGI 기반 FastAPI를 선택했다",
+      "Jinja2 서버 렌더링과 HTMX 부분 갱신으로 프로젝트·시나리오 관리 화면을 만들어 백엔드, 화면, 배포를 함께 관리했다",
+      "PostgreSQL은 영속 데이터, Alembic은 스키마 이력, Compose는 실행 환경을 맡고 FastAPI는 Pydantic 등으로 입력 검증을 지원한다",
+      "async는 I/O 대기에 유용하고 CPU 집중 작업은 별도 프로세스나 작업 큐를 검토해야 한다"
+    ],
+    "commonMistakes": [
+      "async를 쓰면 CPU 집중 계산도 빨라진다고 답한다",
+      "CPU 집중 작업용 작업 큐를 실제로 구축했다고 말한다(강의에서는 검토 대상이며 실제 구축은 확인되지 않았다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q17",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "grid-compose-deployment",
+    "difficulty": "intermediate",
+    "question": "독립계통 프로그램을 Docker Compose로 배포한 구조를 설명해 주세요. depends_on의 헬스체크 조건만으로 운영 중 DB 장애까지 대응되나요?",
+    "expectedPoints": [
+      "FastAPI 애플리케이션과 PostgreSQL을 Compose로 배포해 실행 환경을 분리하고 내부 네트워크로 연결했으며 헬스체크로 DB 준비 상태를 확인하도록 구성했다",
+      "애플리케이션은 Dockerfile USER 설정 등으로 비루트 사용자로 실행했다",
+      "DB와 파일 데이터를 별도 볼륨으로 관리해 컨테이너를 재생성해도 데이터가 유지되게 했다",
+      "depends_on은 시작 시점 준비를 맞출 뿐이고 운영 중 DB 재연결과 Timeout은 별도로 처리해야 한다"
+    ],
+    "commonMistakes": [
+      "depends_on 헬스체크 조건으로 운영 중 DB 장애도 해결된다고 답한다",
+      "Kubernetes 대신 Compose를 쓴 것을 회사 인프라 의사결정 전체를 혼자 내린 것처럼 설명한다(규모에 맞는 운영 복잡성을 고려한 선택으로 설명한다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q18",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "grid-alembic-backup",
+    "difficulty": "intermediate",
+    "question": "Alembic과 데이터 백업은 어떻게 관리했나요? Docker Volume이 있으면 백업은 필요 없지 않나요?",
+    "expectedPoints": [
+      "Alembic으로 DB 스키마 변경 이력을 관리해 기능 추가에 따른 테이블·컬럼 변경을 추적하고 배포 환경에 반영했으며 autogenerate로 만든 migration은 반드시 검토한다",
+      "DB와 업무 파일을 별도 볼륨으로 관리하고 PostgreSQL 덤프와 파일 볼륨의 백업·복구를 고려해 운영 환경을 구성했다",
+      "Volume은 컨테이너 재생성 시 데이터를 유지할 뿐이라 호스트 장애나 삭제에 대비해 별도 백업이 필요하고, 복원은 운영 DB를 덮어쓰지 않고 별도 DB에서 검증한다",
+      "이미지를 롤백해도 DB는 함께 복구되지 않으므로 스키마 호환성과 복구 계획을 따로 세운다"
+    ],
+    "commonMistakes": [
+      "Volume이 있으면 호스트 장애에도 무손실이라 백업이 필요 없다고 답한다",
+      "이미지를 롤백하면 DB 스키마와 데이터도 자동으로 되돌아간다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q19",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "ESS_Grid_Practice",
+    "conceptKey": "grid-change-impact-analysis",
+    "difficulty": "intermediate",
+    "question": "변경 요구사항의 영향 범위를 어떻게 관리했나요? 그 도구가 AI로 코드를 자동 수정하는 건가요?",
+    "expectedPoints": [
+      "ESS 프로젝트에서 요구사항이 바뀔 때마다 코드, DB, 화면, 보고서에 미치는 영향을 반복 확인해야 하는 어려움이 있었다",
+      "독립계통 프로젝트에서는 핵심 계산식과 설계 기준을 Markdown으로 구조화하고 변경 요구를 입력하면 관련 코드, 스키마, 근거 문서, 회귀 테스트 항목을 확인하는 도구를 만들었다",
+      "SOC, 수명 말기(EOL) 용량, 비상부하 기준이 바뀌었을 때 관련 계산과 문서를 누락하지 않도록 영향 범위를 추적한다",
+      "자동 수정이 아니라 영향 분석과 테스트 항목 확인이 핵심이고 개발자가 검토·적용하며, 회귀 테스트로 기존 정상 기능이 깨지지 않았는지 검증한다"
+    ],
+    "commonMistakes": [
+      "AI가 전기 기준을 독자적으로 결정하거나 검증 없이 자동 배포한다고 답한다",
+      "회귀 테스트를 새로 추가한 기능만 검증하는 것으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 12강 Q20",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "ai-analysis-tool-motivation",
+    "difficulty": "intermediate",
+    "question": "AI 장애 분석 도구를 왜 개발했는지 설명해 주세요. Grafana에서 이미 모든 지표를 볼 수 있는데 AI가 왜 필요했나요?",
+    "expectedPoints": [
+      "Prometheus와 Grafana로 운영 지표를 모니터링했지만 장애가 나면 여러 지표의 변화 관계를 분석하고 원인을 좁히는 과정은 직접 해야 했다",
+      "초기 분석 시간을 줄이려고 Prometheus 지표와 k6 결과의 시간을 맞추고 이상 구간 데이터를 Claude API에 전달해 원인 후보, 판단 근거, 반대 지표, 추가 확인 항목을 받았다",
+      "장애 주입 시험 18회 중 15회에서 원인을 올바르게 식별했고 근거 확인을 포함한 초기 조사 시간 중앙값을 8분에서 3분으로 줄였다",
+      "Grafana 시각화를 대체하려는 것이 아니라 지표 간 변화 관계와 원인 후보를 좁히는 과정을 보조하는 것이 목적이고, 최종 판단과 설정 변경은 사람이 한다"
+    ],
+    "commonMistakes": [
+      "Grafana가 CPU나 Redis 지표를 표시하지 못해서 AI를 썼다고 답한다",
+      "AI가 설정을 자동으로 바꿔 장애를 해결한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q1",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "ai-analysis-architecture",
+    "difficulty": "intermediate",
+    "question": "AI 장애 분석 도구의 전체 아키텍처를 설명해 주세요. AI가 Prometheus에 직접 접근해서 지표를 가져오나요?",
+    "expectedPoints": [
+      "Prometheus 운영 지표와 k6 부하 시험 결과를 같은 시간 기준으로 정렬하고 분석 스크립트가 이상 구간을 탐지한다",
+      "이상 구간의 CPU, 스레드, HikariCP 대기, Redis 지연 등을 JSON으로 요약해 규칙 기반 분류기와 Claude API로 원인 후보를 분석한다",
+      "AI가 제시한 수치는 원자료와 대조하고 판정을 비교해 판단 근거와 추가 확인 항목을 제공하며 실제 대응은 운영자가 결정한다",
+      "AI가 Prometheus에 직접 접근하지 않는다. 스크립트가 지표를 수집·요약해 전달하고 AI는 클러스터 설정을 변경하지 않는다"
+    ],
+    "commonMistakes": [
+      "AI가 Prometheus를 직접 조회하거나 클러스터 설정까지 바꾼다고 설명한다",
+      "AI 분석이 Prometheus 지표 수집을 대체한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q2",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "incident-metric-relationships",
+    "difficulty": "intermediate",
+    "question": "장애 분석을 위해 어떤 지표를 수집했나요? CPU 사용량이 낮으면 CPU 원인은 제외해도 되나요?",
+    "expectedPoints": [
+      "CPU뿐 아니라 Tomcat Busy 스레드, HikariCP Active·Pending, Redis latency, PostgreSQL 지표, k6 RPS·p95·오류율을 함께 확인했다",
+      "CPU가 낮은데 요청 스레드가 늘면 DB나 Redis 응답을 기다리는 상황일 수 있어 단일 지표보다 지표 간 관계를 분석했다",
+      "예를 들어 CPU 낮음과 Hikari Pending 증가는 DB 연결 대기 후보, Redis latency와 Tomcat Busy 동시 증가는 Redis 대기 후보로 볼 수 있지만 복합 장애가 가능해 단정하지 않는다",
+      "CPU가 낮아도 특정 Pod나 코어에 집중되거나 throttling이 있을 수 있어 세부 지표를 확인한다"
+    ],
+    "commonMistakes": [
+      "CPU가 낮으면 CPU 원인을 바로 제외하거나 병목이 없다고 판단한다",
+      "지표 조합 하나만 보고 원인을 확정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q3",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "prometheus-k6-time-alignment",
+    "difficulty": "intermediate",
+    "question": "Prometheus 지표와 k6 결과의 시간을 맞춘 이유는 무엇인가요? 두 지표가 같은 시점에 함께 증가하면 인과관계로 확정할 수 있나요?",
+    "expectedPoints": [
+      "k6는 사용자 관점의 응답시간과 오류율을, Prometheus는 서버 내부 상태를 보여 준다",
+      "같은 시간 축에 정렬해야 응답시간이 늘어난 구간에 어떤 내부 지표가 변했는지, 변화 순서와 지속시간을 비교할 수 있다",
+      "시간대와 타임스탬프 단위를 통일하고 공통 시작·종료 시점과 수집·집계 간격 차이를 맞추며 누락값을 0으로 처리하지 않는다",
+      "함께 증가한 것은 상관관계일 뿐 인과관계와 다르므로 주입 결과, 로그, 반대 지표를 추가로 확인한다"
+    ],
+    "commonMistakes": [
+      "누락된 Redis 지표를 0ms로 채워 정상값처럼 계산한다",
+      "두 지표가 같이 증가했으니 인과관계가 확정됐다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q4",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "prometheus-http-api-query-range",
+    "difficulty": "intermediate",
+    "question": "분석 도구에서 Prometheus 지표를 어떻게 조회했나요? 원본 지표 전체를 AI에 그대로 넘기지 않은 이유도 설명해 주세요.",
+    "expectedPoints": [
+      "분석 대상 시간 범위의 지표를 조회해 k6 결과와 비교하고 CPU, 애플리케이션 스레드, DB 커넥션 대기 등 필요한 지표만 뽑아 이상 구간 요약을 만들었다",
+      "/api/v1/query는 특정 평가 시점을, /api/v1/query_range는 start·end·step으로 시간 범위를 조회한다",
+      "지표 이름은 Micrometer나 Exporter 설정에 따라 다르고 CPU rate는 초당 CPU seconds(코어 상당)라 백분율은 기준 용량으로 따로 정규화해야 한다",
+      "원본 전체를 넘기면 토큰, 비용, 잡음이 늘어나므로 필요한 구간과 지표를 골라 코드로 계산한다"
+    ],
+    "commonMistakes": [
+      "시간 범위 조회도 /api/v1/query나 /metrics만으로 한다고 답한다",
+      "원본 지표 전체를 AI에 넘겨야 정확하다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q5",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "anomaly-detection-vs-cause-classification",
+    "difficulty": "intermediate",
+    "question": "이상 탐지와 원인 분류는 어떻게 다른가요? 이상 구간을 탐지하면 원인도 확정된 것인가요?",
+    "expectedPoints": [
+      "먼저 규칙으로 응답시간이나 오류율이 증가한 이상 구간을 찾았다",
+      "그다음 해당 구간의 내부 지표를 비교해 장애 원인 후보를 분류했다",
+      "이상 탐지는 문제가 언제 발생했는지(발생 여부와 시점)를, 원인 분류는 왜 발생했는지(원인 후보)를 좁히는 과정이라 별도로 판단한다"
+    ],
+    "commonMistakes": [
+      "이상 탐지와 원인 분류를 같은 과정으로 설명한다",
+      "이상 구간을 찾으면 원인도 확정된 것이라고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q6",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "script-computation-ai-interpretation",
+    "difficulty": "intermediate",
+    "question": "왜 수치 계산은 스크립트에 맡기고 AI에는 요약만 전달했나요? 요약하면 정보가 손실되지는 않나요?",
+    "expectedPoints": [
+      "분석 스크립트가 수집, 시간 정렬, 평균·최대 같은 수치 계산을 맡아 계산 과정의 재현성을 확보했다",
+      "AI는 지표 간 관계를 해석하고 원인 후보와 추가 확인 항목을 정리하는 역할에 집중했다",
+      "근거 검증은 스크립트와 개발자가, 실제 조치는 개발자가 맡도록 역할을 나눴다",
+      "평균만 넣지 않고 최대값, 변화 시점, 지속시간도 포함하며 필요하면 원본을 추가로 확인한다"
+    ],
+    "commonMistakes": [
+      "요약할 때 평균값만 넣으면 충분하다고 답한다",
+      "LLM이 JSON을 다룰 수 없거나 Prometheus가 계산을 못 해서 스크립트를 썼다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q7",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "claude-structured-input-output",
+    "difficulty": "intermediate",
+    "question": "Claude API에 어떤 데이터를 전달했고 응답은 어떤 형식으로 받았나요? JSON으로 구조화하면 판단의 정확성도 보장되나요?",
+    "expectedPoints": [
+      "이상 구간의 CPU 사용량, Tomcat 스레드, HikariCP 대기, Redis 지연 같은 지표를 JSON으로 구성해 Claude Messages API에 전달했다",
+      "응답은 원인 후보, 판단 근거, 반대 지표, 추가 확인 항목으로 구분해 반환하게 했다",
+      "구조화는 파싱과 검증을 돕지만 판단의 정확성을 보장하지는 않는다",
+      "강의의 가상 예시처럼 Hikari Pending이 0이면 연결 풀 고갈 가설을 약하게 할 뿐 Redis가 근본 원인이라고 확정하지는 않는다"
+    ],
+    "commonMistakes": [
+      "JSON 형식으로 받으면 분석 결과도 정확하다고 답한다",
+      "AI 출력이 배포 명령이나 설정 변경이라고 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q8",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "claude-messages-api-flow",
+    "difficulty": "intermediate",
+    "question": "분석 도구에서 Claude Messages API는 어떤 흐름으로 동작했나요? 장애 분석을 위해 모델을 직접 학습하거나 Fine-tuning했나요?",
+    "expectedPoints": [
+      "분석 스크립트가 장애 분석 지시사항과 이상 구간 요약 지표 JSON을 Claude Messages API에 보내고 모델이 생성한 원인 후보와 근거를 응답으로 받는다",
+      "응답을 파싱한 뒤 응답 구조와 제시된 수치를 검증해 개발자가 확인할 수 있는 결과로 만든다",
+      "모델을 직접 학습하거나 Fine-tuning하지 않았고 기존 LLM API에 입력, 프롬프트, 검증 설계를 더해 활용했다"
+    ],
+    "commonMistakes": [
+      "장애 데이터로 모델을 직접 학습시키거나 Fine-tuning했다고 답한다",
+      "API 응답을 검증 없이 그대로 결과로 내보낸다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q9",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "incident-analysis-prompt-design",
+    "difficulty": "intermediate",
+    "question": "장애 분석 프롬프트는 어떻게 구성했나요? 프롬프트만으로 Hallucination을 막을 수 있나요?",
+    "expectedPoints": [
+      "단순히 원인을 알려 달라고 하지 않고 제공된 지표를 근거로 판단하게 했다",
+      "판단에 반하는 지표와 추가 확인이 필요한 항목도 함께 반환하게 했다",
+      "근거가 부족하면 원인을 억지로 고르지 않고 판단 불가(UNKNOWN)로 처리하게 했다",
+      "프롬프트만으로는 Hallucination을 막을 수 없어 응답 구조와 수치 검증, 판단 보류, 사람 검토를 함께 둔다"
+    ],
+    "commonMistakes": [
+      "프롬프트만 잘 쓰면 Hallucination을 막을 수 있다고 답한다",
+      "근거가 부족해도 반드시 하나의 원인을 고르게 한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q10",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "counter-evidence-requirement",
+    "difficulty": "intermediate",
+    "question": "AI에게 반대 지표를 함께 요구한 이유는 무엇인가요? 반대 지표가 하나라도 있으면 그 가설은 바로 버려야 하나요?",
+    "expectedPoints": [
+      "하나의 지표만으로 원인을 판단하면 잘못된 결론을 낼 수 있어 가설을 뒷받침하는 근거와 반대되는 지표를 함께 반환하게 했다",
+      "개발자가 AI 판단을 그대로 받아들이지 않고 추가 검증이 필요한 부분을 확인하게 하려는 목적이다",
+      "가상 사례로 DB 연결 풀 고갈 가설이라면 Tomcat Busy와 p95 증가는 비특이적 근거이고 Hikari Pending 0과 연결 여유는 반대 지표이며, 그래도 다른 DB 병목은 여전히 가능하다",
+      "반대 지표가 있어도 바로 폐기하지 않고 강도, 측정 시점, 누락 여부에 따라 판단을 보류하고 추가 검증한다"
+    ],
+    "commonMistakes": [
+      "반대 지표가 하나라도 있으면 가설을 무조건 폐기한다고 답한다",
+      "반대 지표를 원인 후보를 늘리거나 응답을 길게 하려는 목적으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q11",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "ai-evidence-value-verification",
+    "difficulty": "advanced",
+    "question": "AI가 근거로 제시한 수치가 틀렸을 때 어떻게 걸러냈나요? 근거 수치가 모두 원자료와 맞으면 원인 판단도 맞다고 볼 수 있나요?",
+    "expectedPoints": [
+      "원인 후보가 맞더라도 근거에 잘못된 수치가 섞일 수 있어 AI가 반환한 근거 수치를 실제 입력 데이터와 다시 대조했다",
+      "근거가 확인되지 않거나 데이터가 부족하면 AI 판단을 그대로 채택하지 않았다",
+      "대조할 때는 지표 존재 여부와 값 일치뿐 아니라 빈 근거, 단위, 반올림, 시간 범위도 따로 검증해야 한다",
+      "수치가 사실과 맞는 것과 인과 추론이 맞는 것은 별개라서 수치가 모두 맞아도 원인 가설의 정확성은 보장되지 않는다"
+    ],
+    "commonMistakes": [
+      "수치가 달라도 그럴듯하면 AI 판단을 채택하거나 원자료를 AI 값에 맞춰 고친다",
+      "근거 수치가 모두 맞으면 원인도 맞고 사람 검증이 필요 없다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q12",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "fault-injection-test-procedure",
+    "difficulty": "intermediate",
+    "question": "분석 도구를 검증하려고 어떤 장애를 어떻게 주입했나요? 실제 고객 서비스에 장애를 주입한 것인가요?",
+    "expectedPoints": [
+      "실제 장애 상황에서도 유효한지 보려고 Redis, DB, CPU 관련 장애 3종을 시험 환경에 주입했다",
+      "정상 환경 확인, 장애 조건 주입, 지표 수집, 규칙·AI 분석, 실제 주입 원인과 비교, 정답·시간 기록, 환경 복원 순서로 진행했다",
+      "실제 주입한 장애를 기준으로 규칙 기반 분류기와 AI 결과를 비교해 원인 식별 여부와 초기 조사 시간을 확인했다",
+      "고객 서비스가 아니라 개인 프로젝트의 통제된 시험 환경에서 진행했다"
+    ],
+    "commonMistakes": [
+      "주입한 장애 유형을 ALB·DNS·S3나 메모리 장애 등으로 잘못 말한다",
+      "실제 운영 중인 고객 서비스에 장애를 주입했다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q13",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "rule-vs-ai-accuracy-evaluation",
+    "difficulty": "advanced",
+    "question": "장애 주입 시험 18회 중 15회 정답이라는 결과를 어떻게 평가했나요? 18회 시험이면 충분히 검증했다고 볼 수 있나요?",
+    "expectedPoints": [
+      "장애 3종을 주입한 총 18회 시험에서 실제 장애 원인과 각 분석 방식이 제시한 원인을 비교했다",
+      "초기 실험에서 규칙 기반은 12/18(66.7%), AI는 15/18(83.3%) 정답이었고 차이는 3/18, 약 16.7%p다",
+      "제한된 시험 결과라 모든 장애에서 AI가 더 정확하다고 판단하지 않았고 해당 조건에서의 초기 유효성을 확인한 것으로 본다",
+      "복합 장애, 미등록 유형, 다양한 부하 조건에 대한 추가 검증이 필요하다"
+    ],
+    "commonMistakes": [
+      "18회 결과로 모든 환경에서 AI가 규칙보다 우수하다는 것이 증명됐다고 답한다",
+      "규칙과 AI 정답 수를 15/12로 바꿔 말하거나 정답률 차이를 3%p로 계산한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q14",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "normal-run-false-positive",
+    "difficulty": "advanced",
+    "question": "장애 시험뿐 아니라 정상 상황에서도 시험한 이유는 무엇인가요? 원인 분류 오답 3건은 모두 FN이라고 볼 수 있나요?",
+    "expectedPoints": [
+      "원인을 찾는 능력뿐 아니라 정상 상태를 불필요하게 장애로 판단하지 않는지 확인하려고 정상 시험을 했다",
+      "정상 시험 6회에서 오탐은 없었지만 시험 횟수가 제한적이라 운영 환경 전체에서 오탐이 없다고 일반화하지 않았다",
+      "실제 장애를 장애로 판정하면 TP, 정상을 장애로 판정하면 FP, 장애를 정상으로 판정하면 FN, 정상을 정상으로 판정하면 TN이다",
+      "원인 분류 오답 3건이 모두 FN은 아니다. 장애는 감지했지만 다른 원인으로 분류했을 수 있다",
+      "오탐이 많으면 Alert Fatigue로 중요한 알림을 놓칠 위험이 있다"
+    ],
+    "commonMistakes": [
+      "정상 6회 오탐 0건을 운영 환경 전체의 오탐률이 0%라는 뜻으로 일반화한다",
+      "원인 분류 오답을 모두 장애를 놓친 FN으로 해석한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q15",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "initial-investigation-median-time",
+    "difficulty": "advanced",
+    "question": "초기 조사 시간이 8분에서 3분으로 줄었다는 것은 무엇을 의미하나요? 장애 복구 시간도 그만큼 줄었다고 볼 수 있나요?",
+    "expectedPoints": [
+      "기존에는 여러 지표를 직접 확인하고 원인 후보를 좁히는 데 시간이 걸렸는데 AI가 분석할 지표와 원인 후보, 근거를 미리 정리하게 했다",
+      "근거 확인까지 포함한 초기 조사 시간의 중앙값이 8분에서 3분으로 5분 줄었고 감소율은 (8-3)/8×100=62.5%다",
+      "중앙값은 극단값의 영향을 덜 받는다. 강의 예시로 2, 3, 3, 4, 20분이면 평균은 6.4분이지만 중앙값은 3분이다",
+      "초기 조사 시간이지 전체 장애 복구 시간(MTTR)이 아니므로 복구 시간이 62.5% 줄었다고 말하지 않는다"
+    ],
+    "commonMistakes": [
+      "8분에서 3분을 장애 복구 시간(MTTR)이 62.5% 줄었다는 뜻으로 설명한다",
+      "감소율을 37.5%로 계산한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q16",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "rule-first-ai-assist-design",
+    "difficulty": "advanced",
+    "question": "초기 실험에서는 AI가 규칙보다 정확했는데 왜 최신 구조에서는 규칙을 우선했나요? 그렇다면 AI는 필요 없었던 것 아닌가요?",
+    "expectedPoints": [
+      "이후 장애 주입 시험을 반복하면서 이미 정의된 장애는 규칙 기반이 더 일관되게 판정한다는 것을 확인했다",
+      "규칙으로 판정할 수 있으면 규칙을 우선하고, 규칙이 UNKNOWN이면 AI 근거 수치를 원자료와 대조해 통과한 경우에만 AI 후보를 쓰며 실패하면 판단 불가로 둔다",
+      "규칙과 AI 판정이 다르면 사람 확인 표시를 붙이고 모든 장애 알림 결과는 운영자에게 전달한다",
+      "규칙은 재현성이 있지만 미등록 장애에 한계가 있고 AI는 관계 해석에 강하지만 판단 편차와 환각이 있어, 알려진 장애는 규칙이 맡고 새로운 장애나 관계 해석은 AI가 보조하도록 시험 결과에 맞춰 역할을 조정했다"
+    ],
+    "commonMistakes": [
+      "Claude를 쓸 수 없게 됐거나 미등록 장애도 규칙으로 모두 해결돼서 규칙을 우선했다고 답한다",
+      "규칙이 UNKNOWN이고 AI 근거 검증이 실패해도 AI 후보를 채택한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q17",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "alertmanager-slack-analysis-flow",
+    "difficulty": "intermediate",
+    "question": "Prometheus, Alertmanager, Slack은 분석 도구와 어떻게 연계했나요? 규칙과 AI 판정이 일치하면 알림을 생략해도 되나요?",
+    "expectedPoints": [
+      "Prometheus 알림 규칙이 발생하면 Alertmanager와 연계해 분석 도구가 해당 시간 구간의 지표를 조회하고 분석한다",
+      "규칙 판정과 Claude가 제시한 원인 후보, 근거, 추가 확인 항목을 검증·비교한 뒤 Slack으로 보내 운영자가 어디부터 확인할지 빠르게 파악하게 했다",
+      "이미 장애가 감지된 상태이므로 판정이 일치해도 알림을 보낸다",
+      "판정이 불일치하면 사람 확인이 필요하다고 표시한다"
+    ],
+    "commonMistakes": [
+      "규칙과 AI 판정이 일치하면 알림을 생략하거나 정상으로 처리한다고 답한다",
+      "Alertmanager 연계 목적을 모델 재학습이나 DB 자동 failover로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q18",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "no-ai-auto-remediation",
+    "difficulty": "intermediate",
+    "question": "AI가 직접 장애를 복구하도록 하지 않은 이유는 무엇인가요? 앞으로 자동 복구를 도입한다면 무엇을 먼저 갖춰야 하나요?",
+    "expectedPoints": [
+      "AI 판단이 항상 정확하지 않아 실제 인프라 설정 변경 권한을 주지 않았다",
+      "AI는 원인 후보, 판단 근거, 추가 확인 방법만 제시하고 Kubernetes·AWS 설정 변경이나 강제 Pod 종료는 하지 않는다",
+      "개발자가 원자료를 검증한 뒤 실제 조치를 결정해 잘못된 자동 조치로 생길 수 있는 운영 위험을 제한했다",
+      "자동 복구는 검증된 반복 장애부터 제한적으로 적용하고 승인, 작업 범위, 변경 이력, 실패 시 복구 계획을 먼저 갖춘다"
+    ],
+    "commonMistakes": [
+      "AI에 인프라 변경 권한을 주고 바로 자동 복구하게 한다고 답한다",
+      "AI가 운영자를 대체한다고 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q19",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "AI_Incident_Analysis",
+    "conceptKey": "ai-ops-adoption-after-joining",
+    "difficulty": "intermediate",
+    "question": "입사하면 이 AI 장애 분석 경험을 어떻게 활용하고 싶나요? 입사 후 바로 운영 환경에 AI 분석을 적용할 수 있나요?",
+    "expectedPoints": [
+      "클라우드 운영에서는 장애가 나면 여러 시스템의 지표를 확인하고 원인을 빠르게 좁히는 것이 중요하다",
+      "먼저 실제 운영 환경의 모니터링 체계, Runbook, 장애 대응 절차를 익힌다",
+      "바로 적용하지 않고 보안 정책, 데이터 외부 전송 기준, 권한, 대응 절차를 먼저 확인한 뒤 검증 환경에서 효과와 위험을 평가한다",
+      "그 뒤 반복적인 지표 수집과 원인 후보 분석 업무에 보조로 적용해 운영자의 장애 대응 속도를 높인다. 회사에 실제 적용한 경험은 아니라고 구분한다"
+    ],
+    "commonMistakes": [
+      "회사 적용 전에 모든 로그를 외부로 보내거나 관리자 권한부터 받아 바로 적용한다고 답한다",
+      "개인 프로젝트 결과를 실제 회사 운영에 적용한 경험처럼 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 13강 Q20",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "aws-cost-billing-resources",
+    "difficulty": "intermediate",
+    "question": "AWS에서는 어떤 리소스에서 비용이 발생하나요? EC2를 모두 종료하면 비용이 0이 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "EC2나 RDS 같은 컴퓨팅 자원뿐 아니라 NAT Gateway, ALB, 스토리지, 로그 등에서도 비용이 발생한다",
+      "과금 기준은 서비스마다 다르다. EC2는 유형·시간, EKS는 클러스터 시간과 별도 컴퓨팅, EBS는 용량·유형·추가 성능, NAT는 시간·처리량, ALB는 시간·LCU, CloudWatch는 로그·지표 등으로 과금된다",
+      "FlowTicket에서는 전체 비용을 리소스별로 나누어 확인하고 비용 비중과 실제 사용량을 함께 분석해 최적화 대상을 정했다",
+      "EC2를 모두 종료해도 EKS, NAT, ALB, EBS, RDS 등 별도 자원이 남아 비용이 계속 발생할 수 있다"
+    ],
+    "commonMistakes": [
+      "EC2를 모두 종료하면 AWS 비용이 0이 된다고 단정한다",
+      "비용을 EC2·RDS 같은 컴퓨팅 자원에서만 찾고 NAT·ALB·스토리지·로그 비용을 빠뜨린다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q1",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "flowticket-session-cost-breakdown",
+    "difficulty": "advanced",
+    "question": "FlowTicket에서 비용을 실제로 어떻게 분석했나요? 비용 비중이 가장 큰 노드부터 무조건 줄이면 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "반복 부하 시험의 세션 비용을 항목별로 분해했고, 당시 서울 리전 온디맨드 공개 가격 기준 추정치로 노드 5대와 부하 발생기 3대 세션이 시간당 약 2.06달러였다",
+      "비중은 Worker Node 29%, 부하 발생기 28%, Redis 19%, NAT 9%, EKS 5%, 기타 10%였고 항목별 시간당 금액은 비중을 곱한 환산값이지 실제 청구 내역이 아니다",
+      "평상시 유휴 노드를 줄이는 것뿐 아니라 부하 발생기 가동 시간과 측정 세션 길이도 관리했고, 평시 노드 3대 기준 세션 비용은 시간당 약 1.82달러로 추정했다",
+      "비용 비중만 보지 않고 실제 사용량과 성능·가용성 영향을 비교해 줄일 대상을 정한다"
+    ],
+    "commonMistakes": [
+      "세션 비용 추정치나 항목별 환산값을 실제 AWS 청구액이라고 말한다",
+      "비용 비중이 가장 큰 노드부터 무조건 줄인다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q2",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "eks-control-plane-vs-node-cost",
+    "difficulty": "intermediate",
+    "question": "EKS Control Plane 비용과 Worker Node 비용은 어떻게 다른가요? Pod를 모두 삭제하면 EKS 비용이 없어지는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "EKS Control Plane(API Server·Scheduler·Controller) 이용 비용과 애플리케이션이 실행되는 Worker Node(EC2·EBS) 비용은 별도로 발생한다",
+      "EC2 기반 EKS에서는 Pod 개수 자체가 직접 과금 단위가 아니므로 Pod 수를 줄였다고 바로 비용이 줄지 않는다",
+      "실제로 EC2 노드가 축소되거나 다른 과금 자원이 제거돼야 비용 절감으로 이어진다",
+      "Pod를 모두 지워도 클러스터와 다른 과금 자원이 유지되면 비용이 남으며, Fargate·Auto Mode는 별도 과금 방식이다"
+    ],
+    "commonMistakes": [
+      "Pod 수를 줄이면 그 비율만큼 EC2 비용이 줄어든다고 단정한다",
+      "Pod를 모두 삭제하면 EKS 비용이 없어진다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q3",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "queue-request-1100m-to-200m",
+    "difficulty": "advanced",
+    "question": "Queue Pod의 CPU Request를 1100m에서 200m로 낮춘 이유는 무엇인가요? Request를 실사용량에 맞춰 20m까지 더 낮추면 어떤 문제가 생기는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "대기열 분리 이후 평상시에도 Queue Pod가 1100m를 예약해 별도 노드 2대가 필요했지만 실제 평시 CPU 사용량은 10~20m(0.01~0.02코어) 수준이었다",
+      "평상시에는 Request를 200m로 낮춰 API 노드에 함께 배치하고 오픈 직전에만 1100m로 높여 평시 노드를 5대에서 3대로 줄였다",
+      "Scheduler는 실제 사용량이 아니라 Request와 배치 조건을 기준으로 Pod를 배치하므로 과도한 Request가 노드 수를 늘린다",
+      "Request를 20m까지 낮추면 순간 부하 여유, 자원 경합, HPA 사용률 계산의 분모가 바뀌는 영향을 고려해야 한다"
+    ],
+    "commonMistakes": [
+      "Scheduler가 실제 CPU 사용량을 보고 Pod를 배치한다고 답한다",
+      "Request를 평시 실사용량과 똑같이 낮추면 된다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q4",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "node-savings-170-estimate",
+    "difficulty": "advanced",
+    "question": "평시 노드 축소로 월 170달러를 절감했다는 수치는 어떻게 계산했나요? 노드 수가 40% 줄었으면 전체 AWS 비용도 40% 줄었다고 볼 수 있는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "절감액은 감소 노드 수 × 시간당 노드 단가 × 가동 시간으로 계산했고 월 730시간 상시 운영을 가정했다",
+      "노드당 월 약 85달러(포트폴리오 추정액을 역산한 시간당 약 0.1164달러) 기준으로 월 예상 노드 비용은 5대 425달러, 4대 340달러, 3대 255달러다",
+      "분리 직후 5대 대비 월 약 170달러, 분리 이전 4대 대비 월 약 85달러의 노드 비용을 줄일 수 있는 것으로 추정했다",
+      "실제 월 청구액의 절감 실적이 아니라 자원 구성에 따른 노드 비용 추정치이며, 부하 발생기를 포함한 세션 비용과는 범위가 다르다"
+    ],
+    "commonMistakes": [
+      "월 170달러를 실제 전체 청구액 절감 실적이라고 말한다",
+      "노드 수 40% 감소를 전체 AWS 비용 40% 감소로 해석한다(RDS·Redis·NAT·EKS 등은 별도 계산이 필요하다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q5",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "queue-split-cost-tradeoff",
+    "difficulty": "advanced",
+    "question": "대기열을 분리하면 비용이 늘었는데도 그 구조를 선택한 이유는 무엇인가요? 그 선택이 매출 증가로 이어졌는지 검증했는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "같은 조건에서 통합 구조와 분리 구조를 각각 2회 비교했고 판정 지표를 사전에 정했다",
+      "분리 후 예매 p95는 1.6~2.6초에서 184~272ms로 개선됐지만 대기열 조회 p95는 13~18ms에서 259~523ms로 늘었고, 시험 중 노드 사용 시간은 15~28% 증가했으며 오류·정합성 위반은 두 구조 모두 0이었다",
+      "대기열 상태 조회보다 좌석 선점과 결제의 응답시간이 더 중요하다고 판단해 비용 증가를 감수하고 예매 성능을 보호했고, 이후 평시 자원을 별도로 최적화했다",
+      "개인 프로젝트라 매출 효과는 검증하지 않았고 핵심 기능 품질을 기준으로 선택했다"
+    ],
+    "commonMistakes": [
+      "노드 사용 시간 15~28% 증가를 전체 AWS 비용 증가율로 해석한다",
+      "대기열 분리로 모든 p95와 비용이 개선됐다고 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q6",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "nat-per-az-cost-vs-availability",
+    "difficulty": "intermediate",
+    "question": "NAT Gateway를 하나가 아닌 AZ별로 구성한 이유는 무엇인가요? NAT를 1개에서 3개로 늘리면 비용이 정확히 3배가 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "NAT를 하나만 쓰면 비용은 줄지만 그 NAT가 있는 AZ에 장애가 나면 다른 AZ의 Private Subnet 외부 통신까지 영향을 받을 수 있다",
+      "예매 시스템에서는 외부 결제 호출이 중요해 AZ별 NAT Gateway 3개를 구성해 외부 통신 경로의 장애 영향을 제한했다(다른 AZ와 외부 의존성이 정상이라는 가정)",
+      "비용은 시간당 고정비, 처리량, AZ 간 전송 비용을 함께 고려하며, 동일 단가라면 고정 시간 비용은 3배가 될 수 있지만 전체 비용은 처리량과 경로에 따라 다르다",
+      "모든 AWS 서비스 접근에 NAT가 필요한 것은 아니며 지원 서비스는 VPC Endpoint를 비용과 함께 비교 검토한다"
+    ],
+    "commonMistakes": [
+      "NAT를 3개로 늘리면 전체 비용이 정확히 3배가 된다고 단정한다",
+      "AZ별 NAT를 인터넷 비용 제거나 ALB 인바운드 처리를 위한 것으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q7",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "rds-multi-az-cost-justification",
+    "difficulty": "intermediate",
+    "question": "비용이 늘어나는데도 RDS를 Multi-AZ로 구성한 이유는 무엇인가요? Multi-AZ가 있으면 별도 백업이 필요 없는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "애플리케이션을 여러 노드에 분산해도 모든 Pod가 쓰는 DB가 단일 장애 지점이면 서비스 전체에 영향을 주므로, 주문·결제 데이터를 위해 비용이 늘어도 Multi-AZ를 구성했다",
+      "일반적인 Multi-AZ DB 인스턴스는 다른 AZ의 Standby로 일반적으로 동기 복제하고 Primary 장애 시 자동 Failover하며, Standby는 직접 조회할 수 없다",
+      "Read Replica는 읽기 분산이 목적이고 일반적으로 비동기 복제이며 장애 시 별도 승격과 대응이 필요하다",
+      "삭제나 잘못된 변경도 복제될 수 있어 별도 백업이 필요하고, Failover 중 연결 단절에 대비해 Timeout과 안전한 재시도를 둔다"
+    ],
+    "commonMistakes": [
+      "Multi-AZ Standby로 읽기 부하를 분산한다고 답한다",
+      "Multi-AZ 복제가 백업을 대체하거나 Failover 중 요청 실패가 전혀 없다고 단정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q8",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "ca-scale-down-delay-10min",
+    "difficulty": "advanced",
+    "question": "Cluster Autoscaler의 노드 축소 대기 시간을 5분으로 줄이지 않고 10분으로 유지한 이유는 무엇인가요? 그렇다면 축소 대기 시간은 길수록 좋은지도 말씀해 주세요.",
+    "expectedPoints": [
+      "축소 대기를 5분으로 줄이는 방안도 검토했지만 절감액이 시험당 약 0.08달러로 추정돼 크지 않았다",
+      "5분이면 트래픽이 다시 늘기 전에 여유 노드가 제거돼 다음 폭증 때 재확장을 기다려야 하는 문제가 있었다",
+      "Pod 증가에 40~70초, 노드 추가에 100~150초가 걸리는 것이 관측돼 재확장 시간과 서비스 안정성을 고려해 10분을 유지했다",
+      "대기 시간이 길수록 유휴 비용이 늘어나므로 트래픽 주기와 재확장 시간 사이의 균형으로 정하며, 실제 CA에는 추가 축소 조건도 있다"
+    ],
+    "commonMistakes": [
+      "축소 대기 시간은 길수록 안전하므로 좋다고 단정한다",
+      "5분으로 줄이면 모든 노드가 즉시 삭제된다고 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q9",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "terraform-build-destroy-lifecycle",
+    "difficulty": "intermediate",
+    "question": "개인 프로젝트에서 Terraform으로 약 84개 리소스를 관리한 이유는 무엇인가요? terraform destroy만 실행하면 모든 리소스가 사라지는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "인프라를 항상 켜 두면 사용하지 않는 시간에도 비용이 발생하므로 Terraform으로 약 84개 리소스를 관리했다",
+      "부하 시험이 필요할 때 같은 환경을 재구축하고 시험이 끝나면 철거해 비용뿐 아니라 시험 환경의 재현성과 인프라 설정 관리도 개선했다",
+      "구축, 부하·장애·배포 시험, 철거, 잔여 자원 확인 순서로 운영했고, 실제 삭제 전에는 terraform plan -destroy 같은 삭제 계획 검토로 대상 환경, 보존 데이터, State를 확인해야 한다",
+      "State 외부 리소스와 Controller가 생성한 자원은 destroy로 지워지지 않을 수 있어 별도로 확인한다"
+    ],
+    "commonMistakes": [
+      "terraform destroy만 하면 모든 자원이 사라진다고 단정한다",
+      "Terraform으로 관리하면 비용이 자동으로 줄어든다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q10",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "residual-resources-after-destroy",
+    "difficulty": "intermediate",
+    "question": "철거한 뒤에도 잔여 리소스를 확인하는 이유는 무엇인가요? 연결되지 않은 EBS가 남아 있으면 바로 삭제해도 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "AWS Load Balancer Controller나 CSI Driver가 생성한 리소스는 Terraform이 직접 관리하지 않을 수 있다(Ingress는 ALB, PVC는 EBS, CNI 등은 ENI를 만든다)",
+      "클러스터를 제거하기 전에 Ingress와 관련 리소스를 먼저 정리한다",
+      "철거 후 aws elbv2 describe-load-balancers, aws ec2 describe-volumes, describe-network-interfaces, describe-nat-gateways 같은 조회로 ALB, EBS, ENI, NAT 등의 잔여 자원을 계정·리전·태그·소유권과 함께 확인한다",
+      "남은 EBS는 데이터 보존 필요성, PV Reclaim Policy, 다른 시스템의 사용 여부를 확인한 뒤 정리한다"
+    ],
+    "commonMistakes": [
+      "남은 EBS를 확인 없이 전부 즉시 삭제한다고 답한다",
+      "연결되지 않은 EBS는 비용이 들지 않는다고 단정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q11",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "budgets-vs-cost-explorer",
+    "difficulty": "intermediate",
+    "question": "AWS Budgets와 Cost Explorer는 어떻게 다른가요? Budgets를 월 50달러로 설정하면 50달러 이상은 청구되지 않는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "FlowTicket에서 AWS Budgets에 월 50달러 기준 4단계 알림과 Cost Anomaly Detection을 설정해 예산 초과 전에 비용 증가와 불필요하게 실행 중인 자원을 점검했다",
+      "Cost Explorer는 비용·사용량 항목과 추세를 분석하는 용도이고, Budgets는 실제·예측 비용이 설정한 예산을 넘는지 알림으로 관리하는 용도다",
+      "Cost Anomaly Detection은 비정상 비용 증가 탐지, Cost Allocation Tags는 프로젝트·조직별 비용 분류, Pricing Calculator는 사전 비용 추정에 쓴다",
+      "일반 Budgets 알림은 강제 한도가 아니고 집계 지연도 있을 수 있어 별도의 제한이나 정리 절차가 필요하다"
+    ],
+    "commonMistakes": [
+      "Budgets를 설정하면 청구가 강제로 제한되거나 자원이 자동으로 정지된다고 단정한다",
+      "Cost Explorer와 Budgets를 같은 기능으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q12",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "pricing-models-ondemand-sp-ri-spot",
+    "difficulty": "intermediate",
+    "question": "On-Demand, Savings Plans, Reserved Instance, Spot은 어떻게 다른가요? 결제 API 전체를 Spot으로 운영해도 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "On-Demand는 장기 약정이 없어 단기·불규칙 사용에, Savings Plans는 일정 시간당 사용금액을 약정해 지속적인 컴퓨팅 사용에 적합하다",
+      "RI는 특정 조건의 사용량을 할인받아 장기 예측이 가능할 때, Spot은 유휴 용량을 할인받지만 회수될 수 있어 중단을 허용하는 작업에 적합하다",
+      "FlowTicket은 환경을 구축하고 철거하는 개인 프로젝트라 온디맨드 기반으로 비용을 산정했고 장기 약정을 실제로 적용한 경험은 없다",
+      "장기 운영 서비스라면 일정한 기본 사용량에 Savings Plans나 RI를, 변동 부분은 온디맨드나 중단 허용 여부에 따라 Spot을 검토하고, 결제 API는 회수 가능성과 복구·가용성 요구를 고려해야 한다"
+    ],
+    "commonMistakes": [
+      "불규칙한 단기 시험 환경에도 장기 약정(Savings Plans·RI)을 우선 적용한다고 답한다",
+      "회수 가능성을 고려하지 않고 결제 API 전체에 Spot을 적용한다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q13",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "right-sizing-validation",
+    "difficulty": "intermediate",
+    "question": "Right-sizing이란 무엇이고 FlowTicket에서 어떻게 적용했나요? CPU 평균 사용률이 10%라면 사양을 10분의 1로 줄여도 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "실제 자원 사용량과 서비스 요구사항을 기반으로 적절한 자원 크기를 정하는 것이다",
+      "평시 대기열 CPU 사용량을 확인해 평시 Request를 1100m에서 200m로 낮췄고, 피크를 650m로 낮춘 시험은 성능 기준을 충족하지 못해 원복하고 피크 자원을 유지했다",
+      "비용만 비교하지 않고 변경 후 응답시간, 오류율, 데이터 정합성까지 검증했다",
+      "CPU 평균·최대·Throttling, Memory 최대·OOM·GC, 네트워크 처리량·연결, Disk IOPS·용량, p95·오류율·처리량, 피크·배포·복구 여유를 함께 확인한다"
+    ],
+    "commonMistakes": [
+      "CPU 평균 사용률만 보고 그 비율만큼 사양을 줄인다고 답한다",
+      "비용 절감만 비교하고 변경 후 응답시간·오류율 검증을 빠뜨린다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q14",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "autoscaler-cost-impact",
+    "difficulty": "intermediate",
+    "question": "HPA, VPA, Cluster Autoscaler는 비용에 각각 어떤 영향을 미치나요? CPU 사용률 기반 HPA와 VPA를 함께 쓰면 어떤 문제가 생기는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "HPA는 Pod 복제본 수, VPA는 Pod Request 권장·조정, CA는 노드 수를 바꾸며 실제 과금 리소스가 줄어야 비용이 달라진다",
+      "FlowTicket에서는 HPA와 CA를 연계해 피크에 확장하고 이후 축소했으며 Request는 측정 후 Git으로 변경했다(VPA 적용은 미확인)",
+      "Pod가 줄어도 노드가 그대로 유지되면 EC2 비용은 줄지 않으므로 실제 노드 수와 자원 배치 상태까지 확인했다",
+      "CPU 사용률 기반 HPA는 Request를 분모로 쓰므로 VPA가 Request를 바꾸면 정책이 충돌할 수 있어 지표와 정책 설계가 필요하다"
+    ],
+    "commonMistakes": [
+      "HPA로 Pod가 줄면 곧바로 EC2 비용이 줄어든다고 답한다",
+      "VPA가 노드 수를 조정한다고 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q15",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "finops-engineer-role",
+    "difficulty": "intermediate",
+    "question": "FinOps란 무엇이며 엔지니어는 어떤 역할을 하나요? 기업 FinOps 조직에서 협업해 본 경험이 있는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "클라우드 비용과 서비스 가치를 함께 관리하는 운영 방식으로, 기술팀(성능·자원), 재무팀(예산), 사업팀(가치)이 함께 비용 가시화, 최적화, 지속 운영을 이어 간다",
+      "엔지니어는 리소스별 비용을 분석하고 실제 사용량에 맞게 자원을 조정하며, 핵심 기능 성능이 중요하면 비용 증가를 감수하는 결정도 한다",
+      "FlowTicket에서 비용 항목 분석, 평시 노드 5대에서 3대 축소, Queue 분리, 월 50달러 Budgets, 84개 리소스 생명주기 관리, 설계 결정 기록을 했다",
+      "개인 프로젝트의 비용 최적화 경험이며 기업 규모 FinOps 협업은 향후 성장 영역이다"
+    ],
+    "commonMistakes": [
+      "FinOps를 항상 최저가를 고르는 것이나 재무팀의 청구서 승인으로만 설명한다",
+      "개인 프로젝트 경험을 기업 FinOps 조직의 실무 경험처럼 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q16",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "cost-allocation-tags",
+    "difficulty": "intermediate",
+    "question": "Cost Allocation Tag와 비용 할당은 무엇인가요? 태그가 없는 리소스의 비용은 어떻게 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "여러 프로젝트가 클라우드 자원을 함께 쓰는 기업 환경에서는 리소스별 비용뿐 아니라 프로젝트와 운영 환경별 비용을 구분하는 것이 중요하다",
+      "Terraform에서 Project, Environment, Team, CostCenter 같은 일관된 태그 정책을 적용하면 어느 프로젝트나 환경(dev/test/prod)에서 비용이 늘었는지 확인하고 최적화 대상을 구분할 수 있다",
+      "태그를 비용 분석에 쓰려면 비용 할당 태그 활성화 등 필요한 설정을 확인해야 한다",
+      "태그가 없어도 비용은 발생하지만 배분이 어려워지므로 공용 비용 배분과 태그 누락 정책이 필요하다"
+    ],
+    "commonMistakes": [
+      "태그가 없는 리소스는 비용이 발생하지 않는다고 답한다",
+      "태그를 달기만 하면 활성화 설정 없이 바로 비용이 분류된다고 단정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q17",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "slo-availability-downtime-budget",
+    "difficulty": "intermediate",
+    "question": "SLA, SLI, SLO는 어떻게 다른가요? 30일 기준 가용성 99.9%라면 중단이 얼마나 허용되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "SLI는 실제 측정 지표, SLO는 달성하려는 목표, SLA는 고객과 약속한 계약상 기준으로 미달 시 계약상 보상이 따른다",
+      "시간 기반 30일 허용 중단은 30×24×60×(1−가용성)으로 계산하며 99%는 432분, 99.9%는 43.2분, 99.95%는 21.6분, 99.99%는 4.32분이다",
+      "시간 기반뿐 아니라 요청 성공률 기반으로도 SLI를 정할 수 있다",
+      "가용성과 응답시간 목표를 먼저 이해하고 필요한 인프라와 장애 대응 정책을 설계하며, 목표가 높을수록 중복 인프라와 운영 비용이 늘 수 있어 업무 중요도와 고객 요구에 맞는 현실적 목표를 정한다"
+    ],
+    "commonMistakes": [
+      "가용성 100%를 목표로 설계해야 한다고 답한다",
+      "SLO와 SLA를 같은 것으로 보거나 SLA를 내부 목표로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q18",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "rto-rpo-error-budget",
+    "difficulty": "intermediate",
+    "question": "RTO, RPO, Error Budget은 각각 무엇인가요? 노드 장애 시험에서 측정한 복구 시간을 RTO라고 말할 수 있는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "RTO는 장애 발생 후 목표 복구 시간이고 RPO는 허용할 수 있는 데이터 손실 범위다(예: 10:00 장애에 RPO 5분이면 09:55 이후 손실까지 허용, RTO 30분이면 10:30까지 복구)",
+      "Error Budget은 SLO 안에서 허용되는 실패 범위로, SLO가 99.9%라면 정의된 측정 범위에서 0.1% 실패를 허용한다",
+      "FlowTicket 노드 장애 시험에서 API 54초, Queue 82초의 복구가 관측됐지만 이는 시험 관측값이지 공식 RTO가 아니다",
+      "실제 운영에서는 고객 업무 중요도에 따라 RTO와 RPO를 정하고 백업·복구 체계를 검증해야 하며, RPO 0도 목표일 뿐 복제·트랜잭션·장애 검증이 필요하다"
+    ],
+    "commonMistakes": [
+      "RTO와 RPO를 뒤바꿔 설명한다",
+      "시험에서 관측된 복구 시간을 공식 RTO나 모든 장애에 대한 보장값으로 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q19",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Cost_CloudOps",
+    "conceptKey": "cost-optimization-request-approach",
+    "difficulty": "intermediate",
+    "question": "입사 후 클라우드 비용 최적화 요청을 받으면 어떻게 진행하겠습니까? 고객이 30% 절감을 요구하는데 성능 저하가 예상된다면 어떻게 하겠어요?",
+    "expectedPoints": [
+      "먼저 어떤 리소스에서 비용이 발생하는지 분석하고 실제 자원 사용량과 SLO, 피크, 복구 등 성능·가용성 요구를 확인한다",
+      "유휴 자원 정리, 자원 크기 조정, 자동 확장 정책, 할인 요금제 같은 여러 대안을 비교한다",
+      "변경 전후 비용과 함께 응답시간·오류율을 검증하고 문제가 생기면 원복할 수 있게 변경 이력과 모니터링·원복 계획을 관리하며, FlowTicket에서도 이 방식으로 평시 노드를 줄이면서 피크 처리 성능을 유지했다",
+      "절감 요구와 성능 저하가 충돌하면 대안별 비용·영향·위험을 제시하고 요구 변경은 고객 및 담당자와 합의한다"
+    ],
+    "commonMistakes": [
+      "비용 분석 없이 요구한 비율만큼 노드를 바로 줄인다고 답한다",
+      "모든 워크로드를 Spot으로 바꾸면 된다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 14강 Q20",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "ktds-self-introduction",
+    "difficulty": "intermediate",
+    "question": "KT DS Cloud/Infra Engineering 직무 기준으로 1분 자기소개를 해 주세요. 본인의 가장 큰 강점은 무엇이라고 생각하나요?",
+    "expectedPoints": [
+      "현재 백엔드 개발자로 ESS 성능평가 시스템의 실시간 모니터링과 결과 분석 기능을 개발하고 있다",
+      "대량 데이터 조회 구조를 개선해 응답시간을 3.26초에서 223ms로 줄였고 JFR로 실시간 전송 과정의 락 경합 문제를 해결했다",
+      "업무 외적으로 선착순 예매 시스템(FlowTicket)을 AWS EKS에 직접 구축하고 10초 동안 10만 건의 진입 요청을 처리하는 부하 시험과 장애 대응을 검증했다",
+      "실무 ESS, 직무 준비 FlowTicket, KT DS 성장 목표 순으로 50~60초 안에 말하고, 강점은 추측보다 실제 지표로 원인을 찾고 변경 전후를 비교해 해결 여부를 검증하는 점이다"
+    ],
+    "commonMistakes": [
+      "ESS 고객 미팅이나 요금제·콘솔 기획처럼 인프라 운영·장애 분석과 거리가 먼 경험을 중심으로 소개한다",
+      "지원 회사에 맞춘다며 같은 경험의 사실이나 수치를 회사마다 다르게 말한다(강조점만 바꾼다)"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q1",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "ktds-motivation",
+    "difficulty": "intermediate",
+    "question": "KT DS에 지원한 이유는 무엇인가요? 다른 클라우드 기업이 아니라 왜 KT DS인지도 말씀해 주세요.",
+    "expectedPoints": [
+      "클라우드 인프라 구축뿐 아니라 서버, 네트워크, 데이터베이스의 성능과 장애까지 다루는 업무라는 점에 관심을 가졌다",
+      "현재 회사에서 백엔드 성능 문제를 분석·개선했지만 대규모 트래픽이나 인프라 장애 상황에서 안정성을 검증할 기회는 부족했다",
+      "이를 보완하려고 개인적으로 AWS EKS 환경을 구축해 부하 시험과 장애 대응을 경험했고, 실제 고객사의 다양한 클라우드 환경에서 인프라 운영 역량을 키우고 싶다",
+      "통신 IT 운영 경험을 기반으로 클라우드 인프라와 애플리케이션 성능 문제를 함께 다루는 곳이라 백엔드 장애 분석 경험도 활용할 수 있다"
+    ],
+    "commonMistakes": [
+      "백엔드 경험과 무관한 새 분야에 도전한다는 식으로 현재 경험과 성장 방향을 연결하지 않는다",
+      "이미 기업 규모의 클라우드 운영 경험이 충분하다고 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q2",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "backend-to-cloud-transition",
+    "difficulty": "intermediate",
+    "question": "백엔드 개발자에서 클라우드 엔지니어로 전환하려는 이유는 무엇인가요? 개발이 재미없어서 바꾸는 것인지도 말씀해 주세요.",
+    "expectedPoints": [
+      "기능 구현뿐 아니라 시스템이 안정적으로 동작하도록 만드는 과정에 더 흥미를 느꼈다",
+      "ESS 성능 문제를 해결하며 애플리케이션 내부뿐 아니라 서버 자원, 데이터베이스, 네트워크 환경이 서비스 성능에 영향을 준다는 점을 경험했다",
+      "FlowTicket을 직접 운영하며 Kubernetes 기반 확장과 장애 대응을 공부했고 인프라 운영 영역에서 전문성을 쌓겠다는 목표가 생겼다",
+      "개발 경험을 버리는 것이 아니라 애플리케이션 동작에 대한 이해를 기반으로 서비스 전체 운영과 안정성까지 전문성을 넓히는 것이다"
+    ],
+    "commonMistakes": [
+      "개발이 싫어서 옮긴다거나 개발 경험을 버린다는 식으로 답한다",
+      "백엔드 경력을 모두 클라우드 경력처럼 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q3",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "early-job-change-reason",
+    "difficulty": "intermediate",
+    "question": "입사 약 1년 만에 이직하려는 이유는 무엇인가요? 원하는 업무를 바로 맡지 못하면 또 이직할 것인지도 말씀해 주세요.",
+    "expectedPoints": [
+      "현재 회사에서 백엔드 개발뿐 아니라 고객 협의, 성능 개선, 배포 업무까지 경험하며 성장했다고 먼저 인정한다",
+      "그 과정에서 클라우드 인프라와 시스템 운영에 대한 관심이 커졌고 장기적으로 해당 분야의 전문성을 갖추겠다는 목표가 명확해졌다",
+      "원하는 직무 방향으로 성장할 환경에 도전하기에 지금이 적절한 시점이라고 판단했다고 20~30초로 간결하게 말한다",
+      "처음부터 원하는 기술만 다룰 수 있다고 생각하지 않으며 조직에 필요한 업무를 하면서 운영 환경과 기본기를 익혀 전문성을 쌓겠다"
+    ],
+    "commonMistakes": [
+      "현재 회사의 규모, 연봉, 기술에 대한 불만을 이직 사유의 핵심으로 삼는다",
+      "현재 회사에서 더 배울 기술이 없다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q4",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "experienced-applying-entry-level",
+    "difficulty": "intermediate",
+    "question": "현직 개발자인데 신입 전형에 지원한 이유는 무엇인가요? 신입 교육이나 반복적인 운영 업무도 괜찮은지 말씀해 주세요.",
+    "expectedPoints": [
+      "백엔드 실무 경험은 있지만 클라우드 인프라 운영 분야에서는 아직 배워야 할 부분이 많다",
+      "기존 경험은 활용할 수 있는 곳에 활용하되 새 직무의 기본기와 실제 운영 절차는 신입사원의 자세로 배우고 싶다",
+      "당장의 경력 인정이나 직급보다 어떤 분야의 전문성을 쌓을 수 있는지를 더 중요하게 판단했다",
+      "실제 운영 절차를 정확히 이해하는 것이 먼저이고 반복 업무에서도 개선할 부분을 찾을 수 있도록 충분히 익히겠다"
+    ],
+    "commonMistakes": [
+      "백엔드 경력을 근거로 클라우드 운영도 이미 경력자 수준이라고 말한다",
+      "신입 교육이나 반복 운영 업무를 배울 것이 없는 일로 취급한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q5",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "cloud-experience-gap-compensation",
+    "difficulty": "intermediate",
+    "question": "클라우드 실무 경험이 부족한 점은 어떻게 보완했나요? 개인 프로젝트와 기업 운영은 다르지 않은지도 말씀해 주세요.",
+    "expectedPoints": [
+      "회사에서는 대규모 클라우드 인프라를 운영할 기회가 부족해 퇴근 후 개인 프로젝트로 보완했다",
+      "FlowTicket을 Terraform으로 AWS EKS에 구축하고 GitHub Actions와 Argo CD로 배포 환경, HPA와 Cluster Autoscaler로 확장 환경을 구성했다",
+      "구축에서 끝내지 않고 10만 건의 진입 요청, 노드 장애, 롤링 배포, Redis 장애 등을 직접 재현하고 개선 결과를 검증했다",
+      "개인 프로젝트는 규모와 운영 조건이 제한적이라 기업 환경을 모두 경험했다고 보지 않으며, 직접 해 본 장애 재현·지표 분석·개선 검증을 실제 환경에서 발전시키고 싶다"
+    ],
+    "commonMistakes": [
+      "개인 프로젝트의 EKS 경험을 회사에서 운영한 것처럼 말하거나 기업 운영 환경과 같다고 단정한다",
+      "자격증으로 실무 경험을 모두 대체할 수 있다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q6",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "strongest-competency-metrics",
+    "difficulty": "intermediate",
+    "question": "가장 자신 있는 기술이나 역량은 무엇인가요? Kubernetes 역량은 어느 수준인지도 말씀해 주세요.",
+    "expectedPoints": [
+      "특정 기술 하나보다 성능 문제를 지표로 분석하고 개선하는 과정, 즉 문제가 생긴 계층을 구분하고 실제 데이터로 원인을 좁히는 역량에 자신 있다",
+      "ESS에서는 CPU 사용률에 여유가 있는데도 실시간 전송이 지연되는 문제를 JFR로 분석해 락 경합을 확인했다",
+      "FlowTicket에서는 Kubernetes 스케줄링 이벤트와 노드별 CPU 예약량을 비교해 Pod가 실행되지 않는 원인을 찾았다",
+      "Kubernetes는 Deployment, Service, Ingress, HPA, CA, 배치 정책, GitOps를 직접 구성하고 검증했지만 기업 규모 운영이나 내부 컴포넌트 개발 경험은 없어 계속 학습 중이라고 범위를 밝힌다"
+    ],
+    "commonMistakes": [
+      "Kubernetes를 기업 규모로 운영해 본 것처럼 경험 범위를 넘어 말한다",
+      "CPU 사용률에 여유가 있으면 성능 문제가 없다고 판단한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q7",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "ktds-growth-goal",
+    "difficulty": "intermediate",
+    "question": "KT DS 입사 후 성장 목표는 무엇인가요? 입사하면 가장 먼저 무엇을 공부할지도 말씀해 주세요.",
+    "expectedPoints": [
+      "입사 초기에는 KT DS의 클라우드 인프라 구성, 운영 절차, 장애 대응 체계를 익히는 데 집중한다",
+      "이후 서버, 네트워크, 데이터베이스에서 발생하는 문제를 종합적으로 분석하고 해결하는 역량을 갖춘다",
+      "장기적으로 반복 운영 업무를 자동화하고 장애 원인을 빠르게 파악할 수 있는 환경을 구축해 서비스 안정성과 운영 효율을 함께 높인다",
+      "가장 먼저 실제 아키텍처, 모니터링 체계, 장애 대응 절차를 공부해 학습한 기술이 고객 환경에서 어떻게 적용되는지 이해한다"
+    ],
+    "commonMistakes": [
+      "운영 환경을 익히기 전부터 자동화나 구조 개편을 하겠다고 답한다",
+      "학습한 기술을 고객 환경에 대한 이해 없이 그대로 적용하겠다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q8",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "gabia-self-introduction",
+    "difficulty": "intermediate",
+    "question": "가비아 클라우드 서비스기획 직무 기준으로 1분 자기소개를 해 주세요. 기획자로서 본인의 강점은 무엇인가요?",
+    "expectedPoints": [
+      "백엔드 개발자로 ESS 성능평가 시스템을 개발하면서 입사 6개월 차부터 고객사 미팅을 단독으로 담당했다(10회 이상)",
+      "고객 요구를 구현하는 데 그치지 않고 실제 사용 과정의 불편을 발견해 시험 결과 비교 기능을 직접 제안하고 반영했다",
+      "개인 프로젝트를 AWS EKS에서 운영하며 비용과 성능을 직접 비교했고 평시 노드를 5대에서 3대로 줄였다",
+      "강점은 개발 경험으로 구현 제약과 예외 상황을 고려할 수 있고, 고객 협의 경험으로 사용자와 개발팀 사이의 요구사항을 구체화할 수 있다는 점이다"
+    ],
+    "commonMistakes": [
+      "EKS 내부 구조나 Docker·GC 같은 기술 설명 위주로 소개한다",
+      "기술 경험을 고객 문제와 정책에 연결하지 않고 나열만 한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q9",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "cloud-service-planning-motivation",
+    "difficulty": "intermediate",
+    "question": "왜 클라우드 서비스기획 직무를 선택했나요? 개발을 하면서도 기획은 할 수 있지 않은지 말씀해 주세요.",
+    "expectedPoints": [
+      "ESS를 개발하며 요청 기능을 그대로 구현하기보다 실제로 해결해야 할 문제를 먼저 파악하는 일이 중요하다고 느꼈다",
+      "시험 비교 기능을 제안할 때 기능 구현 자체보다 고객의 불편을 발견하고 개선 방향을 정하는 과정에 흥미를 느꼈다",
+      "개인적으로 클라우드를 운영하며 비용과 자원 사용 현황을 직접 분석했고, 사용자가 필요한 정보를 쉽게 확인하고 의사결정할 수 있는 서비스를 기획하고 싶다",
+      "개발자도 제안할 수 있지만 서비스기획자는 고객 요구, 운영 정책, 화면 흐름, 개발 우선순위를 종합적으로 결정하는 역할이며 그 전문성을 쌓고 싶다"
+    ],
+    "commonMistakes": [
+      "개발 중에 하는 제안과 서비스기획자의 역할을 구분하지 못한다",
+      "문제 정의나 고객 가치 없이 기술 경험만 지원 이유로 든다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q10",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "gabia-motivation",
+    "difficulty": "intermediate",
+    "question": "가비아에 지원한 이유는 무엇인가요? 클라우드 외에 가비아의 다른 사업도 알고 있는지 말씀해 주세요.",
+    "expectedPoints": [
+      "자체 클라우드뿐 아니라 AWS 관리 서비스와 IDC도 제공해 고객의 다양한 인프라 환경과 요구사항을 경험할 수 있다는 점에 관심을 가졌다",
+      "제출 자기소개서에 쓴 AWS 태그별 비용 조회 기능과 Gen2 할인 플랜을 보며 고객이 비용과 할인 현황을 쉽게 이해하도록 만드는 부분에 관심이 생겼다",
+      "AWS에서 서비스를 운영하며 비용을 직접 분석·비교한 경험을 활용해 고객이 필요한 판단을 쉽게 내릴 수 있는 관리 콘솔을 기획하고 싶다",
+      "도메인, 호스팅, 하이웍스 같은 기업용 서비스도 제공하는 것으로 알고 있으며, 그중 기업 고객의 인프라 관리 관련 기획에서 전문성을 쌓고 싶다"
+    ],
+    "commonMistakes": [
+      "지원서에 쓴 관심 기능 대신 metrics-server나 IRSA 같은 기술 요소를 관심 기능으로 말한다",
+      "최신 제품 정책을 확인하지 않은 채 가비아 서비스의 세부 정책을 단정적으로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q11",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "fulltime-to-intern-reason",
+    "difficulty": "intermediate",
+    "question": "정규직으로 근무 중인데 채용연계형 인턴에 지원한 이유는 무엇인가요? 정규직 전환이 보장되지 않아도 괜찮은지 말씀해 주세요.",
+    "expectedPoints": [
+      "정규직에서 인턴으로 다시 시작한다는 점을 충분히 고민했다",
+      "당장의 고용 형태보다 어떤 직무에서 전문성을 쌓을 수 있는지가 더 중요하다고 판단했다",
+      "클라우드 서비스기획 분야에서 성장하겠다는 목표가 명확해 채용연계형 인턴 전형에도 지원했다",
+      "전환 보장이 없다는 점도 고려했고 인턴 기간 동안 실제 업무를 배우며 맡은 업무를 책임감 있게 수행해 역량을 보여 주겠다"
+    ],
+    "commonMistakes": [
+      "채용 가능성이 높아서, 책임이 적어서처럼 직무와 무관한 이유를 댄다",
+      "기술 경험을 길게 반복하고 성장 방향은 말하지 않는다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q12",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "gabia-cost-console-planning",
+    "difficulty": "intermediate",
+    "question": "가비아에서 어떤 서비스를 기획하고 싶나요? 단순한 화면 설계와는 무엇이 다른지도 말씀해 주세요.",
+    "expectedPoints": [
+      "클라우드 관리 콘솔의 비용 조회, 정산, 권한 정책 관련 업무를 맡고 싶다",
+      "AWS를 직접 운영하며 리소스별 비용은 확인할 수 있었지만 설정을 바꿨을 때 얼마나 절감되는지 비교하려면 직접 계산하고 분석해야 했다",
+      "고객이 사용량, 비용, 할인 적용 현황을 쉽게 이해하고 필요한 변경까지 진행할 수 있는 관리 콘솔을 기획하고 싶다",
+      "화면 뒤의 숫자 계산 기준, 단위, 조회 권한, 예외 정책, 고객이 다음에 수행할 작업까지 구체화해야 한다"
+    ],
+    "commonMistakes": [
+      "강의의 가상 콘솔 예시를 실제 가비아 화면이나 실제 운영 수치처럼 말한다",
+      "화면 배치만 설명하고 계산 기준, 권한, 예외 정책은 정의하지 않는다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q13",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "discount-utilization-vs-coverage",
+    "difficulty": "advanced",
+    "question": "할인 플랜의 사용률과 충당률은 어떻게 다른가요? 사용률이 100%인데 충당률이 40%라면 무슨 의미인지도 설명해 주세요.",
+    "expectedPoints": [
+      "사용률은 신청한 할인 혜택을 얼마나 활용했는지, 충당률은 전체 할인 대상 사용량 중 얼마나 할인을 받고 있는지 보는 지표다",
+      "두 지표는 분모가 달라 사용률이 높아도 충당률은 낮을 수 있다. 강의의 가상 예시로 약정 100h, 할인 대상 사용 200h, 적용 80h면 사용률은 80/100=80%, 충당률은 80/200=40%다",
+      "사용률 100%, 충당률 40%는 약정 혜택은 모두 썼지만 전체 할인 대상 사용량의 40%만 할인받고 있다는 뜻이고, 추가 약정은 향후 사용량과 조건까지 고려해야 한다",
+      "고객이 두 지표를 혼동하지 않도록 계산 기준과 의미를 명확히 안내해야 하며 실제 상품별 단위와 산식은 따로 확인해야 한다"
+    ],
+    "commonMistakes": [
+      "두 지표의 분모를 바꿔 사용률 40%, 충당률 80%로 계산한다",
+      "충당률이 낮으면 향후 사용량과 조건을 보지 않고 바로 약정을 늘리라고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q14",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "gabia-first-three-months",
+    "difficulty": "intermediate",
+    "question": "가비아 입사 후 첫 3개월 동안 무엇을 하겠습니까? 3년 뒤 어떤 기획자가 되고 싶은지도 말씀해 주세요.",
+    "expectedPoints": [
+      "가비아 Gen2와 AWS 관리 콘솔의 기능을 매뉴얼과 테스트 환경에서 직접 사용하며 서비스 구조와 운영 정책을 익힌다",
+      "비용 조회 메뉴의 요금 항목, 권한별 화면, 할인 미적용이나 중도 해지 같은 예외 상황을 확인하고 고객이 이해하기 어려운 부분을 정리한다",
+      "작은 기능이라도 요구사항과 정책을 구체화하고 개발팀과 협의하는 과정에 참여한다",
+      "3년 뒤에는 비용 관리 기능의 요구사항 분석부터 정책·화면 설계, 개발 협의, 출시 후 개선까지 책임지고, 자체 클라우드·AWS·물리 서버를 함께 쓰는 고객의 비용 관리 경험을 개선하고 싶다"
+    ],
+    "commonMistakes": [
+      "기존 서비스를 이해하기 전에 가격 정책을 독자적으로 개편하겠다고 답한다",
+      "고객 문의는 배제하고 Kubernetes 재구축 같은 내부 기술 작업부터 하겠다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q15",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "solo-customer-meeting-difficulty",
+    "difficulty": "intermediate",
+    "question": "고객사 미팅을 단독으로 담당하면서 가장 어려웠던 점은 무엇인가요? 미팅 중 모르는 내용이 나오면 어떻게 했는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "입사 6개월 차부터 단독 고객 미팅을 10회 이상 담당했고, 가장 어려웠던 점은 소통 자체보다 ESS 도메인 지식이 부족했던 것이다",
+      "전기 관련 용어와 시험 기준 이야기가 많아 처음에는 요구사항의 정확한 의미를 파악하기 어려웠다",
+      "시험 기준서와 장비 통신 명세서를 공부하고 이해하지 못한 부분은 고객과 장비 업체에 확인해, 이후 기능의 목적까지 이해하고 개발 방향을 협의할 수 있게 됐다",
+      "모르는 내용은 부정확한 답을 바로 주지 않고 확인 사항으로 정리해 기준서나 담당자에게 확인한 뒤 반영 범위를 다시 협의했다"
+    ],
+    "commonMistakes": [
+      "미팅 중 모르는 내용에 추측으로 바로 답한다",
+      "어려움을 인간관계 갈등이나 모든 기술 결정을 혼자 내린 일로 설명한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q16",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "customer-requirement-negotiation",
+    "difficulty": "advanced",
+    "question": "고객과 의견이 달라 다른 방향을 제안한 경험을 말씀해 주세요. 고객이 기존 방식을 고집했다면 어떻게 했을지도 말씀해 주세요.",
+    "expectedPoints": [
+      "ESS 결과 분석 화면에 일주일치 데이터를 초 단위로 한 번에 보여 달라는 요구가 있었지만 약 593만 건을 브라우저에서 처리해야 해 조회 성능과 화면 사용성에 문제가 생겼다",
+      "실제 사용 목적을 확인하고 전체 구간은 분 단위, 필요한 15분 구간은 초 단위로 조회하는 방식을 제안해 협의 후 반영했다(전체 추세와 상세 분리, 593만→9.9만 건)",
+      "이 구조로 조회시간을 3.26초에서 223ms로 개선했다",
+      "고객이 고집한다면 초 단위 전체 조회의 목적을 다시 확인하고 성능과 제공 범위의 장단점을 설명하며 원본 파일 제공 같은 대안을 검토하겠다(가정한 대응이며 실제로 추가한 기능은 아니다)"
+    ],
+    "commonMistakes": [
+      "초 단위 원본 데이터를 삭제하거나 조회 권한을 제한하는 방식으로 해결했다고 답한다",
+      "실제보다 큰 갈등을 꾸며 내어 고객과 대립한 이야기로 만든다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q17",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "proactive-feature-proposal",
+    "difficulty": "intermediate",
+    "question": "요구사항에 없던 기능을 먼저 제안한 경험이 있나요? 요청받지 않은 기능을 모두 추가하는 것이 좋은지도 말씀해 주세요.",
+    "expectedPoints": [
+      "ESS 성능평가 시스템에서 고객이 이전 시험과 현재 시험을 비교하려고 여러 화면을 반복해서 이동하는 모습을 확인했다",
+      "두 시험의 시작 시각이 달라 시험 시작 이후 경과시간을 기준으로 정렬하고 하나의 차트에서 비교하는 기능을 제안했다",
+      "고객과 협의해 실제 기능에 반영했고, 요청 구현뿐 아니라 사용 과정의 불편을 먼저 발견하는 것도 중요하다는 것을 배웠다",
+      "요청 없는 기능은 실제 사용 목적과 필요성을 확인하고 개발 비용과 기존 기능에 미치는 영향을 검토한 뒤 추가해야 한다"
+    ],
+    "commonMistakes": [
+      "두 시험을 날짜와 시각 그대로 겹치거나 모두 평균으로 비교했다고 답한다",
+      "요청하지 않은 기능도 많이 추가할수록 좋다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q18",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "responsibility-team-shrink-report",
+    "difficulty": "intermediate",
+    "question": "가장 책임감을 발휘한 경험을 말씀해 주세요. 혼자 무리한 것은 아니었는지도 설명해 주세요.",
+    "expectedPoints": [
+      "프로젝트 후반 개발 인원이 4명에서 1명으로 줄어든 상황에서 안전성 평가 보고서 양식이 전면 변경됐다",
+      "반드시 완료할 작업과 고객 확인이 필요한 작업을 구분하고, 미확정 항목은 데이터 출처, 산식, 단위, 출력 위치를 표로 정리해 고객에게 확인을 요청했다",
+      "회신을 기다리는 동안 다른 기능을 개발하고 산식과 출력 로직을 분리해 반복적인 양식 변경에 대응했으며 안정화 작업과 감리 대응까지 마무리했다",
+      "단순히 업무 시간을 늘리기보다 범위를 구분하고 고객 확인 항목을 정리해 불필요한 재작업을 줄이려 했다"
+    ],
+    "commonMistakes": [
+      "고객 회신이 올 때까지 개발을 멈추거나 미확정 기준을 개발자가 임의로 확정했다고 답한다",
+      "업무 시간을 늘린 것만 책임감의 근거로 든다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q19",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "requirement-prioritization",
+    "difficulty": "intermediate",
+    "question": "요구사항의 우선순위는 어떻게 정하나요? 고객이 모든 기능이 긴급하다고 하면 어떻게 하겠습니까?",
+    "expectedPoints": [
+      "서비스 핵심 기능에 영향을 주는 문제인지 먼저 확인하고 완료 기한과 다른 작업에 미치는 영향을 함께 고려한다",
+      "핵심 계산 오류나 서비스 중단은 우선 처리하고, 미확정 사항은 확인을 요청하며, 일반 화면이나 추가 기능은 가치·일정·의존성을 보고 정한다",
+      "ESS에서도 시험 결과의 정확성과 관련된 기능을 우선 확인하고 고객 추가 확인이 필요한 사항과 바로 개발할 수 있는 사항을 구분했다",
+      "일정 안에 모두 반영하기 어렵거나 모두 긴급하다고 하면 업무 영향, 의존 관계, 구현 시간을 정리해 설명하고 우선순위를 다시 합의한다"
+    ],
+    "commonMistakes": [
+      "고객 확인이 필요한 미확정 사항을 임의로 확정해 먼저 개발한다",
+      "영향 범위와 일정을 정리하지 않고 모든 요구사항을 일정 안에 반영하겠다고 약속한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q20",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "fivlo-dev-lead-role",
+    "difficulty": "intermediate",
+    "question": "FIVLO에서 개발팀장으로 어떤 역할을 했나요? 팀장이 모든 일을 직접 하는 것이 좋은지도 말씀해 주세요.",
+    "expectedPoints": [
+      "7명으로 구성된 대학 창업팀에서 FIVLO 개발팀장을 맡아 백엔드 개발 전반을 담당했다",
+      "사용자 인증, API, 데이터 모델링, AI 기반 타임어택 기능을 구현하고 서비스 출시를 목표로 개발팀 업무를 조율했다",
+      "프론트엔드 작업에 공백이 생겨 일부 화면을 직접 구현하고 나머지는 팀원과 분담했다(9개 화면 중 5개 직접, 4개 분담)",
+      "팀원이 각자 역할을 수행하도록 조율하는 것이 우선이고 공백이 생기면 필요한 부분을 함께 해결하는 것이 팀장 역할이며, 전체 일정과 팀 상황을 함께 확인해야 한다"
+    ],
+    "commonMistakes": [
+      "사업·디자인을 혼자 결정하거나 투자·인사까지 관리했다고 역할을 부풀린다",
+      "팀장이 공백을 모두 혼자 떠안는 것이 리더십이라고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q21",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "fivlo-lead-reason",
+    "difficulty": "intermediate",
+    "question": "FIVLO 개발팀장을 맡게 된 이유는 무엇인가요? 본인은 리더와 팔로워 중 어느 쪽에 가까운지도 말씀해 주세요.",
+    "expectedPoints": [
+      "백엔드를 담당하며 전체 서비스 구조와 기능별 연관 관계를 함께 파악하고 있었다",
+      "자신의 개발 업무뿐 아니라 다른 개발 업무의 진행 상황도 확인하고 서비스 출시까지 책임 있게 참여하고 싶어 팀장을 맡았다",
+      "필요한 역할에 맞춰 행동하는 편이며 팀장으로 일정을 조율한 경험과 팀원으로 맡은 기능을 책임지고 개발한 경험이 모두 있다"
+    ],
+    "commonMistakes": [
+      "팀장 역할을 일정 관리만 한 것으로 설명하고 개발과 출시 책임은 빠뜨린다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q22",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "fivlo-ai-response-cache",
+    "difficulty": "intermediate",
+    "question": "FIVLO에서 기술적으로 개선한 경험을 말씀해 주세요. Redis 캐시만으로는 충분하지 않았는지도 설명해 주세요.",
+    "expectedPoints": [
+      "타임어택은 사용자가 목표와 시간을 입력하면 AI가 수행 단계를 추천하는 기능이었고, 같은 조건으로 다시 요청해도 외부 AI API를 호출해 약 2.98초가 걸렸다",
+      "Redis 캐시와 최근 저장된 세션을 먼저 확인해 있으면 재사용하고 없으면 AI로 생성하도록 바꿨다",
+      "동일 조건 반복 요청의 응답시간을 2.98초에서 0.01초로 줄였고 외부 API 호출도 줄었다",
+      "사용자가 수정한 추천은 다시 생성할 수 있는 결과가 아니라 사용자 선택이 반영된 데이터이므로 저장하고 다시 조회하도록 설계했다"
+    ],
+    "commonMistakes": [
+      "0.01초를 첫 요청까지 포함한 모든 요청의 응답시간처럼 말한다(동일 조건 반복 요청 기준이다)",
+      "Timeout을 늘리거나 모든 사용자의 결과를 공유해 재사용하는 방식으로 해결했다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q23",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "umc-gps-outlier-filtering",
+    "difficulty": "intermediate",
+    "question": "UMC 활동에서 해결한 문제를 말씀해 주세요. 이동거리를 계산할 때 왜 시간을 함께 고려했는지도 설명해 주세요.",
+    "expectedPoints": [
+      "반려견 산책 서비스의 GPS 좌표가 순간적으로 튀거나 정지 상태의 작은 움직임이 누적돼 이동거리가 실제보다 길게 계산됐다",
+      "기존에는 좌표 간 거리만으로 판단해 시간 차이를 반영하지 못했으므로 거리와 시간으로 이동속도를 계산했다",
+      "15m/s를 초과하는 비정상 좌표와 정지 구간의 미세 이동을 제외하고 유효한 좌표로 PostGIS 공간 연산을 수행해 이동거리를 다시 계산했다",
+      "30m를 1초에 이동한 경우와 30초에 이동한 경우는 실제 이동 가능성이 다르기 때문이다"
+    ],
+    "commonMistakes": [
+      "15m/s를 보편적인 표준 기준처럼 말한다(해당 프로젝트에서 정한 기준이다)",
+      "시간으로 거리 계산을 완전히 대체했다거나 PostGIS에 시간이 필수라서 썼다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q24",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "sse-to-polling-lesson",
+    "difficulty": "advanced",
+    "question": "기술 선택이 잘못돼 개선한 경험을 말씀해 주세요. 같은 이유로 ESS에서도 SSE를 빼야 하는지 설명해 주세요.",
+    "expectedPoints": [
+      "FlowTicket에서 대기열 상태를 실시간으로 전달하려고 처음에는 SSE를 썼지만 Pod 메모리 한도가 1GiB인 환경에서 약 3,300~3,500개 연결에서 OOM이 발생했다",
+      "대기열 상태가 반드시 실시간이어야 하는지 다시 검토해 일정 간격 조회로도 사용자 경험에 큰 문제가 없다고 판단하고 Polling으로 바꾼 뒤 부하 시험을 다시 했다",
+      "처음에는 서버가 상태 변경을 직접 전달하는 방식이 효율적이라고 봤지만 연결 규모에 따른 메모리 비용을 충분히 검토하지 못했고, 기술 선택 시 운영 비용과 서비스 요구사항을 함께 봐야 한다는 것을 배웠다",
+      "ESS는 실시간 설비 상태 전달이 중요하고 병목도 락 경합이었으므로 SSE를 유지하고 전송 구조를 개선했다"
+    ],
+    "commonMistakes": [
+      "SSE는 항상 비효율적이라거나 메모리를 늘리면 항상 해결된다고 답한다",
+      "ESS도 FlowTicket과 같은 원인으로 Polling으로 바꿨다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q25",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "new-tech-learning-method",
+    "difficulty": "intermediate",
+    "question": "새로운 기술은 어떻게 학습하나요? AI를 활용해 공부하는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "공식 문서로 기술의 기본 동작 원리와 설정의 의미를 먼저 이해한다",
+      "실제로 활용하는 오픈소스 프로젝트를 살펴보고 자기 프로젝트 요구사항에 맞게 적용한다",
+      "정상 동작뿐 아니라 장애나 예외 상황에서도 의도대로 동작하는지 검증하고 기록하며, Argo CD 동기화 옵션을 공부할 때도 공식 문서와 실제 동작을 확인해 문서 수정에 기여했다",
+      "AI는 개념 이해와 조사 방향을 찾는 데 활용하고 설정과 실제 동작은 공식 문서와 직접 실행 결과로 확인한다"
+    ],
+    "commonMistakes": [
+      "AI가 알려 준 설정을 검증 없이 운영에 바로 반영한다",
+      "원리를 이해하지 않고 오픈소스 설정을 그대로 복사한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q26",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "weakness-overengineering-kafka",
+    "difficulty": "intermediate",
+    "question": "본인의 단점은 무엇인가요? 지금도 필요 이상으로 기술을 적용하는 편인지 말씀해 주세요.",
+    "expectedPoints": [
+      "새 기술 학습과 적용에 관심이 많아 초기에는 필요한 수준보다 복잡한 구조를 선택하는 경우가 있었다",
+      "FlowTicket에서 Kafka를 도입했지만 실제 메시지 처리 요구사항에 비해 운영 부담이 크다고 판단해 제거했다",
+      "이후에는 기술을 고르기 전에 해결할 문제와 필요한 기능을 정리하고 더 단순한 대안으로 요구사항을 만족할 수 있는지 확인한다",
+      "선택 이유, 대안, 포기하는 부분을 설계 결정 문서로 남기고 요구사항이나 측정 결과가 달라지면 다시 검토한다"
+    ],
+    "commonMistakes": [
+      "사용한 기술 수를 강점처럼 강조하거나 새 기술은 항상 거부한다고 극단적으로 답한다",
+      "단점만 말하고 개선 행동은 말하지 않거나 다른 사람의 오류를 지적한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q27",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "statistics-double-major",
+    "difficulty": "intermediate",
+    "question": "통계학을 전공하다 컴퓨터공학을 복수전공한 이유는 무엇인가요? 통계학이 클라우드 운영에 어떤 도움이 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "통계학을 공부하며 데이터를 분석하고 수치에 기반해 판단하는 과정에 관심을 갖게 됐다",
+      "그런 데이터를 실제로 처리하고 사용자에게 제공하는 시스템을 직접 만들고 싶어 컴퓨터공학을 복수전공했다",
+      "부하 시험에서 평균뿐 아니라 p95와 중앙값을 확인하고 변경 전후 결과를 비교하는 데 통계학의 수치 해석과 검증 방식을 활용한다",
+      "평균뿐 아니라 분포, 최대값, 백분위수를 함께 보는 데 도움이 되지만 기술적 원인 분석도 함께 해야 한다"
+    ],
+    "commonMistakes": [
+      "수치만으로 장애 원인을 확정하거나 통계로 기술 검증을 대체한다고 답한다",
+      "평균이 정상이면 장애가 없다고 판단한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q28",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "production-incident-first-response",
+    "difficulty": "intermediate",
+    "question": "운영 중 장애가 발생하면 어떻게 대응하겠습니까? 원인을 확정하기 전에 복구해도 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "장애가 발생한 서비스와 사용자 영향 범위를 먼저 확인하고 담당자와 공유한다",
+      "최근 배포나 설정 변경 여부를 확인하고 CPU, 메모리, 네트워크, 애플리케이션, DB 지표를 비교한다",
+      "서비스 영향이 크면 원인 규명 전에도 롤백이나 트래픽 전환 같은 안전한 복구 방안을 검토하고, 상황에 따라 복구와 원인 분석을 병행한다",
+      "복구 후에는 정합성을 확인하고 실제 원인을 정리해 같은 문제가 반복되지 않도록 개선하고 재검증한다"
+    ],
+    "commonMistakes": [
+      "원인이 완전히 확정될 때까지 복구를 보류한다",
+      "원인 확인 없이 서버부터 증설하거나 추정만 하고 대응을 끝낸다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q29",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "hard-customer-request-handling",
+    "difficulty": "intermediate",
+    "question": "고객이 개발하기 어려운 기능을 요청하면 어떻게 하겠습니까? 개발팀이 불가능하다고 하면 그대로 고객에게 전달하는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "고객이 그 기능으로 실제로 해결하고 싶은 문제가 무엇인지 먼저 확인해 요청 방식과 실제 목적을 분리한다",
+      "개발팀과 협의해 기술적 제약, 구현 범위, 필요한 일정을 파악한다",
+      "요청을 그대로 구현하기 어렵다면 같은 목적을 달성할 수 있는 대안을 마련하고 각각의 장단점을 고객에게 설명한다",
+      "개발팀이 불가능하다고 하면 어떤 제약 때문인지 이해하고 범위를 조정하거나 다른 방식으로 해결할 수 있는지 함께 검토한다"
+    ],
+    "commonMistakes": [
+      "목적을 확인하지 않고 요청을 그대로 구현하겠다고 먼저 확정한다",
+      "개발팀이 불가능하다고 하면 그대로 전달하고 논의를 끝낸다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q30",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "cloud-feature-planning-process",
+    "difficulty": "intermediate",
+    "question": "클라우드 신규 기능은 어떤 순서로 기획하나요? 정책서에는 어떤 내용이 들어가야 하는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "기능을 사용할 고객과 해결해야 할 문제를 먼저 정의한다",
+      "정상 사용 흐름뿐 아니라 권한이 없거나 필요한 데이터가 없는 상황 같은 예외 정책도 정리한다",
+      "화면과 기능 요구사항을 구체화해 개발팀과 구현 가능성·일정을 협의하고, 개발 후 정책대로 동작하는지 검증하며 출시 후 고객 문의와 사용 현황으로 개선한다",
+      "정책서에는 기능 목적, 적용 대상, 데이터 정의, 권한, 정상 흐름, 예외 상황, 검증 기준이 들어간다"
+    ],
+    "commonMistakes": [
+      "정책서를 색상·버튼·코딩 스타일이나 소스·관리자 권한을 적는 문서로 설명한다",
+      "정상 흐름만 정의하고 권한 없음이나 데이터 없음 같은 예외 정책을 빠뜨린다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q31",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "billing-console-mismatch-inquiry",
+    "difficulty": "intermediate",
+    "question": "고객이 비용 조회 화면과 실제 청구액이 다르다고 문의하면 어떻게 하겠습니까? 계산이 정상이라면 설명만 하면 되는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "조회 화면과 청구서의 대상 기간, 계정·태그 같은 리소스 범위가 같은지 먼저 확인한다",
+      "사용량 집계 시점, 단가, 할인 적용 여부, 세금·크레딧·조정 금액 등 계산 기준에 차이가 있는지 확인한다",
+      "실제 계산 오류면 개발·운영 담당자와 원인을 확인하고, 정상 값인데 고객이 혼동했다면 계산 기준이나 조회 조건을 화면에 더 명확히 표시하는 개선안을 검토한다",
+      "같은 문의가 반복되면 설명으로 끝내지 않고 안내 문구나 상세 내역 같은 정보 제공 방식 개선을 검토한다"
+    ],
+    "commonMistakes": [
+      "기준을 대조하지 않고 청구 오류로 확정하거나 콘솔을 즉시 수정한다",
+      "정상이라고 가정하고 사용법만 안내한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q32",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "dev-planning-conflict",
+    "difficulty": "intermediate",
+    "question": "개발팀과 기획팀의 의견이 충돌하면 어떻게 조율하겠습니까? 개발 경험이 있다고 개발팀 의견을 우선하지는 않을지도 말씀해 주세요.",
+    "expectedPoints": [
+      "서로 다른 의견이 나온 이유를 먼저 확인한다. 기획팀은 고객 요구를, 개발팀은 구현 복잡성·일정·운영 위험을 중요하게 볼 수 있다",
+      "고객이 반드시 필요로 하는 기능과 조정 가능한 기능을 구분하고 각 대안의 개발 범위와 서비스 영향을 비교한다",
+      "고객 가치, 구현 비용, 일정, 운영 위험처럼 양쪽이 공통으로 이해할 수 있는 기준을 마련해 합의점을 찾는다",
+      "개발 경험은 제약을 이해하는 데 활용하고 최종 판단은 고객 필요성, 서비스 가치, 운영 조건을 함께 고려한다"
+    ],
+    "commonMistakes": [
+      "구현이 쉬운 방식만 고르거나 개발팀 의견은 일정 조정에만 반영한다",
+      "개발 부담을 기획자가 혼자 해결하겠다고 답한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q33",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "ai-service-planning-boundaries",
+    "difficulty": "intermediate",
+    "question": "AI를 서비스기획에 적용할 때 무엇을 고려해야 하나요? 직접 만든 AI 기능은 어떻게 검증했는지도 말씀해 주세요.",
+    "expectedPoints": [
+      "가상 회사의 규정 문서 100개를 검색하고 IT 지원 요청을 접수하는 AI Agent(업무 도우미)를 개발했다",
+      "AI가 모든 것을 결정하지 않도록 문서 접근 권한과 규정 적용 시점은 서버에서 검증하고, 지원 요청은 사용자가 내용을 확인한 뒤 접수되게 했다",
+      "AI는 답변과 접수 초안, 서버는 권한·유효성·중복 검증, 사용자는 내용 확인과 최종 접수를 맡도록 어떤 판단을 누가 할지 먼저 정의해야 한다",
+      "평가에서 권한 없는 문서가 노출된 사례는 없었고 중복 클릭에도 요청이 한 건만 등록됐으며, 이는 제한된 평가 조건의 결과다"
+    ],
+    "commonMistakes": [
+      "AI가 권한 판단과 요청 접수까지 독자적으로 결정하게 한다",
+      "제한된 평가 조건의 결과를 실제 서비스에서도 권한 노출이 전혀 없다고 단정한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q34",
+    "sourceCommit": "notion:2026-11-28"
+  },
+  {
+    "topic": "Motivation_Collaboration",
+    "conceptKey": "closing-remarks",
+    "difficulty": "intermediate",
+    "question": "KT DS 면접을 마무리하며 마지막으로 하고 싶은 말을 해 주세요. 가비아 면접이라면 무엇을 다르게 말할지도 말씀해 주세요.",
+    "expectedPoints": [
+      "새 프로젝트 소개나 성과 반복보다 의지와 태도를 간결하게 말하고 감사 인사로 마무리한다",
+      "KT DS: 백엔드 개발 경험을 기반으로 클라우드 인프라 운영이라는 새 분야에 도전하고 있고, 아직 배울 부분이 많지만 부족한 경험은 개인 프로젝트를 구축하고 직접 검증하며 채워 왔다",
+      "KT DS: 입사 후에도 맡은 업무를 책임감 있게 수행하며 꾸준히 성장하겠다",
+      "가비아: 고객의 요구사항을 이해하고 실제 문제를 해결하는 과정에 흥미를 느꼈고, 개발 경험과 고객 협의 경험을 바탕으로 빠르게 적응해 맡은 업무에 기여하겠다"
+    ],
+    "commonMistakes": [
+      "마지막 말에서 새로운 프로젝트를 소개하거나 앞서 말한 성과를 길게 반복한다",
+      "배워야 할 부분은 인정하지 않고 이미 준비가 끝났다는 식으로 말한다"
+    ],
+    "sourceRef": "클라우드 면접 대비 15강 Q35",
+    "sourceCommit": "notion:2026-11-28"
   }
 ]

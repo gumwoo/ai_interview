@@ -292,7 +292,7 @@ SCHEDULED
 
 ### 5.6 질문 카테고리와 출처
 
-시드 질문은 사용자가 노션에 정리한 **클라우드 면접 대비 1~8강**을 근거로 만든다. 강의마다 실제 면접 답변, 기술 원리, 꼬리 질문이 있으므로 **경험과 원리를 함께 말로 설명하는 연습**이 목적이다.
+시드 질문은 사용자가 노션에 정리한 **클라우드 면접 대비 1~15강**을 근거로 만든다. 강의마다 실제 면접 답변, 기술 원리, 꼬리 질문이 있으므로 **경험과 원리를 함께 말로 설명하는 연습**이 목적이다.
 
 | 강의 | 주제(`topic`) | 질문 유형 |
 |---|---|---|
@@ -304,6 +304,13 @@ SCHEDULED
 | 6강 | CICD_GitOps | 배포 흐름, Argo CD, HPA 충돌, Rolling Update, Probe, preStop·ALB 502, 롤백 |
 | 7강 | Cloud_Security | IAM·STS, 최소 권한, ServiceAccount·RBAC, IRSA, Secrets Manager·ESO, State 민감정보 |
 | 8강 | Monitoring_Incident | Prometheus·Grafana, ServiceMonitor, PromQL·p95, 알림 규칙, CloudWatch 알림, 병목·JFR 분석, 장애 대응 순서, SLO·Runbook |
+| 9강 | Linux_Virtualization | 커널·System Call, 프로세스·스레드, Context Switching, Load Average, 가상 메모리·Swap, OOM, File Descriptor, Namespace·cgroups, VM과 컨테이너, 권한, 장애 명령어, 종료 신호 |
+| 10강 | DB_Redis_Messaging | RDS Multi-AZ, 인덱스·실행계획, 트랜잭션·격리 수준, 락, HikariCP, Redis ZSET·Lua, Pub/Sub·Kafka, Outbox, SSE·Polling, 멱등성 |
+| 11강 | FlowTicket_Project | 목표와 구조, EKS 선택, CPU Request 산정, Pending, 사전 확장, 대기열 분리, 배치 규칙, Redis 장애 격리, 롤링 배포 502·504, 결제 정합성, 기술 선택 회고 |
+| 12강 | ESS_Grid_Practice | ESS SSE 지연·JFR, 쿼리·차트 API 개선, 단위 정규화, 데이터 무결성, 보고서 변경, 독립계통 FastAPI·Compose·Alembic·백업, 변경 영향 분석 |
+| 13강 | AI_Incident_Analysis | 분석 도구 구조, 지표 시간 정렬, 규칙과 AI의 역할, 구조화 입출력, 프롬프트·반증, 근거 검증, 장애 주입 시험, 오탐, 초기 조사 시간, 자동 조치 금지 |
+| 14강 | Cost_CloudOps | 비용 구성, Request 조정 절감, NAT·RDS Multi-AZ 비용, 노드 축소 지연, 생성·삭제와 잔여 리소스, Budgets·Cost Explorer, 요금 모델, Right-sizing, 태그, SLO·RTO·RPO |
+| 15강 | Motivation_Collaboration | 자기소개·지원 동기, 직무 전환, 고객 미팅·요구사항 조율, 팀 리딩, 학습 방법·단점, 장애 첫 대응, 기획·개발 협업 |
 
 **질문 출처(v1):** 강의 기반 시드 질문으로 시작하고, 시드가 없거나 소진된 주제는 Claude가 생성한 질문을 `question_bank`에 저장해 재사용한다. 생성 질문의 참고 답안은 검증되지 않은 값이므로 `origin=GENERATED`로 구분한다.
 
@@ -656,7 +663,7 @@ ai-voice-interview/
 - [x] 상시 PC: 이 Windows 11 데스크톱, Docker Desktop. 자동 로그인은 쓰지 않음
 - [x] 모델: 기본 `claude-sonnet-5-5`. M3 평가로 결정
 - [x] 요금: Ultra, API 키 발급 완료, 자동 충전 금지
-- [x] 시드 질문: 노션 클라우드 면접 대비 1~8강 기반(처음에는 FlowTicket 문서 기반이었고 2026-11-26에 1~7강으로 교체, 2026-11-27에 8강 추가)
+- [x] 시드 질문: 노션 클라우드 면접 대비 1~15강 기반(처음에는 FlowTicket 문서 기반이었고 2026-11-26에 1~7강으로 교체, 2026-11-27에 8강, 2026-11-28에 9~15강 추가)
 - [x] ID 타입: PK는 `bigint`, `client_request_id`만 `uuid`
 
 **미결정·검증:**

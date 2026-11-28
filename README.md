@@ -1,6 +1,6 @@
 # AI Voice Interview
 
-평일 아침 전화처럼 울리는 알림을 받으면, AI가 음성으로 기술 면접을 진행하는 개인용 Android 앱입니다. 질문은 제가 정리한 클라우드 면접 대비 강의 8편(Docker, Kubernetes·EKS, 자원 관리·오토스케일링, AWS·네트워크, Terraform, CI/CD·GitOps, 클라우드 보안, 모니터링·장애 대응)에서 나옵니다.
+평일 아침 전화처럼 울리는 알림을 받으면, AI가 음성으로 기술 면접을 진행하는 개인용 Android 앱입니다. 질문은 제가 정리한 클라우드 면접 대비 강의 15편(Docker, Kubernetes·EKS, 자원 관리·오토스케일링, AWS·네트워크, Terraform, CI/CD·GitOps, 클라우드 보안, 모니터링·장애 대응, Linux·가상화, DB·Redis·메시징, FlowTicket 프로젝트, ESS·독립계통 실무, AI 장애 분석, 비용·클라우드 운영, 지원동기·협업 경험)에서 나옵니다.
 
 폴드에서 말로 면접을 끝까지 진행하고, 틀렸거나 일부만 맞힌 내용은 다음 면접에서 다시 묻습니다.
 
