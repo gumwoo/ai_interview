@@ -125,6 +125,23 @@ class SchemaMigrationTest {
 	}
 
 	@Test
+	void should_remove_lecture_15_seed_but_keep_other_questions_and_past_turns() {
+		long lecture15Seed = insertQuestion("Motivation_Collaboration", "old-motivation");
+		long otherSeed = insertQuestion("Kubernetes_EKS", "pod-creation-flow");
+		long sessionId = insertSession("MANUAL");
+		long turn = insertTurn(sessionId, 1, UUID.randomUUID());
+		jdbc.update("UPDATE session_turn SET question_id = ? WHERE id = ?", lecture15Seed, turn);
+
+		new ResourceDatabasePopulator(new ClassPathResource("db/migration/V5__resync_lecture_15_seed.sql"))
+			.execute(jdbc.getDataSource());
+
+		assertThat(jdbc.queryForList("SELECT id FROM question_bank", Long.class)).containsExactly(otherSeed);
+		assertThat(count("session_turn")).isEqualTo(1);
+		assertThat(jdbc.queryForObject("SELECT question_id FROM session_turn WHERE id = ?", Long.class, turn))
+			.isNull();
+	}
+
+	@Test
 	void should_have_index_on_every_foreign_key() {
 		assertThat(jdbc.queryForList(UNINDEXED_FOREIGN_KEYS, String.class)).isEmpty();
 	}
